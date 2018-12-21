@@ -1,0 +1,16 @@
+platform :ios, '10.0'
+use_frameworks!
+
+target 'VMLKit_Example' do
+  pod 'VMLKit', :path => '../'
+
+  pod 'SnapKit', '~> 4.0'
+  pod 'Alamofire', '~> 4.7'
+
+  target 'VMLKit_Tests' do
+    inherit! :search_paths
+
+    pod 'Quick', '~> 1.3.2'
+    pod 'Nimble', '~> 7.3.1'
+  end
+end
