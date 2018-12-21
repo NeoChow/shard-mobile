@@ -12,10 +12,9 @@ jobs:
     environment:
       _JAVA_OPTIONS: "-Xmx1500m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2"
 
-    working_directory: ~/repo/android
-
     steps:
       - checkout
+      - run: cd android
       - run: ./gradlew androidDependencies --no-daemon --max-workers 2
       - run: ./gradlew test --no-daemon --max-workers 2
 
@@ -23,10 +22,9 @@ jobs:
     macos:
       xcode: "10.0.0"
 
-    working_directory: ~/repo/ios
-
     steps:
       - checkout
+      - run: cd ios
       - run: xcodebuild test -workspace Example/VMLKit.xcworkspace -scheme VMLKit -destination 'platform=iOS Simulator,name=iPhone XR,OS=12.0'
 
 workflows:
