@@ -26,7 +26,7 @@ class JsonTest {
     @Test
     fun testGetJSONArrayOnObject() {
         val vml = VMLObject(mapOf("test" to JSONArray()))
-        assertTrue(vml.get("test") { it } is VMLObject)
+        assertTrue(vml.get("test") { it } is VMLArray)
     }
 
     @Test
