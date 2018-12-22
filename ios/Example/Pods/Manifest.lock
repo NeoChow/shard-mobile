@@ -1,5 +1,13 @@
 PODS:
   - Alamofire (4.8.0)
+  - AppCenter (1.12.0):
+    - AppCenter/Analytics (= 1.12.0)
+    - AppCenter/Crashes (= 1.12.0)
+  - AppCenter/Analytics (1.12.0):
+    - AppCenter/Core
+  - AppCenter/Core (1.12.0)
+  - AppCenter/Crashes (1.12.0):
+    - AppCenter/Core
   - Kingfisher (5.0.1)
   - Nimble (7.3.1)
   - Quick (1.3.2)
@@ -11,6 +19,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 4.8)
+  - AppCenter (~> 1.12)
   - Nimble (~> 7.3.1)
   - Quick (~> 1.3.2)
   - SnapKit (~> 4.2.0)
@@ -19,6 +28,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - AppCenter
     - Kingfisher
     - Nimble
     - Quick
@@ -31,6 +41,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
+  AppCenter: 4d27bdafd74b1b3e90946b9989fd6011a7e39c5e
   Kingfisher: 4f771421b9208185217550528a06fd48756cb7c2
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 2623cb30d7a7f41ca62f684f679586558f483d46
@@ -38,6 +49,6 @@ SPEC CHECKSUMS:
   VMLKit: bbc1599235d3d48470dced4b4899b1cd859a8bb5
   Yoga: aaae8abea68951f60bee05f6277d3eed90bb91bb
 
-PODFILE CHECKSUM: fe8ccb6b719fc147968c081c6b312e93586479e5
+PODFILE CHECKSUM: 7035004d3d7db579435587ef2419d0665e1f780d
 
 COCOAPODS: 1.6.0.beta.2
