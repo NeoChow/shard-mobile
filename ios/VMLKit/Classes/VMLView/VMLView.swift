@@ -14,14 +14,14 @@ public enum BorderRadius {
 
 public protocol VMLViewRequirements {
     func setTapHandler(_ onTap: @escaping () -> Void)
-    func setBackgroundColor(_ color: UIColor, forState state: UIControlState)
+    func setBackgroundColor(_ color: UIColor, forState state: UIControl.State)
     func setBorderRadius(_ radius: BorderRadius)
     func setBorderColor(_ color: UIColor)
     func setBorderWidth(_ width: Float)
 }
 
 public protocol Stateful {
-    func set(state: UIControlState)
+    func set(state: UIControl.State)
 }
 
 public typealias VMLView = UIView & VMLViewRequirements

@@ -1,19 +1,19 @@
 PODS:
-  - Alamofire (4.7.3)
-  - Kingfisher (4.10.0)
+  - Alamofire (4.8.0)
+  - Kingfisher (5.0.1)
   - Nimble (7.3.1)
   - Quick (1.3.2)
-  - SnapKit (4.0.1)
+  - SnapKit (4.2.0)
   - VMLKit (0.0.1):
-    - Kingfisher (~> 4.10.0)
+    - Kingfisher (~> 5.0.1)
     - Yoga (~> 1.9.0)
   - Yoga (1.9.0)
 
 DEPENDENCIES:
-  - Alamofire (~> 4.7)
+  - Alamofire (~> 4.8)
   - Nimble (~> 7.3.1)
   - Quick (~> 1.3.2)
-  - SnapKit (~> 4.0)
+  - SnapKit (~> 4.2.0)
   - VMLKit (from `../`)
 
 SPEC REPOS:
@@ -30,14 +30,14 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  Kingfisher: 43c4b802d8b5256cf1f4379e9cd10b329be6d3e2
+  Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
+  Kingfisher: 4f771421b9208185217550528a06fd48756cb7c2
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 2623cb30d7a7f41ca62f684f679586558f483d46
-  SnapKit: 0de968a9fec17499afa29683b05d0c775b6d1c29
-  VMLKit: e700eb35176a721bdbcc4d27dcbd11a1b0366bda
+  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
+  VMLKit: bbc1599235d3d48470dced4b4899b1cd859a8bb5
   Yoga: aaae8abea68951f60bee05f6277d3eed90bb91bb
 
-PODFILE CHECKSUM: e8fd8a89571ef9022d864473940771d0aba91d80
+PODFILE CHECKSUM: fe8ccb6b719fc147968c081c6b312e93586479e5
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.beta.2

@@ -5,12 +5,13 @@ Pod::Spec.new do |s|
   s.summary          = 'iOS implementation of https://visly.app'
   s.homepage         = 'https://visly.app'
   s.author           = { 'Visly Inc.' => 'emil@visly.app' }
-  s.source           = { :git => 'https://github.com/vislyhq/ios-vml-client.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/vislyhq/vml-mobile.git', :tag => s.version.to_s }
   s.license          = { :type => 'MIT' }
   
-  s.swift_version = '4.0'
+  s.swift_version = '4.2'
   s.source_files = 'VMLKit/Classes/**/*'
+  s.ios.deployment_target  = '10.0'
 
   s.dependency 'Yoga', '~> 1.9.0'
-  s.dependency 'Kingfisher', '~> 4.10.0'
+  s.dependency 'Kingfisher', '~> 5.0.1'
 end

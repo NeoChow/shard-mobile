@@ -9,9 +9,9 @@ import UIKit
 
 public class VMLBaseView: VMLView, Stateful {
     private var onTap: (() -> Void)? = nil
-    private var backgroundColors: [UIControlState : UIColor] = [:]
+    private var backgroundColors: [UIControl.State : UIColor] = [:]
     private var cornerRadius: BorderRadius = .Points(0)
-    private var state: UIControlState = .normal
+    private var state: UIControl.State = .normal
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("unsupported initializer")
@@ -79,14 +79,14 @@ public class VMLBaseView: VMLView, Stateful {
         self.onTap = onTap
     }
     
-    public func setBackgroundColor(_ color: UIColor, forState state: UIControlState) {
+    public func setBackgroundColor(_ color: UIColor, forState state: UIControl.State) {
         backgroundColors[state] = color
         if state == self.state {
             backgroundColor = color
         }
     }
     
-    public func set(state: UIControlState) {
+    public func set(state: UIControl.State) {
         self.state = state
         backgroundColor = backgroundColors[state] ?? backgroundColors[.normal]
     }

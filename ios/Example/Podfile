@@ -1,11 +1,11 @@
-platform :ios, '10.0'
+platform :ios, '12.0'
 use_frameworks!
 
 target 'VMLKit_Example' do
   pod 'VMLKit', :path => '../'
 
-  pod 'SnapKit', '~> 4.0'
-  pod 'Alamofire', '~> 4.7'
+  pod 'SnapKit', '~> 4.2.0'
+  pod 'Alamofire', '~> 4.8'
 
   target 'VMLKit_Tests' do
     inherit! :search_paths

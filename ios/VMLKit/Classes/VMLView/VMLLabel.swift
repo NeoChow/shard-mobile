@@ -8,17 +8,17 @@
 import UIKit
 
 internal class VMLLabel: UILabel, Stateful {
-    private var textColors: [UIControlState : UIColor] = [:]
-    private var state: UIControlState = .normal
+    private var textColors: [UIControl.State : UIColor] = [:]
+    private var state: UIControl.State = .normal
     
-    func setTextColor(_ color: UIColor, forState state: UIControlState) {
+    func setTextColor(_ color: UIColor, forState state: UIControl.State) {
         textColors[state] = color
         if state == self.state {
             textColor = color
         }
     }
     
-    func set(state: UIControlState) {
+    func set(state: UIControl.State) {
         self.state = state
         textColor = textColors[state] ?? textColors[.normal]
     }

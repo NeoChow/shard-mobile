@@ -24,7 +24,7 @@ public class VMLViewWrapper<T: UIView>: VMLBaseView {
         wrapping.frame = self.bounds
     }
     
-    override public func set(state: UIControlState) {
+    override public func set(state: UIControl.State) {
         super.set(state: state)
         
         if let wrapping = wrapping as? Stateful {

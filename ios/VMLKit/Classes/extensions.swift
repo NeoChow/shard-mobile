@@ -70,7 +70,7 @@ internal extension String {
     }
 }
 
-extension UIControlState: Hashable {
+extension UIControl.State: Hashable {
     public var hashValue: Int {
         return Int(rawValue)
     }
