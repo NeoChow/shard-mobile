@@ -12,6 +12,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
+
     defaultConfig {
         applicationId "app.visly.shards"
         minSdkVersion 23
@@ -19,7 +20,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "APPCENTER_SECRET", System.getenv('app-center-secret') ?: ""
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -43,6 +47,10 @@ dependencies {
     kapt "androidx.room:room-compiler:2.1.0-alpha03"
 
     implementation project(':core')
+
+    def appCenterSdkVersion = '1.11.0'
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
 }
 
 kotlin {

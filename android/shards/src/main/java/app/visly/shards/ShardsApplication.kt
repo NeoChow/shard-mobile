@@ -9,10 +9,16 @@ package app.visly.shards
 
 import android.app.Application
 import app.visly.VML
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.AppCenter
 
 class ShardsApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         VML.init(this)
+        if (!BuildConfig.APPCENTER_SECRET.isEmpty()) {
+            AppCenter.start(this, BuildConfig.APPCENTER_SECRET, Analytics::class.java, Crashes::class.java)
+        }
     }
 }
