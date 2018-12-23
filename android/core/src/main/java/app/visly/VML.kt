@@ -16,6 +16,14 @@ class VML {
         fun init(app: Application) {
             SoLoader.init(app, false)
             Fresco.initialize(app)
+
+            SoLoader.loadLibrary("vml")
         }
+    }
+
+    private external fun vmlhello(pattern: String): String
+
+    fun sayHello(to: String): String {
+        return vmlhello(to)
     }
 }
