@@ -58,8 +58,6 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shards_list)
 
-        Log.d("vml", VML().sayHello("awesome world"))
-
         if (isEmulator()) {
             val toolbar = findViewById<Toolbar>(R.id.toolbar)
             toolbar.inflateMenu(R.menu.activity_shards_list)

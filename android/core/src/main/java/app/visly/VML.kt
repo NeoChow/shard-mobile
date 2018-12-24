@@ -8,6 +8,7 @@
 package app.visly
 
 import android.app.Application
+import android.util.Log
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.soloader.SoLoader
 
@@ -18,12 +19,18 @@ class VML {
             Fresco.initialize(app)
 
             SoLoader.loadLibrary("vml")
+
+            VML().getKind("{\"kind\": \"test\"}", object : StringCallback {
+                override fun result(result: String) {
+                    Log.d("vml", result)
+                }
+            })
         }
     }
 
-    private external fun vmlhello(pattern: String): String
-
-    fun sayHello(to: String): String {
-        return vmlhello(to)
+    interface StringCallback {
+        fun result(result: String)
     }
+
+    external fun getKind(json: String, callback: StringCallback)
 }

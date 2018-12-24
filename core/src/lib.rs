@@ -26,24 +26,21 @@
 #[cfg(target_os="android")]
 pub mod android;
 
-use std::os::raw::{c_char};
+use std::os::raw::{c_char, c_void};
+use std::ptr;
 use std::ffi::{CString, CStr};
 
-#[no_mangle]
-pub extern fn vml_hello(to: *const c_char) -> *mut c_char {
-    let c_str = unsafe { CStr::from_ptr(to) };
-    let recipient = match c_str.to_str() {
-        Err(_) => "there",
-        Ok(string) => string,
-    };
-
-    CString::new("Hello ".to_owned() + recipient).unwrap().into_raw()
-}
+use json;
 
 #[no_mangle]
-pub extern fn vml_hello_free(s: *mut c_char) {
-    unsafe {
-        if s.is_null() { return }
-        CString::from_raw(s)
+pub extern fn vml_json_get_kind(json_str: *const c_char, context: *const c_void, callback: fn(*const c_void, *const c_char) -> ()) {
+    let json_str = unsafe { CStr::from_ptr(json_str).to_str().unwrap() };
+    let view = json::parse(json_str).unwrap();
+    match view["kind"] {
+        json::JsonValue::Short(ref value) => {
+            let kind = CString::new(value.as_str()).expect("CString::new failed");
+            callback(context, kind.as_ptr());
+        },
+        _ => callback(context, ptr::null()),
     };
 }

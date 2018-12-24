@@ -2,6 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-char *vml_hello(const char *to);
-
-void vml_hello_free(char *s);
+void vml_json_get_kind(const char *json_str,
+                       const void *context,
+                       void (*callback)(const void*, const char*));
