@@ -1,0 +1,16 @@
+[package]
+name = "ios"
+version = "0.1.0"
+authors = ["Emil Sjölander <emil@visly.app>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+core = { path = ".." }
+
+[profile.release]
+lto = true
+
+[lib]
+name = "vml"
+crate-type = ["staticlib"]

@@ -82,5 +82,5 @@ xcuserdata/
 *.dSYM
 
 # Rust
-core/target
+core/**/target
 **/*.rs.bk
