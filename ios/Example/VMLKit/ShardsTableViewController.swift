@@ -17,9 +17,23 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        VML.getKind(json: "{\"kind\": \"test\"}", result: StringCallback({ kind in
-            print(kind)
-        }))
+        let viewManager = VMLViewManager()
+        let view = viewManager.render(json: """
+            {
+                "root": {
+                    "kind": "test",
+                    "layout": {},
+                    "props": {"one": "hello", "two": "world"},
+                    "children": [
+                        {"kind": "test", "layout": {"width": {"unit": "points", "value": 50}, "height": {"unit": "points", "value": 50}}},
+                        {"kind": "test", "layout": {"width": {"unit": "points", "value": 50}, "height": {"unit": "points", "value": 50}}},
+                        {"kind": "test", "layout": {}}
+                    ]
+                }
+            }
+        """)
+        
+        print(view)
     
         if TARGET_OS_SIMULATOR == 0 {
             navigationItem.rightBarButtonItem = nil
