@@ -1,9 +1,9 @@
+use json::JsonValue;
+use std::any::Any;
 use std::collections::HashMap;
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::Number;
-use json::JsonValue;
-use std::any::Any;
 
 pub struct View {
     pub kind: String,
@@ -26,10 +26,15 @@ impl core::VMLView for View {
     }
 
     fn measure(&self, constraints: Size<Number>) -> Size<f32> {
-        Size { width: 100.0, height: 100.0 } 
+        Size {
+            width: 100.0,
+            height: 100.0,
+        }
     }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 }
 
 pub struct ViewManager {}
@@ -39,7 +44,12 @@ impl core::VMLViewManager for ViewManager {
         Box::new(View {
             kind: kind.to_string(),
             props: HashMap::new(),
-            frame: Rect { start: 0.0, end: 0.0, top: 0.0, bottom: 0.0 },
+            frame: Rect {
+                start: 0.0,
+                end: 0.0,
+                top: 0.0,
+                bottom: 0.0,
+            },
             child_count: 0,
         })
     }
