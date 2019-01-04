@@ -7,9 +7,8 @@ use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::*;
 
-extern crate jni;
-use self::jni::objects::{GlobalRef, JObject, JString, JValue};
-use self::jni::JNIEnv;
+use jni::objects::{GlobalRef, JObject, JString, JValue};
+use jni::JNIEnv;
 use jni::sys::{jlong, jobject};
 
 pub struct JavaObject {
