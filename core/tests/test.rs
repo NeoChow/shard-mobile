@@ -28,6 +28,8 @@ impl core::VMLView for View {
     fn measure(&self, constraints: Size<Number>) -> Size<f32> {
         Size { width: 100.0, height: 100.0 } 
     }
+
+    fn as_any(&self) -> &Any { self }
 }
 
 pub struct ViewManager {}

@@ -62,6 +62,8 @@ impl core::VMLView for IOSView {
         let set_frame = self.set_frame;
         set_frame(self.context, frame.start, frame.end, frame.top, frame.bottom);
     }
+
+    fn as_any(&self) -> &Any { self }
 }
 
 #[no_mangle]

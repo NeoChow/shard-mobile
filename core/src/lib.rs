@@ -11,7 +11,7 @@ pub trait VMLView: Any {
     fn set_prop(&mut self, key: &str, value: &JsonValue);
     fn set_frame(&mut self, frame: Rect<f32>);
     fn measure(&self, constraints: Size<Number>) -> Size<f32>;
-    fn as_any(&self) -> &Any where Self: Sized { self }
+    fn as_any(&self) -> &Any;
 }
 
 pub trait VMLViewManager {

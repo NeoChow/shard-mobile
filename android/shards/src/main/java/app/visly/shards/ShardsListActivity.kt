@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.visly.VML
+import app.visly.vml.ViewManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -57,6 +58,22 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shards_list)
+
+        val vm = ViewManager()
+        val view2 = vm.render("""{
+            "root": {
+                "kind": "hello",
+                "layout": {
+                    "width": {"unit": "points", "value": 100},
+                    "height": {"unit": "points", "value": 100}
+                },
+                "props": {"one": "hello", "two": "world"},
+                "children": [
+                    {"kind": "child1", "layout": {}},
+                    {"kind": "child1", "layout": {}}
+                ]
+            }
+        }""")
 
         if (isEmulator()) {
             val toolbar = findViewById<Toolbar>(R.id.toolbar)
