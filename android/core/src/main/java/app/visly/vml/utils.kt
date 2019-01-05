@@ -43,3 +43,5 @@ fun JsonValue.Object.toSips(ctx: Context): Float {
         else -> 0f
     }
 }
+
+fun String.quote(): String = "\"${this}\""

@@ -1,24 +1,90 @@
 package app.visly.vml.viewimpl
 
 import android.content.Context
+import android.view.View
+import android.widget.HorizontalScrollView
 import android.widget.ScrollView
-import app.visly.vml.JsonValue
-import app.visly.vml.Size
+import app.visly.vml.*
 
-class ScrollViewImpl(ctx: Context): BaseViewImpl<ScrollView>(ctx) {
+class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
+    private enum class Direction {
+        VERTICAL,
+        HORIZONTAL,
+    }
+
+    private var direction = Direction.VERTICAL
+    private var contentInset = 0
+    private var content: VMLView? = null
+
     override fun measure(width: Float?, height: Float?): Size {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val content = content
+        return if (content != null) {
+            val size = content.getSize()
+            Size(width ?: size.width, height ?: size.height)
+        } else {
+            Size(width ?: 0f, height ?: 0f)
+        }
     }
 
     override fun setProp(key: String, value: JsonValue) {
         super.setProp(key, value)
+
+        when (key) {
+            "direction" -> {
+                direction = when (value) {
+                    JsonValue.String("horizontal") -> Direction.HORIZONTAL
+                    JsonValue.String("vertical") -> Direction.VERTICAL
+                    else -> Direction.VERTICAL
+                }
+            }
+
+            "content-inset" -> {
+                contentInset = when (value) {
+                    is JsonValue.Object -> value.toDips(ctx).toInt()
+                    else -> 0
+                }
+            }
+
+            "content" -> {
+                content = when (value) {
+                    is JsonValue.Object -> VMLViewManager.instance.loadJson(ctx, value)
+                    else -> null
+                }
+            }
+        }
     }
 
-    override fun createView(): ScrollView {
-        return ScrollView(ctx)
+    override fun createView(): View {
+        val view = if (direction == Direction.VERTICAL) {
+            ScrollView(ctx)
+        } else {
+            HorizontalScrollView(ctx)
+        }
+
+        view.clipToPadding = false
+        view.isHorizontalScrollBarEnabled = false
+        view.isVerticalScrollBarEnabled = false
+        return view
     }
 
-    override fun bindView(view: ScrollView) {
+    override fun bindView(view: View) {
         super.bindView(view)
+        val view = if (direction == Direction.VERTICAL) {
+            view as ScrollView
+        } else {
+            view as HorizontalScrollView
+        }
+
+        view.setPadding(
+                if (direction == Direction.VERTICAL) 0 else contentInset,
+                if (direction == Direction.HORIZONTAL) 0 else contentInset,
+                if (direction == Direction.VERTICAL) 0 else contentInset,
+                if (direction == Direction.HORIZONTAL) 0 else contentInset)
+
+        view.removeAllViews()
+        val content = content?.getView(ctx)
+        if (content != null) {
+            view.addView(content)
+        }
     }
 }

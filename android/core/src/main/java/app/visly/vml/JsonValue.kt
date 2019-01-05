@@ -3,10 +3,11 @@ package app.visly.vml
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import java.lang.StringBuilder
 
 private fun JSONArray.toList(): List<JsonValue> {
     val list: MutableList<JsonValue> = mutableListOf()
-    for (i in 0..length()) {
+    for (i in 0 until length()) {
         list.add(JsonValue.from(get(i)))
     }
     return list
@@ -21,11 +22,25 @@ private fun JSONObject.toMap(): Map<String, JsonValue> {
 }
 
 sealed class JsonValue {
-    object Null : JsonValue()
-    data class String(val value: kotlin.String) : JsonValue()
-    data class Number(val value: Float) : JsonValue()
-    data class Object(val value: Map<kotlin.String, JsonValue>) : JsonValue()
-    data class Array(val value: List<JsonValue>) : JsonValue()
+    object Null : JsonValue() {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
+
+    data class String(val value: kotlin.String) : JsonValue()  {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
+
+    data class Number(val value: Float) : JsonValue() {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
+
+    data class Object(val value: Map<kotlin.String, JsonValue>) : JsonValue() {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
+
+    data class Array(val value: List<JsonValue>) : JsonValue() {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
 
     companion object {
         @JvmStatic fun parse(json: kotlin.String): JsonValue {
@@ -39,6 +54,37 @@ sealed class JsonValue {
                 is JSONObject -> Object(value.toMap())
                 is JSONArray -> Array(value.toList())
                 else -> Null
+            }
+        }
+
+        fun toJsonString(value: JsonValue): kotlin.String {
+            return when (value) {
+                is Null -> "null"
+                is String -> value.value.quote()
+                is Number -> value.value.toString()
+                is Object -> {
+                    val s = StringBuilder()
+                    s.append("{")
+                    var i = 0
+                    for (key in value.value.keys) {
+                        s.append(key.quote())
+                        s.append(":")
+                        s.append(value.value[key])
+                        if (i < value.value.size - 1) s.append(","); i++
+                    }
+                    s.append("}")
+                    s.toString()
+                }
+                is Array -> {
+                    val s = StringBuilder()
+                    s.append("[")
+                    for (i in 0 until value.value.size) {
+                        s.append(value.value[i])
+                        if (i < value.value.size - 1) s.append(",")
+                    }
+                    s.append("]")
+                    s.toString()
+                }
             }
         }
     }

@@ -42,11 +42,50 @@ class ShardActivity : AppCompatActivity() {
 
                 "children": [
                     {
-                        "kind": "text",
+                        "kind": "scroll",
 
                         "props": {
-                            "span": {
-                                "text": "hello world"
+                            "content": {
+                                "root": {
+                                    "kind": "flexbox",
+
+                                    "layout": {
+                                        "flex-direction": "column"
+                                    },
+
+                                    "children": [
+                                        {
+                                            "kind": "solid-color",
+
+                                            "props": {"background-color": "#ff0000"},
+
+                                            "layout": {
+                                                "width": {"unit": "points", "value": 400},
+                                                "height": {"unit": "points", "value": 400}
+                                            }
+                                        },
+                                        {
+                                            "kind": "solid-color",
+
+                                            "props": {"background-color": "#00ff00"},
+
+                                            "layout": {
+                                                "width": {"unit": "points", "value": 400},
+                                                "height": {"unit": "points", "value": 400}
+                                            }
+                                        },
+                                        {
+                                            "kind": "solid-color",
+
+                                            "props": {"background-color": "#0000ff"},
+
+                                            "layout": {
+                                                "width": {"unit": "points", "value": 400},
+                                                "height": {"unit": "points", "value": 400}
+                                            }
+                                        }
+                                    ]
+                                }
                             }
                         },
 

@@ -69,6 +69,10 @@ class VMLViewManager private constructor() {
         }
     }
 
+    fun loadJson(ctx: Context, json: JsonValue): VMLView {
+        return loadJson(ctx, json.toString())
+    }
+
     fun loadJson(ctx: Context, json: String): VMLView {
         assert(hasCalledInit) { "Must call VMLViewManager.init() from your Application class" }
         return render(ctx, json)
