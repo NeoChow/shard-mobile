@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package app.visly
+package app.visly.vml
 
 import android.graphics.Color
+import app.visly.vml.parseColor
 import com.facebook.soloader.SoLoader
 import org.junit.Test
 import org.junit.Assert.assertEquals

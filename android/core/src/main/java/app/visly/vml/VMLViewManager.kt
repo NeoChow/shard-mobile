@@ -18,7 +18,7 @@ import app.visly.vml.viewimpl.TextViewImpl
 import app.visly.vml.viewimpl.SolidColorViewImpl
 import app.visly.vml.viewimpl.ScrollViewImpl
 
-class VMLViewManager private constructor() {
+class VMLViewManager internal constructor() {
 
     companion object {
         private var hasCalledInit = false
@@ -32,19 +32,20 @@ class VMLViewManager private constructor() {
                 SoLoader.loadLibrary("vml")
 
                 instance = VMLViewManager()
+                instance.rustPtr = instance.bind()
                 hasCalledInit = true
             }
         }
     }
 
-    @DoNotStrip private var rustPtr = bind()
+    @DoNotStrip private var rustPtr: Long = 0
     private fun finalize() { free() }
     private external fun bind(): Long
     private external fun free()
     private external fun render(ctx: Context, json: String): VMLView
 
     private val httpClient = OkHttpClient()
-    private val implFactories: MutableMap<String, (Context) -> VMLViewImpl<View>> = mutableMapOf()
+    internal val implFactories: MutableMap<String, (Context) -> VMLViewImpl<View>> = mutableMapOf()
 
     init {
         setViewImpl("flexbox") { FlexboxViewImpl(it) }

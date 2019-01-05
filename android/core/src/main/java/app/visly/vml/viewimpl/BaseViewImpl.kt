@@ -5,10 +5,10 @@ import android.view.View
 import app.visly.vml.*
 
 abstract class BaseViewImpl<T: View>(val ctx: Context): VMLViewImpl<T> {
-    private var backgroundColor = 0
-    private var borderColor = 0
-    private var borderRadius = 0f
-    private var borderWidth = 0f
+    internal var backgroundColor = 0
+    internal var borderColor = 0
+    internal var borderRadius = 0f
+    internal var borderWidth = 0f
 
     override fun setProp(key: String, value: JsonValue) {
         when (key) {

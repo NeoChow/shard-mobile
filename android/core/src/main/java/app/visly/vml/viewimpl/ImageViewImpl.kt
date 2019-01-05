@@ -13,10 +13,10 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.image.ImageInfo
 
 class ImageViewImpl(ctx: Context): BaseViewImpl<SimpleDraweeView>(ctx) {
-    private var src: String? = null
-    private var scaleType = ScalingUtils.ScaleType.CENTER
-    private var roundingParams: RoundingParams? = null
-    private var imageSize = Size(0f, 0f)
+    internal var src: String? = null
+    internal var scaleType = ScalingUtils.ScaleType.CENTER
+    internal var roundingParams: RoundingParams? = null
+    internal var imageSize = Size(0f, 0f)
 
     override fun measure(width: Float?, height: Float?): Size {
         return Size(width ?: imageSize.width, height ?: imageSize.height)

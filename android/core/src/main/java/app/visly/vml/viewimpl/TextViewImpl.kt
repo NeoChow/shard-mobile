@@ -14,10 +14,10 @@ import com.facebook.fbui.textlayoutbuilder.TextLayoutBuilder
 import com.facebook.fbui.textlayoutbuilder.util.LayoutMeasureUtil
 
 class TextViewImpl(ctx: Context): BaseViewImpl<TextView>(ctx) {
-    private var textAlign: Int = TextView.TEXT_ALIGNMENT_TEXT_START
-    private var maxLines: Int = Integer.MAX_VALUE
-    private var spacingMultiplier: Float = 1.0f
-    private var textSpan: Spannable = SpannableString("")
+    internal var textAlign: Int = TextView.TEXT_ALIGNMENT_TEXT_START
+    internal var maxLines: Int = Integer.MAX_VALUE
+    internal var spacingMultiplier: Float = 1.0f
+    internal var textSpan: Spannable = SpannableString("")
 
     override fun measure(width: Float?, height: Float?): Size {
         val textMeasureMode = when (width) {

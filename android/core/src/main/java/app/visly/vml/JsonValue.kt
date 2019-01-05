@@ -30,6 +30,10 @@ sealed class JsonValue {
         override fun toString(): kotlin.String = JsonValue.toJsonString(this)
     }
 
+    data class Boolean(val value: kotlin.Boolean) : JsonValue() {
+        override fun toString(): kotlin.String = JsonValue.toJsonString(this)
+    }
+
     data class Number(val value: Float) : JsonValue() {
         override fun toString(): kotlin.String = JsonValue.toJsonString(this)
     }
@@ -50,6 +54,7 @@ sealed class JsonValue {
         @JvmStatic fun from(value: Any?): JsonValue {
             return when (value) {
                 is kotlin.String -> String(value)
+                is kotlin.Boolean -> Boolean(value)
                 is kotlin.Number -> Number(value.toFloat())
                 is JSONObject -> Object(value.toMap())
                 is JSONArray -> Array(value.toList())
@@ -61,6 +66,7 @@ sealed class JsonValue {
             return when (value) {
                 is Null -> "null"
                 is String -> value.value.quote()
+                is Boolean -> value.value.toString()
                 is Number -> value.value.toString()
                 is Object -> {
                     val s = StringBuilder()

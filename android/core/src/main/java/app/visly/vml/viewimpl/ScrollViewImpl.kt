@@ -7,14 +7,14 @@ import android.widget.ScrollView
 import app.visly.vml.*
 
 class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
-    private enum class Direction {
+    internal enum class Direction {
         VERTICAL,
         HORIZONTAL,
     }
 
-    private var direction = Direction.VERTICAL
-    private var contentInset = 0
-    private var content: VMLView? = null
+    internal var direction = Direction.VERTICAL
+    internal var contentInset = 0
+    internal var content: VMLView? = null
 
     override fun measure(width: Float?, height: Float?): Size {
         val content = content
