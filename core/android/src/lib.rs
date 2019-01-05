@@ -8,8 +8,8 @@ use stretch::geometry::Size;
 use stretch::number::*;
 
 use jni::objects::{GlobalRef, JObject, JString, JValue};
-use jni::JNIEnv;
 use jni::sys::{jlong, jobject};
+use jni::JNIEnv;
 
 pub struct JavaObject {
     instance: GlobalRef,
@@ -37,12 +37,17 @@ impl JavaObject {
 }
 
 impl core::VMLViewManager for JavaObject {
-    fn create_view(&self, kind: &str) -> Box<core::VMLView> {
+    fn create_view(&self, context: &Any, kind: &str) -> Box<core::VMLView> {
         let kind = self.env.new_string(kind).unwrap();
+        let context = context.downcast_ref::<GlobalRef>().unwrap();
+
         let j_view = self.call_method(
             "createView",
-            "(Ljava/lang/String;)Lapp/visly/vml/View;",
-            &[JValue::from(JObject::from(kind))],
+            "(Landroid/content/Context;Ljava/lang/String;)Lapp/visly/vml/VMLView;",
+            &[
+                JValue::from(context.as_obj()),
+                JValue::from(JObject::from(kind)),
+            ],
         );
         rust_obj(&self.env, j_view.l().unwrap())
     }
@@ -53,7 +58,7 @@ impl core::VMLView for JavaObject {
         let child = child.as_any().downcast_ref::<JavaObject>().unwrap();
         self.call_method(
             "addChild",
-            "(Lapp/visly/vml/View;)V",
+            "(Lapp/visly/vml/VMLView;)V",
             &[JValue::from(child.instance.as_obj())],
         );
     }
@@ -116,24 +121,34 @@ impl core::VMLView for JavaObject {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_ViewManager_bind(
+pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_bind(
     env: JNIEnv<'static>,
-    j_view_manager: JObject,
+    instance: JObject,
 ) -> jlong {
-    Box::into_raw(JavaObject::new(env, j_view_manager)) as jlong
+    Box::into_raw(JavaObject::new(env, instance)) as jlong
 }
 
 #[no_mangle]
-pub extern "C" fn Java_app_visly_vml_ViewManager_render(
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_free(
     env: JNIEnv<'static>,
-    _: JObject,
-    view_manager: jlong,
+    instance: JObject,
+) -> jlong {
+    let view_manager = rust_obj(&env, instance);
+}
+
+#[no_mangle]
+pub extern "C" fn Java_app_visly_vml_VMLViewManager_render(
+    env: JNIEnv<'static>,
+    instance: JObject,
+    context: JObject,
     json: JString,
 ) -> jobject {
-    let view_manager = unsafe { Box::from_raw(view_manager as *mut JavaObject) };
+    let view_manager = rust_obj(&env, instance);
+    let context = env.new_global_ref(context).unwrap();
 
     let json = env.get_string(json).unwrap();
-    let root = core::render_root(Box::leak(view_manager), json.to_str().unwrap());
+    let root = core::render_root(Box::leak(view_manager), &context, json.to_str().unwrap());
     let vml_view: &core::VMLView = &*root.view_node.vml_view;
 
     let view = vml_view.as_any().downcast_ref::<JavaObject>().unwrap();
@@ -143,9 +158,18 @@ pub extern "C" fn Java_app_visly_vml_ViewManager_render(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_View_bind(
+pub unsafe extern "C" fn Java_app_visly_vml_VMLView_bind(
     env: JNIEnv<'static>,
-    j_view: JObject,
+    instance: JObject,
 ) -> jlong {
-    Box::into_raw(JavaObject::new(env, j_view)) as jlong
+    Box::into_raw(JavaObject::new(env, instance)) as jlong
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_app_visly_vml_VMLView_free(
+    env: JNIEnv<'static>,
+    instance: JObject,
+) -> jlong {
+    let vml_view = rust_obj(&env, instance);
 }

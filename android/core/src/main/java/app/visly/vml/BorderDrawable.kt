@@ -1,15 +1,16 @@
-package app.visly
+package app.visly.vml
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import java.lang.Float.min
 
-class BorderDrawable: Drawable() {
+class BorderDrawable(val borderWidth: Float, borderColor: Int, val borderRadius: Float): Drawable() {
     private val borderPaint = Paint()
-    private var borderRadius = 0f
 
     init {
         borderPaint.style = Paint.Style.STROKE
+        borderPaint.strokeWidth = borderWidth
+        borderPaint.color = borderColor
     }
 
     override fun draw(canvas: Canvas) {
@@ -17,10 +18,10 @@ class BorderDrawable: Drawable() {
 
         canvas.drawRoundRect(
                 RectF(
-                    bounds.left.toFloat() + borderPaint.strokeWidth / 2,
-                    bounds.top.toFloat() + borderPaint.strokeWidth / 2,
-                    bounds.right.toFloat() - borderPaint.strokeWidth / 2,
-                    bounds.bottom.toFloat() - borderPaint.strokeWidth / 2),
+                        bounds.left.toFloat() + borderPaint.strokeWidth / 2,
+                        bounds.top.toFloat() + borderPaint.strokeWidth / 2,
+                        bounds.right.toFloat() - borderPaint.strokeWidth / 2,
+                        bounds.bottom.toFloat() - borderPaint.strokeWidth / 2),
                 radius,
                 radius,
                 borderPaint)
@@ -28,21 +29,6 @@ class BorderDrawable: Drawable() {
 
     override fun setAlpha(alpha: Int) {
         borderPaint.alpha = alpha
-        invalidateSelf()
-    }
-
-    fun setBorderWidth(borderWidth: Float) {
-        borderPaint.strokeWidth = borderWidth
-        invalidateSelf()
-    }
-
-    fun setBorderColor(borderColor: Int) {
-        borderPaint.color = borderColor
-        invalidateSelf()
-    }
-
-    fun setBorderRadius(borderRadius: Float) {
-        this.borderRadius = borderRadius
         invalidateSelf()
     }
 

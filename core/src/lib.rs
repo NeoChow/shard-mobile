@@ -15,7 +15,7 @@ pub trait VMLView: Any {
 }
 
 pub trait VMLViewManager {
-    fn create_view(&self, kind: &str) -> Box<VMLView>;
+    fn create_view(&self, context: &Any, kind: &str) -> Box<VMLView>;
 }
 
 pub struct ViewNode {
@@ -28,9 +28,9 @@ pub struct Root {
     pub stretch_node: stretch::style::Node,
 }
 
-pub fn render_root(platform: &VMLViewManager, json: &str) -> Root {
+pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str) -> Root {
     let json = json::parse(json).unwrap();
-    let mut root = render(platform, &json["root"]);
+    let mut root = render(platform, context, &json["root"]);
     set_frame(&mut root.view_node, &stretch::compute(&root.stretch_node));
     root
 }
@@ -50,17 +50,17 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
     }
 }
 
-fn render(platform: &VMLViewManager, view: &JsonValue) -> Root {
-    let mut vml_view = platform.create_view(view["kind"].as_str().expect("Expected kind"));
-    view["props"]
+fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
+    let mut vml_view = platform.create_view(context, json["kind"].as_str().expect("Expected kind"));
+    json["props"]
         .entries()
         .for_each(|(key, value)| vml_view.set_prop(key, value));
 
     let mut children: Vec<ViewNode> = vec![];
     let mut node_children: Vec<stretch::style::Node> = vec![];
 
-    view["children"].members().for_each(|child| {
-        let root = render(platform, child);
+    json["children"].members().for_each(|child| {
+        let root = render(platform, context, child);
         children.push(root.view_node);
         node_children.push(root.stretch_node);
     });
@@ -71,7 +71,7 @@ fn render(platform: &VMLViewManager, view: &JsonValue) -> Root {
         .iter()
         .for_each(|child| vml_view.add_child(&*child.vml_view));
 
-    let layout = match view["layout"] {
+    let layout = match json["layout"] {
         JsonValue::Object(ref value) => value,
         _ => panic!("Expected layout"),
     };
