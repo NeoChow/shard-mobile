@@ -22,12 +22,23 @@ fun parseColor(color: String): Int {
     } else color)
 }
 
-fun JsonValue.Object.toPixels(ctx: Context): Float {
+fun JsonValue.Object.toDips(ctx: Context): Float {
     val value = (this.value["value"] as JsonValue.Number).value
     val unit = this.value["unit"]
 
     return when (unit) {
         JsonValue.String("points") -> dipsToPixels(ctx, value)
+        JsonValue.String("pixels") -> value
+        else -> 0f
+    }
+}
+
+fun JsonValue.Object.toSips(ctx: Context): Float {
+    val value = (this.value["value"] as JsonValue.Number).value
+    val unit = this.value["unit"]
+
+    return when (unit) {
+        JsonValue.String("points") -> sipsToPixels(ctx, value)
         JsonValue.String("pixels") -> value
         else -> 0f
     }

@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import app.visly.vml.JsonValue
 import app.visly.vml.Size
-import app.visly.vml.toPixels
+import app.visly.vml.toDips
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils
@@ -45,7 +45,7 @@ class ImageViewImpl(ctx: Context): BaseViewImpl<SimpleDraweeView>(ctx) {
             "border-radius" -> {
                 roundingParams = when (value) {
                     JsonValue.String("max") -> RoundingParams.asCircle()
-                    is JsonValue.Object -> RoundingParams.fromCornersRadius(value.toPixels(ctx))
+                    is JsonValue.Object -> RoundingParams.fromCornersRadius(value.toDips(ctx))
                     else -> null
                 }
             }

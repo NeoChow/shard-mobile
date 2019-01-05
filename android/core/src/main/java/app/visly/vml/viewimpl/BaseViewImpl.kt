@@ -29,14 +29,14 @@ abstract class BaseViewImpl<T: View>(val ctx: Context): VMLViewImpl<T> {
             "border-radius" -> {
                 borderRadius = when (value) {
                     JsonValue.String("max") -> Float.MAX_VALUE
-                    is JsonValue.Object -> value.toPixels(ctx).toFloat()
+                    is JsonValue.Object -> value.toDips(ctx).toFloat()
                     else -> 0f
                 }
             }
 
             "border-width" -> {
                 borderWidth = when (value) {
-                    is JsonValue.Object -> value.toPixels(ctx).toFloat()
+                    is JsonValue.Object -> value.toDips(ctx).toFloat()
                     else -> 0f
                 }
             }

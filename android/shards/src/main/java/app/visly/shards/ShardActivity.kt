@@ -34,7 +34,6 @@ class ShardActivity : AppCompatActivity() {
         val vmlView = VMLViewManager.instance.loadJson(this,"""{
             "root": {
                 "kind": "flexbox",
-                "props": {"background-color": "#000000"},
 
                 "layout": {
                     "width": {"unit": "points", "value": 400},
@@ -43,11 +42,12 @@ class ShardActivity : AppCompatActivity() {
 
                 "children": [
                     {
-                        "kind": "image",
+                        "kind": "text",
 
                         "props": {
-                            "src": "https://placekitten.com/400/400",
-                            "border-radius": {"unit": "points", "value": 20}
+                            "span": {
+                                "text": "hello world"
+                            }
                         },
 
                         "layout": {
