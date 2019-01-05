@@ -19,8 +19,8 @@ class ShardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shard)
 
-//        val title = intent.extras!!.getString("title")!!
-//        val instance = intent.extras!!.getString("instance")!!
+        val title = intent.extras!!.getString("title")!!
+        val instance = intent.extras!!.getString("instance")!!
 //        val revision = intent.extras!!.getInt("revision")!!
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -31,74 +31,9 @@ class ShardActivity : AppCompatActivity() {
             finish()
         }
 
-        val vmlView = VMLViewManager.instance.loadJson(this,"""{
-            "root": {
-                "kind": "flexbox",
-
-                "layout": {
-                    "width": {"unit": "points", "value": 400},
-                    "height": {"unit": "points", "value": 400}
-                },
-
-                "children": [
-                    {
-                        "kind": "scroll",
-
-                        "props": {
-                            "content": {
-                                "root": {
-                                    "kind": "flexbox",
-
-                                    "layout": {
-                                        "flex-direction": "column"
-                                    },
-
-                                    "children": [
-                                        {
-                                            "kind": "solid-color",
-
-                                            "props": {"background-color": "#ff0000"},
-
-                                            "layout": {
-                                                "width": {"unit": "points", "value": 400},
-                                                "height": {"unit": "points", "value": 400}
-                                            }
-                                        },
-                                        {
-                                            "kind": "solid-color",
-
-                                            "props": {"background-color": "#00ff00"},
-
-                                            "layout": {
-                                                "width": {"unit": "points", "value": 400},
-                                                "height": {"unit": "points", "value": 400}
-                                            }
-                                        },
-                                        {
-                                            "kind": "solid-color",
-
-                                            "props": {"background-color": "#0000ff"},
-
-                                            "layout": {
-                                                "width": {"unit": "points", "value": 400},
-                                                "height": {"unit": "points", "value": 400}
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-
-                        "layout": {
-                            "width": {"unit": "percent", "value": 1},
-                            "height": {"unit": "percent", "value": 1}
-                        }
-                    }
-                ]
-            }
-        }""")
-
         val root: FrameLayout = findViewById(R.id.vml_root)
-        root.addView(vmlView.getView(this))
+        VMLViewManager.instance.loadUrl(this, instance) {
+            root.addView(it.getView(this))
+        }
     }
 }
