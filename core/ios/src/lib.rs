@@ -13,7 +13,7 @@ pub struct IOSViewManager {
 }
 
 impl core::VMLViewManager for IOSViewManager {
-    fn create_view(&self, kind: &str) -> Box<core::VMLView> {
+    fn create_view(&self, _: &Any, kind: &str) -> Box<core::VMLView> {
         let kind = CString::new(kind).unwrap();
         let create_view = self.create_view;
         let view = create_view(self.context, kind.as_ptr());
@@ -126,6 +126,7 @@ pub extern "C" fn vml_render(
 ) -> *const IOSView {
     let view_manager = unsafe { Box::from_raw(view_manager) };
     let json = unsafe { CStr::from_ptr(json).to_str().unwrap() };
-    let root = core::render_root(Box::leak(view_manager), json);
+    let context: Option<&Any> = None;
+    let root = core::render_root(Box::leak(view_manager), &context, json);
     Box::into_raw(root.view_node.vml_view) as *const IOSView
 }
