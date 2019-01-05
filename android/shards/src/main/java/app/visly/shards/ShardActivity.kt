@@ -36,52 +36,23 @@ class ShardActivity : AppCompatActivity() {
                 "kind": "flexbox",
                 "props": {"background-color": "#000000"},
 
-                "layout": {},
+                "layout": {
+                    "width": {"unit": "points", "value": 400},
+                    "height": {"unit": "points", "value": 400}
+                },
 
                 "children": [
                     {
-                        "kind": "solid-color",
+                        "kind": "image",
 
                         "props": {
-                            "background-color": "#ff0000",
-                            "border-color": "#ffffff",
-                            "border-width": {"unit": "points", "value": 1},
-                            "border-radius": {"unit": "points", "value": 10}
+                            "src": "https://placekitten.com/400/400",
+                            "border-radius": {"unit": "points", "value": 20}
                         },
 
                         "layout": {
-                            "width": {"unit": "points", "value": 100},
-                            "height": {"unit": "points", "value": 100}
-                        }
-                    },
-                    {
-                        "kind": "solid-color",
-
-                        "props": {
-                            "background-color": "#00ff00",
-                            "border-color": "#ffffff",
-                            "border-width": {"unit": "points", "value": 1},
-                            "border-radius": {"unit": "points", "value": 10}
-                        },
-
-                        "layout": {
-                            "width": {"unit": "points", "value": 100},
-                            "height": {"unit": "points", "value": 200}
-                        }
-                    },
-                    {
-                        "kind": "solid-color",
-
-                        "props": {
-                            "background-color": "#0000ff",
-                            "border-color": "#ffffff",
-                            "border-width": {"unit": "points", "value": 1},
-                            "border-radius": {"unit": "points", "value": 10}
-                        },
-
-                        "layout": {
-                            "width": {"unit": "points", "value": 100},
-                            "height": {"unit": "points", "value": 300}
+                            "width": {"unit": "percent", "value": 1},
+                            "height": {"unit": "percent", "value": 1}
                         }
                     }
                 ]

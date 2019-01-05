@@ -5,14 +5,14 @@ import android.graphics.Color
 
 data class Size(val width: Float, val height: Float)
 
-fun dipsToPixels(ctx: Context, dips: Float): Int {
+fun dipsToPixels(ctx: Context, dips: Float): Float {
     val scale = ctx.resources.displayMetrics.density
-    return Math.round(dips * scale)
+    return Math.round(dips * scale).toFloat()
 }
 
-fun sipsToPixels(ctx: Context, dips: Float): Int {
+fun sipsToPixels(ctx: Context, dips: Float): Float {
     val scale = ctx.resources.displayMetrics.scaledDensity
-    return Math.round(dips * scale)
+    return Math.round(dips * scale).toFloat()
 }
 
 // Patch android Color.parseColor() to handle #F00
@@ -22,13 +22,13 @@ fun parseColor(color: String): Int {
     } else color)
 }
 
-fun JsonValue.Object.toPixels(ctx: Context): Int {
+fun JsonValue.Object.toPixels(ctx: Context): Float {
     val value = (this.value["value"] as JsonValue.Number).value
     val unit = this.value["unit"]
 
     return when (unit) {
         JsonValue.String("points") -> dipsToPixels(ctx, value)
-        JsonValue.String("pixels") -> value.toInt()
-        else -> 0
+        JsonValue.String("pixels") -> value
+        else -> 0f
     }
 }
