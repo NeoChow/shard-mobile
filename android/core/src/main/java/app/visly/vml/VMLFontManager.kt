@@ -1,5 +1,11 @@
-package app.visly.vml
+/**
+ * Copyright (c) Visly Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
+package app.visly.vml
 
 import java.util.HashMap
 
