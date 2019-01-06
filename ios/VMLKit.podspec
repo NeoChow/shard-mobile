@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'VMLKit/Classes/**/*'
 
-  s.dependency 'Yoga', '~> 1.9.0'
   s.dependency 'Kingfisher', '~> 5.0.1'
 
   s.subspec 'VMLCore' do |core|
