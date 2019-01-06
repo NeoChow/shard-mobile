@@ -80,3 +80,7 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+
+# Rust
+core/**/target
+**/*.rs.bk

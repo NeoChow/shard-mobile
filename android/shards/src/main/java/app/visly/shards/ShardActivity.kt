@@ -8,10 +8,10 @@
 package app.visly.shards
 
 import android.os.Bundle
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import app.visly.VMLRootView
-import java.lang.IllegalArgumentException
+import app.visly.vml.VMLViewManager
 
 class ShardActivity : AppCompatActivity() {
 
@@ -23,10 +23,6 @@ class ShardActivity : AppCompatActivity() {
         val instance = intent.extras!!.getString("instance")!!
 //        val revision = intent.extras!!.getInt("revision")!!
 
-
-        val root: VMLRootView = findViewById(R.id.vml_root)
-        root.load(instance)
-
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.activity_shard)
         toolbar.title = title
@@ -35,14 +31,9 @@ class ShardActivity : AppCompatActivity() {
             finish()
         }
 
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.action_refresh -> {
-                    root.load(instance)
-                    true
-                }
-                else -> throw IllegalArgumentException()
-            }
+        val root: FrameLayout = findViewById(R.id.vml_root)
+        VMLViewManager.instance.loadUrl(this, instance) {
+            root.addView(it.getView(this))
         }
     }
 }

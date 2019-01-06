@@ -14,16 +14,29 @@
     "type": "MIT"
   },
   "swift_version": "4.2",
-  "source_files": "VMLKit/Classes/**/*",
   "platforms": {
     "ios": "10.0"
   },
+  "source_files": "VMLKit/Classes/**/*",
   "dependencies": {
-    "Yoga": [
-      "~> 1.9.0"
-    ],
     "Kingfisher": [
       "~> 5.0.1"
     ]
-  }
+  },
+  "subspecs": [
+    {
+      "name": "VMLCore",
+      "source_files": "Libraries/Headers/*.h",
+      "vendored_libraries": "Libraries/libvml.a",
+      "xcconfig": {
+        "HEADER_SEARCH_PATHS": "${PODS_ROOT}/VMLCore/Libraries/Headers"
+      },
+      "preserve_paths": [
+        "Libraries/libvml.a",
+        "Libraries/Headers/libvml.h"
+      ],
+      "public_header_files": "Libraries/Headers/*.h",
+      "requires_arc": false
+    }
+  ]
 }

@@ -25,9 +25,33 @@ jobs:
       - checkout
       - run: cd ios && xcodebuild test -workspace Example/VMLKit.xcworkspace -scheme VMLKit -destination 'platform=iOS Simulator,name=iPhone XR,OS=12.0'
 
+  core:
+    docker:
+      - image: rust:1
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: target-cache
+
+      - run: rustc --version; cargo --version; rustup --version
+      - run: rustup component add rustfmt
+      - run: cd core && cargo fmt -- --check
+      - run: cd core && cargo test
+      - run: cd core/android && cargo build
+      - run: cd core/ios && cargo build
+
+      - save_cache:
+          key: target-cache
+          paths:
+            - ~/.cargo
+            - ./target
+
 workflows:
   version: 2
   test_all:
     jobs:
       - android
       - ios
+      - core

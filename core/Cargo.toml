@@ -1,0 +1,10 @@
+[package]
+name = "core"
+version = "0.1.0"
+authors = ["Emil Sjölander <emil@visly.app>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+json = "0.11.13"
+stretch = "0.1.1"

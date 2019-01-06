@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "libvml.h"
 
 FOUNDATION_EXPORT double VMLKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char VMLKitVersionString[];

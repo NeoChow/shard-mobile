@@ -1,4 +1,3 @@
-
 Pod::Spec.new do |s|
   s.name             = 'VMLKit'
   s.version          = '0.0.1'
@@ -9,9 +8,18 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT' }
   
   s.swift_version = '4.2'
-  s.source_files = 'VMLKit/Classes/**/*'
   s.ios.deployment_target  = '10.0'
 
-  s.dependency 'Yoga', '~> 1.9.0'
+  s.source_files = 'VMLKit/Classes/**/*'
+
   s.dependency 'Kingfisher', '~> 5.0.1'
+
+  s.subspec 'VMLCore' do |core|
+    core.source_files = 'Libraries/Headers/*.h'
+    core.vendored_libraries = "Libraries/libvml.a"
+    core.xcconfig = { "HEADER_SEARCH_PATHS" => "${PODS_ROOT}/VMLCore/Libraries/Headers" }
+    core.preserve_paths = ["Libraries/libvml.a", "Libraries/Headers/libvml.h"]
+    core.public_header_files = "Libraries/Headers/*.h"
+    core.requires_arc = false
+  end
 end

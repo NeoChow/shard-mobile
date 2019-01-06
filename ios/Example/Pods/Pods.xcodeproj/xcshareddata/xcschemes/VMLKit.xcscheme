@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EACEFDF42E349D4E38948B28F74A0946"
+               BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
                BuildableName = "VMLKit.framework"
                BlueprintName = "VMLKit"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -56,7 +56,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EACEFDF42E349D4E38948B28F74A0946"
+            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
             BuildableName = "VMLKit.framework"
             BlueprintName = "VMLKit"
             ReferencedContainer = "container:Pods.xcodeproj">
@@ -78,7 +78,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EACEFDF42E349D4E38948B28F74A0946"
+            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
             BuildableName = "VMLKit.framework"
             BlueprintName = "VMLKit"
             ReferencedContainer = "container:Pods.xcodeproj">
@@ -96,7 +96,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EACEFDF42E349D4E38948B28F74A0946"
+            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
             BuildableName = "VMLKit.framework"
             BlueprintName = "VMLKit"
             ReferencedContainer = "container:Pods.xcodeproj">
