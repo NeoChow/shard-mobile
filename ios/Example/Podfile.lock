@@ -15,11 +15,8 @@ PODS:
   - VMLKit (0.0.1):
     - Kingfisher (~> 5.0.1)
     - VMLKit/VMLCore (= 0.0.1)
-    - Yoga (~> 1.9.0)
   - VMLKit/VMLCore (0.0.1):
     - Kingfisher (~> 5.0.1)
-    - Yoga (~> 1.9.0)
-  - Yoga (1.9.0)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8)
@@ -37,7 +34,6 @@ SPEC REPOS:
     - Nimble
     - Quick
     - SnapKit
-    - Yoga
 
 EXTERNAL SOURCES:
   VMLKit:
@@ -50,8 +46,7 @@ SPEC CHECKSUMS:
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 2623cb30d7a7f41ca62f684f679586558f483d46
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  VMLKit: b585297595f0bd0382dfea747668cbbff3e0b750
-  Yoga: aaae8abea68951f60bee05f6277d3eed90bb91bb
+  VMLKit: efa09285389c51f331347e4d5eb9d7644f7bcb73
 
 PODFILE CHECKSUM: 7035004d3d7db579435587ef2419d0665e1f780d
 

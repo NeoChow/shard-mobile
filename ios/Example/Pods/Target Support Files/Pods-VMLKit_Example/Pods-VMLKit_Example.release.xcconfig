@@ -1,10 +1,10 @@
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
-FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit" "${PODS_CONFIGURATION_BUILD_DIR}/VMLKit" "${PODS_CONFIGURATION_BUILD_DIR}/Yoga" "${PODS_ROOT}/AppCenter/AppCenter-SDK-Apple/iOS"
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit" "${PODS_CONFIGURATION_BUILD_DIR}/VMLKit" "${PODS_ROOT}/AppCenter/AppCenter-SDK-Apple/iOS"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire/Alamofire.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit/SnapKit.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/VMLKit/VMLKit.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Yoga/yoga.framework/Headers" ${PODS_ROOT}/VMLCore/Libraries/Headers
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire/Alamofire.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit/SnapKit.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/VMLKit/VMLKit.framework/Headers" ${PODS_ROOT}/VMLCore/Libraries/Headers
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
 LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/../../Libraries"
-OTHER_LDFLAGS = $(inherited) -ObjC -l"c++" -l"sqlite3" -l"vml" -l"z" -framework "Accelerate" -framework "Alamofire" -framework "AppCenter" -framework "AppCenterAnalytics" -framework "AppCenterCrashes" -framework "CFNetwork" -framework "CoreTelephony" -framework "Foundation" -framework "Kingfisher" -framework "SnapKit" -framework "SystemConfiguration" -framework "UIKit" -framework "VMLKit" -framework "yoga"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"c++" -l"sqlite3" -l"vml" -l"z" -framework "Accelerate" -framework "Alamofire" -framework "AppCenter" -framework "AppCenterAnalytics" -framework "AppCenterCrashes" -framework "CFNetwork" -framework "CoreTelephony" -framework "Foundation" -framework "Kingfisher" -framework "SnapKit" -framework "SystemConfiguration" -framework "UIKit" -framework "VMLKit"
 OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)

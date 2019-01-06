@@ -19,9 +19,6 @@
   },
   "source_files": "VMLKit/Classes/**/*",
   "dependencies": {
-    "Yoga": [
-      "~> 1.9.0"
-    ],
     "Kingfisher": [
       "~> 5.0.1"
     ]
