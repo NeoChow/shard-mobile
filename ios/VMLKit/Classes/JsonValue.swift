@@ -6,7 +6,6 @@
  */
  
 import Foundation
-import yoga
 
 public enum JsonValue {
     case Null
@@ -106,27 +105,6 @@ public extension Dictionary where Key == String, Value == JsonValue {
             return try callback(value)
         } else {
             return try callback(JsonValue.Null)
-        }
-    }
-}
-
-internal extension Dictionary where Key == String, Value == JsonValue {
-    func asYGValue() throws -> YGValue {
-        
-        let value: Float = try get("value") {
-            switch $0 {
-            case .Number(let value): return value
-            case let value: throw "Unexpected value: \(value)"
-            }
-        }
-        
-        return try get("unit") {
-            switch $0 {
-            case .String(let unit) where unit == "point": return YGValue(value: value, unit: .point)
-            case .String(let unit) where unit == "pixel": return YGValue(value: value / Float(UIScreen.main.scale), unit: .point)
-            case .String(let unit) where unit == "percent": return YGValue(value: value, unit: .percent)
-            case let unit: throw "Unexpected unit: \(unit)"
-            }
         }
     }
 }
