@@ -133,8 +133,8 @@ pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_bind(
 pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_free(
     env: JNIEnv<'static>,
     instance: JObject,
-) -> jlong {
-    let view_manager = rust_obj(&env, instance);
+) {
+    let _view_manager = rust_obj(&env, instance);
 }
 
 #[no_mangle]
@@ -170,6 +170,6 @@ pub unsafe extern "C" fn Java_app_visly_vml_VMLView_bind(
 pub unsafe extern "C" fn Java_app_visly_vml_VMLView_free(
     env: JNIEnv<'static>,
     instance: JObject,
-) -> jlong {
-    let vml_view = rust_obj(&env, instance);
+) {
+    let _vml_view = rust_obj(&env, instance);
 }

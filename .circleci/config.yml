@@ -39,6 +39,8 @@ jobs:
       - run: rustup component add rustfmt
       - run: cd core && cargo fmt -- --check
       - run: cd core && cargo test
+      - run: cd core/android && cargo build
+      - run: cd core/ios && cargo build
 
       - save_cache:
           key: target-cache
