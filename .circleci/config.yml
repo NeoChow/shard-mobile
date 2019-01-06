@@ -37,8 +37,8 @@ jobs:
 
       - run: rustc --version; cargo --version; rustup --version
       - run: rustup component add rustfmt
-      - run: cargo fmt -- --check
-      - run: cargo test
+      - run: cd core && cargo fmt -- --check
+      - run: cd core && cargo test
 
       - save_cache:
           key: target-cache
