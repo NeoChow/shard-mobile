@@ -14,7 +14,7 @@ To get started using `VML` in your Android app start by adding the jcenter depen
 
 ```groovy
 dependencies {
-    implementation 'app.visly.vml:core:0.1.1'
+    implementation 'app.visly.vml:core:0.1.2'
 }
 ```
 
