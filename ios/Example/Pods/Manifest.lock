@@ -12,10 +12,10 @@ PODS:
   - Nimble (7.3.1)
   - Quick (1.3.2)
   - SnapKit (4.2.0)
-  - VMLKit (0.0.1):
+  - VMLKit (0.1.1):
     - Kingfisher (~> 5.0.1)
-    - VMLKit/VMLCore (= 0.0.1)
-  - VMLKit/VMLCore (0.0.1):
+    - VMLKit/VMLCore (= 0.1.1)
+  - VMLKit/VMLCore (0.1.1):
     - Kingfisher (~> 5.0.1)
 
 DEPENDENCIES:
@@ -24,7 +24,7 @@ DEPENDENCIES:
   - Nimble (~> 7.3.1)
   - Quick (~> 1.3.2)
   - SnapKit (~> 4.2.0)
-  - VMLKit (from `../`)
+  - VMLKit (from `../../`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -37,7 +37,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   VMLKit:
-    :path: "../"
+    :path: "../../"
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
@@ -46,8 +46,8 @@ SPEC CHECKSUMS:
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 2623cb30d7a7f41ca62f684f679586558f483d46
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  VMLKit: efa09285389c51f331347e4d5eb9d7644f7bcb73
+  VMLKit: a6c3f29ffdcf32203f2d1d56118cd1ad4c86944d
 
-PODFILE CHECKSUM: 7035004d3d7db579435587ef2419d0665e1f780d
+PODFILE CHECKSUM: 8c4806b5965f0463b4ed875702934b889f1d7805
 
 COCOAPODS: 1.6.0.beta.2
