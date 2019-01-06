@@ -63,7 +63,7 @@ platform :ios, '11.0'
 use_frameworks!
 
 target 'ios' do
-  pod 'VMLKit', '~> 0.1.0'
+  pod 'VMLKit', '~> 0.1.2'
 end
 ```
 
