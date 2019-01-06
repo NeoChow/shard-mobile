@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 use core;
 
 use json::JsonValue;
@@ -174,9 +173,6 @@ pub unsafe extern "C" fn Java_app_visly_vml_VMLView_bind(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLView_free(
-    env: JNIEnv<'static>,
-    instance: JObject,
-) {
+pub unsafe extern "C" fn Java_app_visly_vml_VMLView_free(env: JNIEnv<'static>, instance: JObject) {
     let _vml_view = rust_obj(&env, instance);
 }
