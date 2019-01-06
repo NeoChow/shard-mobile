@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://visly.app'
   s.author           = { 'Visly Inc.' => 'emil@visly.app' }
   s.source           = { :git => 'https://github.com/vislyhq/vml-mobile.git', :tag => s.version.to_s }
-  s.license          = { :type => 'MIT' }
+  s.license          = { :type => 'MIT', :file => '../LICENSE' }
   
   s.swift_version = '4.2'
   s.ios.deployment_target  = '10.0'
