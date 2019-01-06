@@ -77,7 +77,7 @@ ext {
     siteUrl = 'https://visly.app'
     gitUrl = 'https://github.com/vislyhq/android-vml-client.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.1'
 
     developerId = 'visly'
     developerName = 'Visly'
@@ -144,8 +144,8 @@ artifacts {
 }
 
 Properties properties = new Properties()
-if (file("private.properties").exists()) {
-    properties.load(project.rootProject.file('private.properties').newDataInputStream())
+if (project.rootProject.file("local.properties").exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
 }
 
 bintray {
