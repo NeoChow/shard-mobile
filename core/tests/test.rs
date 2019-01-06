@@ -3,7 +3,7 @@ use std::any::Any;
 use std::collections::HashMap;
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
-use stretch::number::Number;
+use stretch::number::*;
 
 pub struct View {
     pub kind: String,
@@ -13,7 +13,7 @@ pub struct View {
 }
 
 impl core::VMLView for View {
-    fn add_child(&mut self, child: &core::VMLView) {
+    fn add_child(&mut self, _: &core::VMLView) {
         self.child_count += 1;
     }
 
@@ -27,8 +27,8 @@ impl core::VMLView for View {
 
     fn measure(&self, constraints: Size<Number>) -> Size<f32> {
         Size {
-            width: 100.0,
-            height: 100.0,
+            width: constraints.width.or_else(100.0),
+            height: constraints.height.or_else(100.0),
         }
     }
 
@@ -40,7 +40,7 @@ impl core::VMLView for View {
 pub struct ViewManager {}
 
 impl core::VMLViewManager for ViewManager {
-    fn create_view(&self, kind: &str) -> Box<core::VMLView> {
+    fn create_view(&self, _: &Any, kind: &str) -> Box<core::VMLView> {
         Box::new(View {
             kind: kind.to_string(),
             props: HashMap::new(),
