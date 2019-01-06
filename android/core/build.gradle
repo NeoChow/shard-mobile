@@ -75,16 +75,16 @@ ext {
     libraryDescription = 'Android VML client library'
 
     siteUrl = 'https://visly.app'
-    gitUrl = 'https://github.com/vislyhq/android-vml-client.git'
+    gitUrl = 'https://github.com/vislyhq/vml-mobile.git'
 
-    libraryVersion = '0.1.1'
+    libraryVersion = '0.1.2'
 
     developerId = 'visly'
     developerName = 'Visly'
     developerEmail = 'android@visly.app'
 
     licenseName = 'MIT'
-    licenseUrl = 'https://github.com/vislyhq/android-vml-client/blob/master/LICENSE'
+    licenseUrl = 'https://github.com/vislyhq/vml-mobile/blob/master/LICENSE'
     allLicenses = ["MIT"]
 }
 
