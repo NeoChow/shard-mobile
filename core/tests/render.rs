@@ -52,7 +52,7 @@ fn render_view_with_flex_direction() {
 #[test]
 fn render_view_with_size() {
     let context: Option<&Any> = None;
-    
+
     let root = core::render_root(
         &test::ViewManager {},
         &context,
@@ -87,7 +87,7 @@ fn render_view_with_size() {
 #[test]
 fn render_view_with_children() {
     let context: Option<&Any> = None;
-    
+
     let root = core::render_root(
         &test::ViewManager {},
         &context,
@@ -118,7 +118,7 @@ fn render_view_with_children() {
 #[test]
 fn render_view_with_props() {
     let context: Option<&Any> = None;
-    
+
     let root = core::render_root(
         &test::ViewManager {},
         &context,
@@ -147,7 +147,7 @@ fn render_view_with_props() {
 #[test]
 fn render_view_intrinsic_size() {
     let context: Option<&Any> = None;
-    
+
     let root = core::render_root(
         &test::ViewManager {},
         &context,
