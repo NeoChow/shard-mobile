@@ -1,5 +1,5 @@
 # VML Mobile libraries
-[![CircleCI](https://circleci.com/gh/vislyhq/vml-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/vml-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/android-vml-client/images/download.svg?version=0.1.2) ](https://bintray.com/visly/maven/android-vml-client/0.1.2/link)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/VMLKit/badge.png)](https://cocoadocs.org/docsets/VMLKit)
+[![CircleCI](https://circleci.com/gh/vislyhq/vml-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/vml-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/android-vml-client/images/download.svg) ](https://bintray.com/visly/maven/android-vml-client)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/VMLKit/badge.png)](https://cocoadocs.org/docsets/VMLKit)
 
 Mobile client libraries for https://visly.app. VML is currently in an experimental state so if you are interested in integrating it into your app please contact us at hello@visly.app so we can make sure it is a good fit and offer any assistance if needed.
 
