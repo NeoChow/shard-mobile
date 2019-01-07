@@ -47,7 +47,7 @@ class MainActivity : Activity() {
                     "height": {"unit": "points", "value": 200}
                 }
             }
-        }""")
+        }""", null, null)
 
         val root: FrameLayout = findViewById(R.id.vml_root)
         root.addView(result.getView(this))
@@ -87,7 +87,7 @@ class ViewController: UIViewController {
                 }
             }
         }
-        """)
+        """, width: nil, height: nil)
 
         self.view.addSubview(result.view)
     }
