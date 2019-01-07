@@ -7,6 +7,7 @@
 mod test;
 use std::any::Any;
 use stretch::geometry::Rect;
+use stretch::geometry::Size;
 
 #[test]
 fn render_view_of_kind() {
@@ -21,6 +22,7 @@ fn render_view_of_kind() {
             "layout": {}
         }
     }"#,
+        Size::undefined(),
     );
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -42,6 +44,7 @@ fn render_view_with_flex_direction() {
             }
         }
     }"#,
+        Size::undefined(),
     );
 
     assert_eq!(root.stretch_node.flex_direction, stretch::style::FlexDirection::Column);
@@ -63,6 +66,7 @@ fn render_view_with_size() {
             }
         }
     }"#,
+        Size::undefined(),
     );
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -86,6 +90,7 @@ fn render_view_with_children() {
             ]
         }
     }"#,
+        Size::undefined(),
     );
 
     assert_eq!(root.view_node.children.len(), 2);
@@ -112,6 +117,7 @@ fn render_view_with_props() {
             }
         }
     }"#,
+        Size::undefined(),
     );
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -132,6 +138,7 @@ fn render_view_intrinsic_size() {
             "layout": {}
         }
     }"#,
+        Size::undefined(),
     );
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
