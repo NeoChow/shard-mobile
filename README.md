@@ -10,9 +10,15 @@ This repo contains both the Android and iOS libraries for VML written in Kotlin/
 
 ## Getting started
 ### Android
-To get started using `VML` in your Android app start by adding the jcenter dependency.
+To get started using `VML` in your Android app start by adding our bintray maven repo and then the vml dependency itself.
 
 ```groovy
+repositories {
+    maven {
+        url  "https://dl.bintray.com/visly/maven"
+    }
+}
+
 dependencies {
     implementation 'app.visly.vml:core:0.1.4'
 }
