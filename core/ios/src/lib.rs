@@ -54,10 +54,7 @@ impl core::VMLView for IOSView {
         let width = constraints.width.or_else(f32::NAN);
         let height = constraints.height.or_else(f32::NAN);
         let size = measure(self.context, CSize { width, height });
-        Size {
-            width: size.width,
-            height: size.height,
-        }
+        Size { width: size.width, height: size.height }
     }
 
     fn set_prop(&mut self, key: &str, value: &JsonValue) {
@@ -69,13 +66,7 @@ impl core::VMLView for IOSView {
 
     fn set_frame(&mut self, frame: Rect<f32>) {
         let set_frame = self.set_frame;
-        set_frame(
-            self.context,
-            frame.start,
-            frame.end,
-            frame.top,
-            frame.bottom,
-        );
+        set_frame(self.context, frame.start, frame.end, frame.top, frame.bottom);
     }
 
     fn as_any(&self) -> &Any {
@@ -91,13 +82,7 @@ pub extern "C" fn vml_view_new(
     add_child: fn(*const c_void, *const c_void) -> (),
     measure: fn(*const c_void, CSize) -> CSize,
 ) -> *mut IOSView {
-    Box::into_raw(Box::new(IOSView {
-        context,
-        set_frame,
-        set_prop,
-        add_child,
-        measure,
-    }))
+    Box::into_raw(Box::new(IOSView { context, set_frame, set_prop, add_child, measure }))
 }
 
 #[no_mangle]
@@ -112,10 +97,7 @@ pub extern "C" fn vml_view_manager_new(
     context: *const c_void,
     create_view: fn(*const c_void, *const c_char) -> *mut IOSView,
 ) -> *const IOSViewManager {
-    Box::into_raw(Box::new(IOSViewManager {
-        context,
-        create_view,
-    }))
+    Box::into_raw(Box::new(IOSViewManager { context, create_view }))
 }
 
 #[no_mangle]
@@ -126,13 +108,18 @@ pub extern "C" fn vml_view_manager_free(view_manager: *mut IOSViewManager) {
 }
 
 #[no_mangle]
-pub extern "C" fn vml_render(
-    view_manager: *mut IOSViewManager,
-    json: *const c_char,
-) -> *const IOSView {
+pub extern "C" fn vml_render(view_manager: *mut IOSViewManager, json: *const c_char, size: CSize) -> *const IOSView {
     let view_manager = unsafe { Box::from_raw(view_manager) };
     let json = unsafe { CStr::from_ptr(json).to_str().unwrap() };
     let context: Option<&Any> = None;
-    let root = core::render_root(Box::leak(view_manager), &context, json);
+    let root = core::render_root(
+        Box::leak(view_manager),
+        &context,
+        json,
+        Size {
+            width: if size.width.is_nan() { Number::Undefined } else { Number::Defined(size.width) },
+            height: if size.height.is_nan() { Number::Undefined } else { Number::Defined(size.height) },
+        },
+    );
     Box::into_raw(root.view_node.vml_view) as *const IOSView
 }

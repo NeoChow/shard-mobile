@@ -34,10 +34,10 @@ pub struct Root {
     pub stretch_node: stretch::style::Node,
 }
 
-pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str) -> Root {
+pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str, size: Size<Number>) -> Root {
     let json = json::parse(json).unwrap();
     let mut root = render(platform, context, &json["root"]);
-    set_frame(&mut root.view_node, &stretch::compute(&root.stretch_node));
+    set_frame(&mut root.view_node, &stretch::compute(&root.stretch_node, size));
     root
 }
 
@@ -58,9 +58,7 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
 
 fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
     let mut vml_view = platform.create_view(context, json["kind"].as_str().expect("Expected kind"));
-    json["props"]
-        .entries()
-        .for_each(|(key, value)| vml_view.set_prop(key, value));
+    json["props"].entries().for_each(|(key, value)| vml_view.set_prop(key, value));
 
     let mut children: Vec<ViewNode> = vec![];
     let mut node_children: Vec<stretch::style::Node> = vec![];
@@ -73,9 +71,7 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
 
     let raw_vml_view = &*vml_view as *const VMLView;
 
-    children
-        .iter()
-        .for_each(|child| vml_view.add_child(&*child.vml_view));
+    children.iter().for_each(|child| vml_view.add_child(&*child.vml_view));
 
     let layout = match json["layout"] {
         JsonValue::Object(ref value) => value,
@@ -90,12 +86,8 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         },
 
         position_type: match layout["position"] {
-            JsonValue::Short(ref value) if value == "relative" => {
-                stretch::style::PositionType::Relative
-            }
-            JsonValue::Short(ref value) if value == "absolute" => {
-                stretch::style::PositionType::Absolute
-            }
+            JsonValue::Short(ref value) if value == "relative" => stretch::style::PositionType::Relative,
+            JsonValue::Short(ref value) if value == "absolute" => stretch::style::PositionType::Absolute,
             _ => Default::default(),
         },
 
@@ -107,24 +99,16 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
 
         flex_direction: match layout["flex-direction"] {
             JsonValue::Short(ref value) if value == "row" => stretch::style::FlexDirection::Row,
-            JsonValue::Short(ref value) if value == "row-reverse" => {
-                stretch::style::FlexDirection::RowReverse
-            }
-            JsonValue::Short(ref value) if value == "column" => {
-                stretch::style::FlexDirection::Column
-            }
-            JsonValue::Short(ref value) if value == "column-reverse" => {
-                stretch::style::FlexDirection::ColumnReverse
-            }
+            JsonValue::Short(ref value) if value == "row-reverse" => stretch::style::FlexDirection::RowReverse,
+            JsonValue::Short(ref value) if value == "column" => stretch::style::FlexDirection::Column,
+            JsonValue::Short(ref value) if value == "column-reverse" => stretch::style::FlexDirection::ColumnReverse,
             _ => Default::default(),
         },
 
         flex_wrap: match layout["flex-wrap"] {
             JsonValue::Short(ref value) if value == "nowrap" => stretch::style::FlexWrap::NoWrap,
             JsonValue::Short(ref value) if value == "wrap" => stretch::style::FlexWrap::Wrap,
-            JsonValue::Short(ref value) if value == "wrap-reverse" => {
-                stretch::style::FlexWrap::WrapReverse
-            }
+            JsonValue::Short(ref value) if value == "wrap-reverse" => stretch::style::FlexWrap::WrapReverse,
             _ => Default::default(),
         },
 
@@ -136,79 +120,41 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         },
 
         align_items: match layout["align-items"] {
-            JsonValue::Short(ref value) if value == "flex-start" => {
-                stretch::style::AlignItems::FlexStart
-            }
-            JsonValue::Short(ref value) if value == "flex-end" => {
-                stretch::style::AlignItems::FlexEnd
-            }
+            JsonValue::Short(ref value) if value == "flex-start" => stretch::style::AlignItems::FlexStart,
+            JsonValue::Short(ref value) if value == "flex-end" => stretch::style::AlignItems::FlexEnd,
             JsonValue::Short(ref value) if value == "center" => stretch::style::AlignItems::Center,
-            JsonValue::Short(ref value) if value == "baseline" => {
-                stretch::style::AlignItems::Baseline
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::AlignItems::Stretch
-            }
+            JsonValue::Short(ref value) if value == "baseline" => stretch::style::AlignItems::Baseline,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignItems::Stretch,
             _ => Default::default(),
         },
 
         align_self: match layout["align-self"] {
             JsonValue::Short(ref value) if value == "auto" => stretch::style::AlignSelf::Auto,
-            JsonValue::Short(ref value) if value == "flex-start" => {
-                stretch::style::AlignSelf::FlexStart
-            }
-            JsonValue::Short(ref value) if value == "flex-end" => {
-                stretch::style::AlignSelf::FlexEnd
-            }
+            JsonValue::Short(ref value) if value == "flex-start" => stretch::style::AlignSelf::FlexStart,
+            JsonValue::Short(ref value) if value == "flex-end" => stretch::style::AlignSelf::FlexEnd,
             JsonValue::Short(ref value) if value == "center" => stretch::style::AlignSelf::Center,
-            JsonValue::Short(ref value) if value == "baseline" => {
-                stretch::style::AlignSelf::Baseline
-            }
+            JsonValue::Short(ref value) if value == "baseline" => stretch::style::AlignSelf::Baseline,
             JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignSelf::Stretch,
             _ => Default::default(),
         },
 
         align_content: match layout["align-content"] {
-            JsonValue::Short(ref value) if value == "flex-start" => {
-                stretch::style::AlignContent::FlexStart
-            }
-            JsonValue::Short(ref value) if value == "flex-end" => {
-                stretch::style::AlignContent::FlexEnd
-            }
-            JsonValue::Short(ref value) if value == "center" => {
-                stretch::style::AlignContent::Center
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::AlignContent::Stretch
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::AlignContent::SpaceBetween
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::AlignContent::SpaceAround
-            }
+            JsonValue::Short(ref value) if value == "flex-start" => stretch::style::AlignContent::FlexStart,
+            JsonValue::Short(ref value) if value == "flex-end" => stretch::style::AlignContent::FlexEnd,
+            JsonValue::Short(ref value) if value == "center" => stretch::style::AlignContent::Center,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::Stretch,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::SpaceBetween,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::SpaceAround,
             _ => Default::default(),
         },
 
         justify_content: match layout["justify-content"] {
-            JsonValue::Short(ref value) if value == "flex-start" => {
-                stretch::style::JustifyContent::FlexStart
-            }
-            JsonValue::Short(ref value) if value == "flex-end" => {
-                stretch::style::JustifyContent::FlexEnd
-            }
-            JsonValue::Short(ref value) if value == "center" => {
-                stretch::style::JustifyContent::Center
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::JustifyContent::SpaceBetween
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::JustifyContent::SpaceAround
-            }
-            JsonValue::Short(ref value) if value == "stretch" => {
-                stretch::style::JustifyContent::SpaceEvenly
-            }
+            JsonValue::Short(ref value) if value == "flex-start" => stretch::style::JustifyContent::FlexStart,
+            JsonValue::Short(ref value) if value == "flex-end" => stretch::style::JustifyContent::FlexEnd,
+            JsonValue::Short(ref value) if value == "center" => stretch::style::JustifyContent::Center,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceBetween,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceAround,
+            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceEvenly,
             _ => Default::default(),
         },
 
@@ -245,20 +191,11 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
 
         flex_basis: parse_dimension(&layout["flex-basis"]),
 
-        size: Size {
-            width: parse_dimension(&layout["width"]),
-            height: parse_dimension(&layout["height"]),
-        },
+        size: Size { width: parse_dimension(&layout["width"]), height: parse_dimension(&layout["height"]) },
 
-        min_size: Size {
-            width: parse_dimension(&layout["min-width"]),
-            height: parse_dimension(&layout["min-height"]),
-        },
+        min_size: Size { width: parse_dimension(&layout["min-width"]), height: parse_dimension(&layout["min-height"]) },
 
-        max_size: Size {
-            width: parse_dimension(&layout["max-width"]),
-            height: parse_dimension(&layout["max-height"]),
-        },
+        max_size: Size { width: parse_dimension(&layout["max-width"]), height: parse_dimension(&layout["max-height"]) },
 
         aspect_ratio: match layout["aspect-ratio"] {
             JsonValue::Number(value) => Number::Defined(value.into()),
@@ -273,10 +210,7 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         children: node_children,
     };
 
-    Root {
-        view_node: ViewNode { vml_view, children },
-        stretch_node: stretch_node,
-    }
+    Root { view_node: ViewNode { vml_view, children }, stretch_node }
 }
 
 fn parse_dimension(json: &JsonValue) -> Dimension {
@@ -284,12 +218,8 @@ fn parse_dimension(json: &JsonValue) -> Dimension {
 
     match json["unit"] {
         JsonValue::Short(ref unit) if unit == "auto" => Dimension::Auto,
-        JsonValue::Short(ref unit) if unit == "points" => {
-            Dimension::Points(value.as_f32().unwrap())
-        }
-        JsonValue::Short(ref unit) if unit == "percent" => {
-            Dimension::Percent(value.as_f32().unwrap())
-        }
+        JsonValue::Short(ref unit) if unit == "points" => Dimension::Points(value.as_f32().unwrap()),
+        JsonValue::Short(ref unit) if unit == "percent" => Dimension::Percent(value.as_f32().unwrap()),
         _ => Default::default(),
     }
 }

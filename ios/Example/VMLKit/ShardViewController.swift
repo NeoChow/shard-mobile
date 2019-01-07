@@ -19,7 +19,7 @@ class ShardViewController: UIViewController {
     }
     
     @objc private func refresh() {
-        VMLViewManager.shared.loadUrl(url: url!) { result in
+        VMLViewManager.shared.loadUrl(url: url!, width: nil, height: nil) { result in
             self.root.addSubview(result.view)
         }
     }

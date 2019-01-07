@@ -17,7 +17,7 @@ typedef struct {
   CSize (*measure)(const void*, CSize);
 } IOSView;
 
-const IOSView *vml_render(IOSViewManager *view_manager, const char *json);
+const IOSView *vml_render(IOSViewManager *view_manager, const char *json, CSize size);
 
 void vml_view_free(IOSView *view);
 

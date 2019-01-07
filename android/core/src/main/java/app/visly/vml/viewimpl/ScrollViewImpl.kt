@@ -54,7 +54,7 @@ class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
 
             "content" -> {
                 content = when (value) {
-                    is JsonValue.Object -> VMLViewManager.instance.loadJson(ctx, value)
+                    is JsonValue.Object -> VMLViewManager.instance.loadJson(ctx, value, null, null)
                     else -> null
                 }
             }

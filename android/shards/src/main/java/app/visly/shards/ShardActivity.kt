@@ -32,7 +32,7 @@ class ShardActivity : AppCompatActivity() {
         }
 
         val root: FrameLayout = findViewById(R.id.vml_root)
-        VMLViewManager.instance.loadUrl(this, instance) {
+        VMLViewManager.instance.loadUrl(this, instance, null, null) {
             root.addView(it.getView(this))
         }
     }

@@ -32,10 +32,7 @@ impl core::VMLView for View {
     }
 
     fn measure(&self, constraints: Size<Number>) -> Size<f32> {
-        Size {
-            width: constraints.width.or_else(100.0),
-            height: constraints.height.or_else(100.0),
-        }
+        Size { width: constraints.width.or_else(100.0), height: constraints.height.or_else(100.0) }
     }
 
     fn as_any(&self) -> &Any {
@@ -50,12 +47,7 @@ impl core::VMLViewManager for ViewManager {
         Box::new(View {
             kind: kind.to_string(),
             props: HashMap::new(),
-            frame: Rect {
-                start: 0.0,
-                end: 0.0,
-                top: 0.0,
-                bottom: 0.0,
-            },
+            frame: Rect { start: 0.0, end: 0.0, top: 0.0, bottom: 0.0 },
             child_count: 0,
         })
     }

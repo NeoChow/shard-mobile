@@ -36,7 +36,7 @@ internal class ScrollViewImpl: BaseViewImpl {
             default: return self.direction = .vertical
             }
         case "content-inset": self.contentInset = try! value.asObject().asDimension()
-        case "content": self.content = VMLViewManager.shared.loadJson(value)
+        case "content": self.content = VMLViewManager.shared.loadJson(value, width: nil, height: nil)
         default: ()
         }
     }

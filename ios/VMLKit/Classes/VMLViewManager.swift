@@ -45,19 +45,20 @@ public class VMLViewManager {
         return VMLView(implFactories[kind]!())
     }
     
-    public func loadUrl(url: URL, onComplete: @escaping (VMLView) -> ()) {
-        self.defaultSession.dataTask(with: url) { data, response, httpError in
+    public func loadUrl(url: URL, width: Float?, height: Float?, onComplete: @escaping (VMLView) -> ()) {
+        let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
             let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
-            DispatchQueue.main.async { onComplete(self.loadJson(json)) }
+            DispatchQueue.main.async { onComplete(self.loadJson(json, width: width, height: height)) }
         }
+        task.resume()
     }
     
-    public func loadJson(_ json: JsonValue) -> VMLView {
-        return loadJson(json.toString())
+    public func loadJson(_ json: JsonValue, width: Float?, height: Float?) -> VMLView {
+        return loadJson(json.toString(), width: width, height: height)
     }
     
-    public func loadJson(_ json: String) -> VMLView {
-        let context = vml_render(self.rust_ptr, (json as NSString).utf8String)?.pointee.context
+    public func loadJson(_ json: String, width: Float?, height: Float?) -> VMLView {
+        let context = vml_render(self.rust_ptr, (json as NSString).utf8String, CSize(width: width ?? Float.nan, height: height ?? Float.nan))!.pointee.context
         return Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
     }
 }
