@@ -100,6 +100,11 @@ pub extern "C" fn vml_root_get_view(root: IOSRoot) -> *const c_void {
 }
 
 #[no_mangle]
+pub extern "C" fn vml_root_free(root: IOSRoot) {
+    let _root: Box<core::Root> = unsafe { Box::from_raw(root.root_ptr as *mut core::Root) };
+}
+
+#[no_mangle]
 pub extern "C" fn vml_view_new(
     context: *const c_void,
     set_frame: fn(*const c_void, f32, f32, f32, f32) -> (),

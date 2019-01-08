@@ -23,6 +23,8 @@ typedef struct {
 
 IOSRoot vml_render(IOSViewManager *view_manager, const char *json);
 
+void vml_root_free(IOSRoot root);
+
 const void *vml_root_get_view(IOSRoot root);
 
 void vml_root_measure(IOSRoot root, CSize size);

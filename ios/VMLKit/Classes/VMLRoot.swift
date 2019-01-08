@@ -14,6 +14,10 @@ public class VMLRoot {
         self.root = root
     }
     
+    deinit {
+        vml_root_free(self.root)
+    }
+    
     public func sizeThatFits(width: CGFloat?, height: CGFloat?) -> CGSize {
         vml_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)))
         let rootView: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(vml_root_get_view(root)!)).takeUnretainedValue()
