@@ -93,9 +93,11 @@ class ViewController: UIViewController {
                 }
             }
         }
-        """, width: nil, height: nil)
+        """)
 
-        self.view.addSubview(result.view)
+        let vmlRoot = VMLRootView(result)
+        vmlRoot.frame = self.view.frame
+        self.view.addSubview(vmlRoot)
     }
 }
 ```

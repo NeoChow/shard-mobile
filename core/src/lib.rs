@@ -34,11 +34,10 @@ pub struct Root {
     pub stretch_node: stretch::style::Node,
 }
 
-pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str, size: Size<Number>) -> Root {
-    let json = json::parse(json).unwrap();
-    let mut root = render(platform, context, &json["root"]);
-    set_frame(&mut root.view_node, &stretch::compute(&root.stretch_node, size));
-    root
+impl Root {
+    pub fn measure(&mut self, size: Size<Number>) {
+        set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size));
+    }
 }
 
 fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
@@ -54,6 +53,11 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
         let layout = &layout.children[i];
         set_frame(view_node, layout);
     }
+}
+
+pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str) -> Root {
+    let json = json::parse(json).unwrap();
+    render(platform, context, &json["root"])
 }
 
 fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
@@ -92,8 +96,8 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         },
 
         direction: match layout["direction"] {
-            JsonValue::Short(ref value) if value == "relative" => stretch::style::Direction::RTL,
-            JsonValue::Short(ref value) if value == "absolute" => stretch::style::Direction::LTR,
+            JsonValue::Short(ref value) if value == "rtl" => stretch::style::Direction::RTL,
+            JsonValue::Short(ref value) if value == "ltr" => stretch::style::Direction::LTR,
             _ => Default::default(),
         },
 
@@ -143,8 +147,8 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
             JsonValue::Short(ref value) if value == "flex-end" => stretch::style::AlignContent::FlexEnd,
             JsonValue::Short(ref value) if value == "center" => stretch::style::AlignContent::Center,
             JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::Stretch,
-            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::SpaceBetween,
-            JsonValue::Short(ref value) if value == "stretch" => stretch::style::AlignContent::SpaceAround,
+            JsonValue::Short(ref value) if value == "space-between" => stretch::style::AlignContent::SpaceBetween,
+            JsonValue::Short(ref value) if value == "space-around" => stretch::style::AlignContent::SpaceAround,
             _ => Default::default(),
         },
 
@@ -152,50 +156,62 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
             JsonValue::Short(ref value) if value == "flex-start" => stretch::style::JustifyContent::FlexStart,
             JsonValue::Short(ref value) if value == "flex-end" => stretch::style::JustifyContent::FlexEnd,
             JsonValue::Short(ref value) if value == "center" => stretch::style::JustifyContent::Center,
-            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceBetween,
-            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceAround,
-            JsonValue::Short(ref value) if value == "stretch" => stretch::style::JustifyContent::SpaceEvenly,
+            JsonValue::Short(ref value) if value == "space-between" => stretch::style::JustifyContent::SpaceBetween,
+            JsonValue::Short(ref value) if value == "space-around" => stretch::style::JustifyContent::SpaceAround,
+            JsonValue::Short(ref value) if value == "space-evenly" => stretch::style::JustifyContent::SpaceEvenly,
             _ => Default::default(),
         },
 
         position: Rect {
-            start: parse_dimension(&layout["start"]),
-            end: parse_dimension(&layout["end"]),
-            top: parse_dimension(&layout["top"]),
-            bottom: parse_dimension(&layout["bottom"]),
+            start: parse_dimension(&layout["start"], Dimension::Undefined),
+            end: parse_dimension(&layout["end"], Dimension::Undefined),
+            top: parse_dimension(&layout["top"], Dimension::Undefined),
+            bottom: parse_dimension(&layout["bottom"], Dimension::Undefined),
         },
 
         margin: Rect {
-            start: parse_dimension(&layout["margin-start"]),
-            end: parse_dimension(&layout["margin-end"]),
-            top: parse_dimension(&layout["margin-top"]),
-            bottom: parse_dimension(&layout["margin-bottom"]),
+            start: parse_dimension(&layout["margin-start"], parse_dimension(&layout["margin"], Dimension::Undefined)),
+            end: parse_dimension(&layout["margin-end"], parse_dimension(&layout["margin"], Dimension::Undefined)),
+            top: parse_dimension(&layout["margin-top"], parse_dimension(&layout["margin"], Dimension::Undefined)),
+            bottom: parse_dimension(&layout["margin-bottom"], parse_dimension(&layout["margin"], Dimension::Undefined)),
         },
 
         padding: Rect {
-            start: parse_dimension(&layout["padding-start"]),
-            end: parse_dimension(&layout["padding-end"]),
-            top: parse_dimension(&layout["padding-top"]),
-            bottom: parse_dimension(&layout["padding-bottom"]),
+            start: parse_dimension(&layout["padding-start"], parse_dimension(&layout["padding"], Dimension::Undefined)),
+            end: parse_dimension(&layout["padding-end"], parse_dimension(&layout["padding"], Dimension::Undefined)),
+            top: parse_dimension(&layout["padding-top"], parse_dimension(&layout["padding"], Dimension::Undefined)),
+            bottom: parse_dimension(
+                &layout["padding-bottom"],
+                parse_dimension(&layout["padding"], Dimension::Undefined),
+            ),
         },
 
         border: Rect {
-            start: parse_dimension(&layout["border-start"]),
-            end: parse_dimension(&layout["border-end"]),
-            top: parse_dimension(&layout["border-top"]),
-            bottom: parse_dimension(&layout["border-bottom"]),
+            start: parse_dimension(&layout["border-start"], parse_dimension(&layout["border"], Dimension::Undefined)),
+            end: parse_dimension(&layout["border-end"], parse_dimension(&layout["border"], Dimension::Undefined)),
+            top: parse_dimension(&layout["border-top"], parse_dimension(&layout["border"], Dimension::Undefined)),
+            bottom: parse_dimension(&layout["border-bottom"], parse_dimension(&layout["border"], Dimension::Undefined)),
         },
 
         flex_grow: layout["flex-grow"].as_f32().unwrap_or(0.0),
         flex_shrink: layout["flex-shrink"].as_f32().unwrap_or(1.0),
 
-        flex_basis: parse_dimension(&layout["flex-basis"]),
+        flex_basis: parse_dimension(&layout["flex-basis"], Dimension::Auto),
 
-        size: Size { width: parse_dimension(&layout["width"]), height: parse_dimension(&layout["height"]) },
+        size: Size {
+            width: parse_dimension(&layout["width"], Dimension::Auto),
+            height: parse_dimension(&layout["height"], Dimension::Auto),
+        },
 
-        min_size: Size { width: parse_dimension(&layout["min-width"]), height: parse_dimension(&layout["min-height"]) },
+        min_size: Size {
+            width: parse_dimension(&layout["min-width"], Dimension::Auto),
+            height: parse_dimension(&layout["min-height"], Dimension::Auto),
+        },
 
-        max_size: Size { width: parse_dimension(&layout["max-width"]), height: parse_dimension(&layout["max-height"]) },
+        max_size: Size {
+            width: parse_dimension(&layout["max-width"], Dimension::Auto),
+            height: parse_dimension(&layout["max-height"], Dimension::Auto),
+        },
 
         aspect_ratio: match layout["aspect-ratio"] {
             JsonValue::Number(value) => Number::Defined(value.into()),
@@ -213,13 +229,13 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
     Root { view_node: ViewNode { vml_view, children }, stretch_node }
 }
 
-fn parse_dimension(json: &JsonValue) -> Dimension {
+fn parse_dimension(json: &JsonValue, default: Dimension) -> Dimension {
     let value = &json["value"];
 
     match json["unit"] {
         JsonValue::Short(ref unit) if unit == "auto" => Dimension::Auto,
         JsonValue::Short(ref unit) if unit == "points" => Dimension::Points(value.as_f32().unwrap()),
         JsonValue::Short(ref unit) if unit == "percent" => Dimension::Percent(value.as_f32().unwrap()),
-        _ => Default::default(),
+        _ => default,
     }
 }

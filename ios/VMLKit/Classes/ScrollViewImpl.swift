@@ -15,11 +15,11 @@ internal enum Direction {
 internal class ScrollViewImpl: BaseViewImpl {
     internal var direction: Direction = .vertical
     internal var contentInset = Float(0)
-    internal var content: VMLView? = nil
+    internal var content: VMLRoot? = nil
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         if let content = content {
-            return CGSize(width: width ?? content.size.width, height: height ?? content.size.height)
+            return content.sizeThatFits(width: width, height: height)
         } else {
             return CGSize(width: width ?? 0, height: height ?? 0)
         }
@@ -36,7 +36,7 @@ internal class ScrollViewImpl: BaseViewImpl {
             default: return self.direction = .vertical
             }
         case "content-inset": self.contentInset = try! value.asObject().asDimension()
-        case "content": self.content = VMLViewManager.shared.loadJson(value, width: nil, height: nil)
+        case "content": self.content = VMLViewManager.shared.loadJson(value)
         default: ()
         }
     }
@@ -62,8 +62,11 @@ internal class ScrollViewImpl: BaseViewImpl {
         }
         
         if let content = self.content {
+            content.sizeToFit(
+                width: self.direction == .vertical ? view.frame.width : nil,
+                height: self.direction == .horizontal ? view.frame.height : nil)
             view.addSubview(content.view)
-            view.contentSize = content.size
+            view.contentSize = content.view.frame.size
         }
     }
 }

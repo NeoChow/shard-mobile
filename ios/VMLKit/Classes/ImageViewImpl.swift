@@ -37,10 +37,6 @@ internal class ImageViewImpl: BaseViewImpl {
     override func createView() -> UIView {
         let image = UIImageView()
         image.layer.masksToBounds = true
-        
-        let scale = UIScreen.main.scale
-        image.transform = CGAffineTransform.init(scaleX: 1 / scale, y: 1 / scale)
-        
         return image
     }
     
@@ -49,7 +45,7 @@ internal class ImageViewImpl: BaseViewImpl {
         
         let view = view as! UIImageView
         view.contentMode = contentMode
-        view.kf.setImage(with: src!) { result in
+        view.kf.setImage(with: src!, options: [.scaleFactor(UIScreen.main.scale)]) { result in
             if let image = result.value?.image {
                 self.imgSize = image.size
                 // TODO re-layout

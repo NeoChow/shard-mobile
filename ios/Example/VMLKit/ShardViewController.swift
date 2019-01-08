@@ -19,8 +19,12 @@ class ShardViewController: UIViewController {
     }
     
     @objc private func refresh() {
-        VMLViewManager.shared.loadUrl(url: url!, width: nil, height: nil) { result in
-            self.root.addSubview(result.view)
+        self.root.subviews.first?.removeFromSuperview()
+
+        VMLViewManager.shared.loadUrl(url: url!) { result in
+            let vmlRoot = VMLRootView(result)
+            vmlRoot.frame = self.root.frame
+            self.root.addSubview(vmlRoot)
         }
     }
 }

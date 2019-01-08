@@ -13,7 +13,7 @@ use stretch::geometry::Size;
 fn render_view_of_kind() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -22,8 +22,8 @@ fn render_view_of_kind() {
             "layout": {}
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.kind, "test");
@@ -33,7 +33,7 @@ fn render_view_of_kind() {
 fn render_view_with_flex_direction() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -44,8 +44,8 @@ fn render_view_with_flex_direction() {
             }
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     assert_eq!(root.stretch_node.flex_direction, stretch::style::FlexDirection::Column);
 }
@@ -54,7 +54,7 @@ fn render_view_with_flex_direction() {
 fn render_view_with_size() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -66,8 +66,8 @@ fn render_view_with_size() {
             }
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
@@ -77,7 +77,7 @@ fn render_view_with_size() {
 fn render_view_with_children() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -90,8 +90,8 @@ fn render_view_with_children() {
             ]
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     assert_eq!(root.view_node.children.len(), 2);
     assert_eq!(root.stretch_node.children.len(), 2);
@@ -104,7 +104,7 @@ fn render_view_with_children() {
 fn render_view_with_props() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -117,8 +117,8 @@ fn render_view_with_props() {
             }
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.props["one"], "\"hello\"");
@@ -129,7 +129,7 @@ fn render_view_with_props() {
 fn render_view_intrinsic_size() {
     let context: Option<&Any> = None;
 
-    let root = core::render_root(
+    let mut root = core::render_root(
         &test::ViewManager {},
         &context,
         r#"{
@@ -138,8 +138,8 @@ fn render_view_intrinsic_size() {
             "layout": {}
         }
     }"#,
-        Size::undefined(),
     );
+    root.measure(Size::undefined());
 
     let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
