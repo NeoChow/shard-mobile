@@ -224,6 +224,8 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         })),
 
         children: node_children,
+
+        ..Default::default()
     };
 
     Root { view_node: ViewNode { vml_view, children }, stretch_node }
