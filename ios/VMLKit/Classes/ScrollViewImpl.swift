@@ -15,11 +15,11 @@ internal enum Direction {
 internal class ScrollViewImpl: BaseViewImpl {
     internal var direction: Direction = .vertical
     internal var contentInset = Float(0)
-    internal var content: VMLView? = nil
+    internal var content: VMLRoot? = nil
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         if let content = content {
-            return CGSize(width: width ?? content.size.width, height: height ?? content.size.height)
+            return content.measure(width: width, height: height)
         } else {
             return CGSize(width: width ?? 0, height: height ?? 0)
         }
@@ -36,13 +36,16 @@ internal class ScrollViewImpl: BaseViewImpl {
             default: return self.direction = .vertical
             }
         case "content-inset": self.contentInset = try! value.asObject().asDimension()
-        case "content": self.content = VMLViewManager.shared.loadJson(value, width: nil, height: nil)
+        case "content": self.content = VMLViewManager.shared.loadJson(value)
         default: ()
         }
     }
     
     override func createView() -> UIView {
-        return UIScrollView()
+        let scroll = UIScrollView()
+        let contentRoot = VMLRootView()
+        scroll.addSubview(contentRoot)
+        return scroll
     }
     
     override func bindView(_ view: UIView) {
@@ -61,9 +64,17 @@ internal class ScrollViewImpl: BaseViewImpl {
             view.contentOffset = CGPoint(x: -inset, y: 0)
         }
         
+        
         if let content = self.content {
-            view.addSubview(content.view)
-            view.contentSize = content.size
+            let contentRoot = view.subviews[0] as! VMLRootView
+            
+            let size = content.layout(
+                width: self.direction == .vertical ? view.frame.width : nil,
+                height: self.direction == .horizontal ? view.frame.height : nil)
+            
+            contentRoot.frame = CGRect(origin: .zero, size: size)
+            view.contentSize = size
+            contentRoot.setRoot(content)
         }
     }
 }

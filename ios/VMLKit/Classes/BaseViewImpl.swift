@@ -41,6 +41,7 @@ internal class BaseViewImpl: VMLViewImpl {
     }
     
     func bindView(_ view: UIView) {
+        view.clipsToBounds = true
         view.backgroundColor = backgroundColor
         view.layer.borderColor = borderColor.cgColor
         view.layer.borderWidth = CGFloat(borderWidth)

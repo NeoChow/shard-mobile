@@ -7,7 +7,7 @@
 
 import UIKit
 
-private let systemFont = UIFont.systemFont(ofSize: 10);
+private let systemFont = UIFont.systemFont(ofSize: 12);
 
 internal class TextViewImpl: BaseViewImpl {
     internal var text: NSAttributedString = NSAttributedString()
@@ -16,8 +16,9 @@ internal class TextViewImpl: BaseViewImpl {
     internal var lineHeightMultiple = Float(1)
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
-        let size = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
-        return textWithLineHeight().boundingRect(with: size, options: [.usesLineFragmentOrigin], context: nil).size
+        let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
+        let size = textWithLineHeight().boundingRect(with: constraint, options: [.usesLineFragmentOrigin], context: nil).size
+        return CGSize(width: width ?? ceil(size.width), height: height ?? ceil(size.height))
     }
     
     override func setProp(key: String, value: JsonValue) {
@@ -140,6 +141,7 @@ internal class TextViewImpl: BaseViewImpl {
             .paragraphStyle,
             value: paragraphStyle,
             range: NSRange(location: 0, length: string.length))
+        
         return string
     }
 }

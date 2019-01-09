@@ -53,10 +53,10 @@ class MainActivity : Activity() {
                     "height": {"unit": "points", "value": 200}
                 }
             }
-        }""", null, null)
+        }""")
 
-        val root: FrameLayout = findViewById(R.id.vml_root)
-        root.addView(result.getView(this))
+        val root: VMLRootView = findViewById(R.id.vml_root)
+        root.setRoot(result)
     }
 }
 ```
@@ -80,6 +80,7 @@ import UIKit
 import VMLKit
 
 class ViewController: UIViewController {
+    @IBOutlet weak var vmlRoot: VMLRootView!
     
     override func viewDidLoad() {
         let result = VMLViewManager.shared.loadJson("""
@@ -93,9 +94,9 @@ class ViewController: UIViewController {
                 }
             }
         }
-        """, width: nil, height: nil)
+        """)
 
-        self.view.addSubview(result.view)
+        self.vmlRoot.setRoot(result)
     }
 }
 ```

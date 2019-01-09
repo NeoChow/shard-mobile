@@ -25,9 +25,9 @@ private func vml_view_add_child(_ context: UnsafeRawPointer?, _ child: UnsafeRaw
     view.children.append(child)
 }
 
-private func vml_view_measure(_ context: UnsafeRawPointer?, _ size: CSize) -> CSize {
+private func vml_view_measure(_ context: UnsafeRawPointer?, _ size: UnsafePointer<CSize>?) -> CSize {
     let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
-    return view.measure(size)
+    return view.measure(size!.pointee)
 }
 
 public protocol VMLViewImpl {
@@ -57,27 +57,15 @@ public class VMLView {
          return frame.size
     }
     
-    public var view: UIView {
-        let view = impl.createView()
-        view.frame = self.frame
-        impl.bindView(view)
-        
-        if impl is FlexboxViewImpl {
-            for child in self.children {
-                view.addSubview(child.view)
-            }
-        } else if children.count > 0 {
-            assertionFailure("Only flexbox is allowed to specify children")
-        }
-        
-        return view
-    }
+    internal lazy var view: UIView = {
+        return impl.createView()
+    }()
     
-    func setProp(_ key: String, _ value: String) {
+    internal func setProp(_ key: String, _ value: String) {
         impl.setProp(key: key, value: JsonValue(try! JSONSerialization.jsonObject(with: value.data(using: .utf8)!, options: [.allowFragments])))
     }
     
-    func measure(_ size: CSize) -> CSize {
+    internal func measure(_ size: CSize) -> CSize {
         let size = impl.measure(
             width: size.width.isNaN ? nil : CGFloat(size.width),
             height: size.height.isNaN ? nil : CGFloat(size.height))

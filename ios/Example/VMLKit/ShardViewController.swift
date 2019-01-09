@@ -9,7 +9,7 @@ import UIKit
 import VMLKit
 
 class ShardViewController: UIViewController {
-    @IBOutlet weak var root: UIView!
+    @IBOutlet weak var root: VMLRootView!
     
     var url: URL? = nil
     
@@ -19,8 +19,8 @@ class ShardViewController: UIViewController {
     }
     
     @objc private func refresh() {
-        VMLViewManager.shared.loadUrl(url: url!, width: nil, height: nil) { result in
-            self.root.addSubview(result.view)
+        VMLViewManager.shared.loadUrl(url: url!) { result in
+            self.root.setRoot(result)
         }
     }
 }
