@@ -80,6 +80,7 @@ import UIKit
 import VMLKit
 
 class ViewController: UIViewController {
+    @IBOutlet weak var vmlRoot: VMLRootView!
     
     override func viewDidLoad() {
         let result = VMLViewManager.shared.loadJson("""
@@ -95,9 +96,7 @@ class ViewController: UIViewController {
         }
         """)
 
-        let vmlRoot = VMLRootView(result)
-        vmlRoot.frame = self.view.frame
-        self.view.addSubview(vmlRoot)
+        self.vmlRoot.setRoot(result)
     }
 }
 ```

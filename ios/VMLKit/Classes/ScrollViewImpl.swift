@@ -19,7 +19,7 @@ internal class ScrollViewImpl: BaseViewImpl {
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         if let content = content {
-            return content.sizeThatFits(width: width, height: height)
+            return content.measure(width: width, height: height)
         } else {
             return CGSize(width: width ?? 0, height: height ?? 0)
         }
@@ -42,7 +42,10 @@ internal class ScrollViewImpl: BaseViewImpl {
     }
     
     override func createView() -> UIView {
-        return UIScrollView()
+        let scroll = UIScrollView()
+        let contentRoot = VMLRootView()
+        scroll.addSubview(contentRoot)
+        return scroll
     }
     
     override func bindView(_ view: UIView) {
@@ -61,13 +64,17 @@ internal class ScrollViewImpl: BaseViewImpl {
             view.contentOffset = CGPoint(x: -inset, y: 0)
         }
         
+        
         if let content = self.content {
-            // TODO remove current view if any and replace with VMLRootView
-            content.sizeToFit(
+            let contentRoot = view.subviews[0] as! VMLRootView
+            
+            let size = content.layout(
                 width: self.direction == .vertical ? view.frame.width : nil,
                 height: self.direction == .horizontal ? view.frame.height : nil)
-            view.addSubview(content.view)
-            view.contentSize = content.view.frame.size
+            
+            contentRoot.frame = CGRect(origin: .zero, size: size)
+            view.contentSize = size
+            contentRoot.setRoot(content)
         }
     }
 }

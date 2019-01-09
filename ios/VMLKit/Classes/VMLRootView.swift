@@ -8,22 +8,31 @@
 import UIKit
 
 public class VMLRootView: UIView {
-    private let root: VMLRoot
+    private var root: VMLRoot? = nil
     private var lastSize: CGSize? = nil
     
     public required init?(coder aDecoder: NSCoder) {
-        fatalError()
+        super.init(coder: aDecoder)
     }
     
-    public init(_ root: VMLRoot) {
-        self.root = root
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    public init() {
         super.init(frame: .zero)
-        addSubview(self.root.view)
+    }
+    
+    public func setRoot(_ root: VMLRoot) {
+        self.root = root
+        self.root?.view.removeFromSuperview()
+        lastSize = nil
+        addSubview(root.view)
     }
     
     public override func layoutSubviews() {
         if lastSize == nil || lastSize != self.frame.size {
-            self.root.sizeToFit(width: self.frame.width, height: self.frame.height)
+            self.root?.layout(width: self.frame.width, height: self.frame.height)
             lastSize = self.frame.size
         }
     }
