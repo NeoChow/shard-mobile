@@ -31,7 +31,7 @@ LICENSE file in the root directory of this source tree.
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <app.visly.vml.VMLRootView
         android:id="@+id/vml_root"
         android:layout_width="match_parent"
         android:layout_height="0dp"

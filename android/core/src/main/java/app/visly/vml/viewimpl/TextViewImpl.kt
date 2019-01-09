@@ -10,10 +10,7 @@ package app.visly.vml.viewimpl
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.Spanned
+import android.text.*
 import android.util.TypedValue
 import android.widget.TextView
 import app.visly.vml.*
@@ -37,6 +34,8 @@ class TextViewImpl(ctx: Context): BaseViewImpl<TextView>(ctx) {
                 .setTextSize(Math.round(ctx.resources.displayMetrics.scaledDensity * 12f))
                 .setWidth(width?.toInt() ?: Int.MAX_VALUE, textMeasureMode)
                 .setIncludeFontPadding(true)
+                .setTextSpacingMultiplier(spacingMultiplier)
+                .setMaxLines(maxLines)
                 .build()
 
         return if (textLayout != null) {

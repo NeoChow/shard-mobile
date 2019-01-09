@@ -62,6 +62,7 @@ internal class ScrollViewImpl: BaseViewImpl {
         }
         
         if let content = self.content {
+            // TODO remove current view if any and replace with VMLRootView
             content.sizeToFit(
                 width: self.direction == .vertical ? view.frame.width : nil,
                 height: self.direction == .horizontal ? view.frame.height : nil)

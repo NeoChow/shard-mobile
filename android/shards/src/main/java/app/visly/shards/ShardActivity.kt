@@ -11,17 +11,22 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import app.visly.vml.VMLRootView
 import app.visly.vml.VMLViewManager
 
 class ShardActivity : AppCompatActivity() {
+    lateinit var root: VMLRootView
+    lateinit var instance: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shard)
 
+        instance = intent.extras!!.getString("instance")!!
         val title = intent.extras!!.getString("title")!!
-        val instance = intent.extras!!.getString("instance")!!
 //        val revision = intent.extras!!.getInt("revision")!!
+
+        root = findViewById(R.id.vml_root)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.activity_shard)
@@ -31,9 +36,21 @@ class ShardActivity : AppCompatActivity() {
             finish()
         }
 
-        val root: FrameLayout = findViewById(R.id.vml_root)
-        VMLViewManager.instance.loadUrl(this, instance, null, null) {
-            root.addView(it.getView(this))
+        toolbar.setOnMenuItemClickListener {
+            if (it.itemId == R.id.action_refresh) {
+                refresh()
+                true
+            } else {
+                false
+            }
+        }
+
+        refresh()
+    }
+
+    fun refresh() {
+        VMLViewManager.instance.loadUrl(this, instance) {
+            root.setRoot(it)
         }
     }
 }

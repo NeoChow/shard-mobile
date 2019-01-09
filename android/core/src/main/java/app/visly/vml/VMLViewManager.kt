@@ -49,7 +49,7 @@ class VMLViewManager internal constructor() {
     private fun finalize() { free() }
     private external fun bind(): Long
     private external fun free()
-    private external fun render(ctx: Context, json: String, size: Size): VMLView
+    private external fun render(ctx: Context, json: String): Long
 
     private val httpClient = OkHttpClient()
     internal val implFactories: MutableMap<String, (Context) -> VMLViewImpl<View>> = mutableMapOf()
@@ -62,7 +62,7 @@ class VMLViewManager internal constructor() {
         setViewImpl("scroll") { ScrollViewImpl(it) }
     }
 
-    fun loadUrl(ctx: Context, url: String, width: Float?, height: Float?, completion: (VMLView) -> Unit) {
+    fun loadUrl(ctx: Context, url: String, completion: (VMLRoot) -> Unit) {
         assert(hasCalledInit) { "Must call VMLViewManager.init() from your Application class" }
 
         val handler = Handler(Looper.getMainLooper())
@@ -73,17 +73,18 @@ class VMLViewManager internal constructor() {
                     .build()
 
             val response = httpClient.newCall(request).execute()
-            handler.post { completion(loadJson(ctx, response.body()!!.string(), width, height)) }
+            val json = response.body()!!.string()
+            handler.post { completion(loadJson(ctx, json)) }
         }
     }
 
-    fun loadJson(ctx: Context, json: JsonValue, width: Float?, height: Float?): VMLView {
-        return loadJson(ctx, json.toString(), width, height)
+    fun loadJson(ctx: Context, json: JsonValue): VMLRoot {
+        return loadJson(ctx, json.toString())
     }
 
-    fun loadJson(ctx: Context, json: String, width: Float?, height: Float?): VMLView {
+    fun loadJson(ctx: Context, json: String): VMLRoot {
         assert(hasCalledInit) { "Must call VMLViewManager.init() from your Application class" }
-        return render(ctx, json, Size(width ?: Float.NaN, height ?: Float.NaN))
+        return VMLRoot(ctx, render(ctx, json))
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -92,6 +93,6 @@ class VMLViewManager internal constructor() {
     }
 
     @DoNotStrip private fun createView(ctx: Context, kind: String): VMLView {
-        return VMLView(implFactories[kind]!!(ctx))
+        return VMLView(ctx, implFactories[kind]!!(ctx))
     }
 }

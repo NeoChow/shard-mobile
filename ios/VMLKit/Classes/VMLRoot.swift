@@ -27,15 +27,16 @@ public class VMLRoot {
     func sizeToFit(width: CGFloat?, height: CGFloat?) {
         vml_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)))
         let rootView: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(vml_root_get_view(root)!)).takeUnretainedValue()
-        updateFrame(rootView)
-    }
-    
-    private func updateFrame(_ root: VMLView) {
-        root.view.frame = root.frame
-        root.impl.bindView(root.view)
-        for child in root.children {
-            updateFrame(child)
+        
+        func updateFrame(_ root: VMLView) {
+            root.view.frame = root.frame
+            root.impl.bindView(root.view)
+            for child in root.children {
+                updateFrame(child)
+            }
         }
+
+        updateFrame(rootView)
     }
     
     internal lazy var view: UIView = {

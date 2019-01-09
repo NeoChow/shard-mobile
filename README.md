@@ -53,10 +53,10 @@ class MainActivity : Activity() {
                     "height": {"unit": "points", "value": 200}
                 }
             }
-        }""", null, null)
+        }""")
 
-        val root: FrameLayout = findViewById(R.id.vml_root)
-        root.addView(result.getView(this))
+        val root: VMLRootView = findViewById(R.id.vml_root)
+        root.setRoot(result)
     }
 }
 ```

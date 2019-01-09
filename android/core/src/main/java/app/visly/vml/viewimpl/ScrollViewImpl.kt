@@ -21,16 +21,10 @@ class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
 
     internal var direction = Direction.VERTICAL
     internal var contentInset = 0
-    internal var content: VMLView? = null
+    internal var content: VMLRoot? = null
 
     override fun measure(width: Float?, height: Float?): Size {
-        val content = content
-        return if (content != null) {
-            val size = content.getSize()
-            Size(width ?: size.width, height ?: size.height)
-        } else {
-            Size(width ?: 0f, height ?: 0f)
-        }
+        return content?.measure(width, height) ?: Size(width ?: 0f, height ?: 0f)
     }
 
     override fun setProp(key: String, value: JsonValue) {
@@ -54,7 +48,7 @@ class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
 
             "content" -> {
                 content = when (value) {
-                    is JsonValue.Object -> VMLViewManager.instance.loadJson(ctx, value, null, null)
+                    is JsonValue.Object -> VMLViewManager.instance.loadJson(ctx, value)
                     else -> null
                 }
             }
@@ -71,6 +65,7 @@ class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
         view.clipToPadding = false
         view.isHorizontalScrollBarEnabled = false
         view.isVerticalScrollBarEnabled = false
+        view.addView(VMLRootView(ctx))
         return view
     }
 
@@ -88,10 +83,10 @@ class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
                 if (direction == Direction.VERTICAL) 0 else contentInset,
                 if (direction == Direction.HORIZONTAL) 0 else contentInset)
 
-        view.removeAllViews()
-        val content = content?.getView(ctx)
+        val content = content
         if (content != null) {
-            view.addView(content)
+            val contentRoot = view.getChildAt(0) as VMLRootView
+            contentRoot.setRoot(content)
         }
     }
 }
