@@ -24,9 +24,9 @@ public class VMLRootView: UIView {
     }
     
     public func setRoot(_ root: VMLRoot) {
-        self.root = root
         self.root?.view.removeFromSuperview()
         lastSize = nil
+        self.root = root
         addSubview(root.view)
     }
     
