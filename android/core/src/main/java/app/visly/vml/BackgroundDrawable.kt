@@ -9,14 +9,29 @@ package app.visly.vml
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import java.lang.Float.min
+import kotlin.math.min
 
-class BackgroundDrawable(backgroundColor: Int, val borderRadius: Float): Drawable() {
+class BackgroundDrawable(private val backgroundColor: Color, private val borderRadius: Float): Drawable() {
     private val backgroundPaint = Paint()
 
     init {
         backgroundPaint.style = Paint.Style.FILL
-        backgroundPaint.color = backgroundColor
+        backgroundPaint.color = backgroundColor.default
+    }
+
+    override fun isStateful(): Boolean {
+        return backgroundColor.pressed != null
+    }
+
+    override fun setState(stateSet: IntArray): Boolean {
+        backgroundPaint.color = if (stateSet.contains(android.R.attr.state_pressed)) {
+            backgroundColor.pressed ?: backgroundColor.default
+        } else {
+            backgroundColor.default
+        }
+
+        invalidateSelf()
+        return true
     }
 
     override fun draw(canvas: Canvas) {

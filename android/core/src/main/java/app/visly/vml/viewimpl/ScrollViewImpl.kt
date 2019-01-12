@@ -7,13 +7,12 @@
 
 package app.visly.vml.viewimpl
 
-import android.content.Context
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
 import app.visly.vml.*
 
-class ScrollViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
+class ScrollViewImpl(ctx: VMLContext): BaseViewImpl<View>(ctx) {
     internal enum class Direction {
         VERTICAL,
         HORIZONTAL,

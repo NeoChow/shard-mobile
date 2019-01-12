@@ -10,45 +10,53 @@ package app.visly.vml.viewimpl
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import app.visly.vml.JsonValue
+import app.visly.vml.VMLContext
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class TextViewImplTest {
+    lateinit var context: VMLContext
+
+    @Before
+    fun setup() {
+        context = VMLContext(ApplicationProvider.getApplicationContext())
+    }
 
     @Test
     fun testSetTextAlignStart() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("text-align", JsonValue.String("start"))
         assertEquals(viewImpl.textAlign, TextView.TEXT_ALIGNMENT_TEXT_START)
     }
 
     @Test
     fun testSetTextAlignEnd() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("text-align", JsonValue.String("end"))
         assertEquals(viewImpl.textAlign, TextView.TEXT_ALIGNMENT_TEXT_END)
     }
 
     @Test
     fun testSetTextAlignCenter() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("text-align", JsonValue.String("center"))
         assertEquals(viewImpl.textAlign, TextView.TEXT_ALIGNMENT_CENTER)
     }
 
     @Test
     fun testSetMaxLines() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("max-lines", JsonValue.Number(1f))
         assertEquals(viewImpl.maxLines, 1)
     }
 
     @Test
     fun testSetLinesHeight() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("line-height", JsonValue.Object(mapOf(
                 "unit" to JsonValue.String("percent"),
                 "value" to JsonValue.Number(2f)
@@ -58,7 +66,7 @@ class TextViewImplTest {
 
     @Test
     fun testSetSpanSimple() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("span", JsonValue.Object(mapOf(
                 "text" to JsonValue.String("hello")
         )))
@@ -67,7 +75,7 @@ class TextViewImplTest {
 
     @Test
     fun testSetSpanComplex() {
-        val viewImpl = TextViewImpl(ApplicationProvider.getApplicationContext())
+        val viewImpl = TextViewImpl(context)
         viewImpl.setProp("span", JsonValue.Object(mapOf(
                 "text" to JsonValue.Array(listOf(
                         JsonValue.Object(mapOf(

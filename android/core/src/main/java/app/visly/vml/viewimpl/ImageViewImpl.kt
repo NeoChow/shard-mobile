@@ -7,10 +7,10 @@
 
 package app.visly.vml.viewimpl
 
-import android.content.Context
 import android.graphics.drawable.Animatable
 import app.visly.vml.JsonValue
 import app.visly.vml.Size
+import app.visly.vml.VMLContext
 import app.visly.vml.toDips
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
@@ -19,7 +19,7 @@ import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.image.ImageInfo
 
-class ImageViewImpl(ctx: Context): BaseViewImpl<SimpleDraweeView>(ctx) {
+class ImageViewImpl(ctx: VMLContext): BaseViewImpl<SimpleDraweeView>(ctx) {
     internal var src: String? = null
     internal var scaleType = ScalingUtils.ScaleType.CENTER
     internal var roundingParams: RoundingParams? = null

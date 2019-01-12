@@ -7,7 +7,6 @@
 
 package app.visly.vml.viewimpl
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.*
@@ -17,7 +16,7 @@ import app.visly.vml.*
 import com.facebook.fbui.textlayoutbuilder.TextLayoutBuilder
 import com.facebook.fbui.textlayoutbuilder.util.LayoutMeasureUtil
 
-class TextViewImpl(ctx: Context): BaseViewImpl<TextView>(ctx) {
+class TextViewImpl(ctx: VMLContext): BaseViewImpl<TextView>(ctx) {
     internal var textAlign: Int = TextView.TEXT_ALIGNMENT_TEXT_START
     internal var maxLines: Int = Integer.MAX_VALUE
     internal var spacingMultiplier: Float = 1.0f
@@ -98,8 +97,8 @@ class TextViewImpl(ctx: Context): BaseViewImpl<TextView>(ctx) {
         }
 
         val fontColor = when (val value = props["font-color"]) {
-            is JsonValue.String -> parseColor(value.value)
-            else -> null
+            null -> null
+            else -> value.toColor().default
         }
 
         val fontFamily = when (val value = props["font-family"]) {

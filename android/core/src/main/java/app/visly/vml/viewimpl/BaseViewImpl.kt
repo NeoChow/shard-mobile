@@ -7,50 +7,56 @@
 
 package app.visly.vml.viewimpl
 
-import android.content.Context
 import android.view.View
 import app.visly.vml.*
 
-abstract class BaseViewImpl<T: View>(val ctx: Context): VMLViewImpl<T> {
-    internal var backgroundColor = 0
+abstract class BaseViewImpl<T: View>(val ctx: VMLContext): VMLViewImpl<T> {
+    internal var backgroundColor: Color = Color(0, null)
     internal var borderColor = 0
     internal var borderRadius = 0f
     internal var borderWidth = 0f
+    internal var onClick: View.OnClickListener? = null
 
     override fun setProp(key: String, value: JsonValue) {
         when (key) {
             "background-color" -> {
-                backgroundColor = when (value) {
-                    is JsonValue.String -> parseColor(value.value)
-                    else -> 0
-                }
+                backgroundColor = value.toColor()
             }
 
             "border-color" -> {
-                borderColor = when (value) {
-                    is JsonValue.String -> parseColor(value.value)
-                    else -> 0
-                }
+                borderColor = value.toColor().default
             }
 
             "border-radius" -> {
                 borderRadius = when (value) {
                     JsonValue.String("max") -> Float.MAX_VALUE
-                    is JsonValue.Object -> value.toDips(ctx).toFloat()
+                    is JsonValue.Object -> value.toDips(ctx)
                     else -> 0f
                 }
             }
 
             "border-width" -> {
                 borderWidth = when (value) {
-                    is JsonValue.Object -> value.toDips(ctx).toFloat()
+                    is JsonValue.Object -> value.toDips(ctx)
                     else -> 0f
+                }
+            }
+
+            "on-click" -> {
+                onClick = when (value) {
+                    is JsonValue.Object -> View.OnClickListener {
+                        val action = (value.value.get("action") as JsonValue.String).value
+                        val value = value.value.get("value")
+                        ctx.dispatch(action, value)
+                    }
+                    else -> null
                 }
             }
         }
     }
 
     override fun bindView(view: T) {
+        view.setOnClickListener(this.onClick)
         view.background = BackgroundDrawable(backgroundColor, borderRadius)
         view.foreground = BorderDrawable(borderWidth, borderColor, borderRadius)
     }

@@ -1,11 +1,10 @@
 package app.visly.vml
 
-import android.content.Context
 import android.view.View
 import com.facebook.common.internal.DoNotStrip
 import java.lang.RuntimeException
 
-class VMLRoot(private val ctx: Context, @DoNotStrip internal val rustPtr: Long) {
+class VMLRoot(internal val ctx: VMLContext, @DoNotStrip internal val rustPtr: Long) {
     private fun finalize() { free() }
     private external fun free()
     private external fun getView(): VMLView

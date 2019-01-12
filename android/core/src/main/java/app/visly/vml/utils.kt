@@ -8,9 +8,11 @@
 package app.visly.vml
 
 import android.content.Context
-import android.graphics.Color
+import java.lang.IllegalArgumentException
 
 data class Size(val width: Float, val height: Float)
+
+data class Color(val default: Int, val pressed: Int?)
 
 fun dipsToPixels(ctx: Context, dips: Float): Float {
     val scale = ctx.resources.displayMetrics.density
@@ -23,10 +25,24 @@ fun sipsToPixels(ctx: Context, dips: Float): Float {
 }
 
 // Patch android Color.parseColor() to handle #F00
-fun parseColor(color: String): Int {
-    return Color.parseColor(if(color.length == 4) {
+fun parseColorString(color: String): Int {
+    return android.graphics.Color.parseColor(if(color.length == 4) {
         "#" + color[1] + color[1] + color[2] + color[2] + color[3] + color[3]
     } else color)
+}
+
+fun JsonValue.toColor(): Color {
+    return when (this) {
+        is JsonValue.String -> Color(parseColorString(this.value), null)
+        is JsonValue.Object -> {
+            val default = (this.value["default"] as JsonValue.String).value
+            val pressed = (this.value["pressed"] as JsonValue.String?)?.value
+            Color(
+                    parseColorString(default),
+                    if (pressed == null) null else parseColorString(pressed))
+        }
+        else -> throw IllegalArgumentException()
+    }
 }
 
 fun JsonValue.Object.toDips(ctx: Context): Float {

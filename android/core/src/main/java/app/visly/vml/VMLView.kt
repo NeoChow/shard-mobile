@@ -7,7 +7,6 @@
 
 package app.visly.vml
 
-import android.content.Context
 import android.graphics.RectF
 import android.view.View
 import com.facebook.common.internal.DoNotStrip
@@ -20,7 +19,7 @@ interface VMLViewImpl<T: View> {
     fun bindView(view: T)
 }
 
-class VMLView(private val ctx: Context, internal val impl: VMLViewImpl<View>) {
+class VMLView(private val ctx: VMLContext, internal val impl: VMLViewImpl<View>) {
     @DoNotStrip private val rustPtr = bind()
     private fun finalize() { free() }
     private external fun bind(): Long
