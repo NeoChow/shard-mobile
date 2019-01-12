@@ -10,9 +10,17 @@ import VMLKit
 import CoreData
 import Alamofire
 
+struct SampleShard {
+    var title: String
+    var url: String
+}
+
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
     var shards: [Shard] = []
+    var samples = [
+        SampleShard(title: "Quickstart", url: "http://localhost:3000")
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,23 +43,48 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Previous shards"
+        switch section {
+        case 0:
+            return "Previous shards"
+        case 1:
+            return "Samples"
+        default:
+            return nil
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return shards.count
+        switch section {
+        case 0:
+            return shards.count
+        case 1:
+            return samples.count
+        default:
+            return 0
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "shardcell", for: indexPath)
-        let shard = shards[indexPath.row]
         
-        cell.textLabel?.text = shard.title
-        cell.detailTextLabel?.text = shard.instance
+        switch indexPath.section {
+        case 0:
+            let shard = shards[indexPath.row]
+            cell.textLabel?.text = shard.title
+            cell.detailTextLabel?.text = shard.instance
+            break
+        case 1:
+            let sample = samples[indexPath.row]
+            cell.textLabel?.text = sample.title
+            cell.detailTextLabel?.text = nil
+            break
+        default:
+            break
+        }
         
         return cell
     }
@@ -68,9 +101,21 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 shardVC.title =  "localhost"
                 shardVC.url = URL(string:  "http://localhost:3000")
             } else {
-                let shard = self.shards[tableView.indexPathForSelectedRow!.row]
-                shardVC.title = shard.title
-                shardVC.url = URL(string: shard.instance!)
+                let indexPath = tableView.indexPathForSelectedRow!
+                switch indexPath.section {
+                case 0:
+                    let shard = self.shards[tableView.indexPathForSelectedRow!.row]
+                    shardVC.title = shard.title
+                    shardVC.url = URL(string: shard.instance!)
+                    break
+                case 1:
+                    let sample = self.samples[tableView.indexPathForSelectedRow!.row]
+                    shardVC.title = sample.title
+                    shardVC.url = URL(string: sample.url)
+                    break
+                default:
+                    break
+                }
             }
         }
     }
