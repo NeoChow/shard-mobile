@@ -118,13 +118,12 @@ internal class TextViewImpl: BaseViewImpl {
         
         try props.get("font-color") {
             switch $0 {
-            case .String(let value):
+            case .Null: ()
+            case let value:
                 string.addAttribute(
                     .foregroundColor,
-                    value: try UIColor(hex: value),
+                    value: try value.asColor().default,
                     range: NSRange(location: 0, length: string.length))
-            case .Null: ()
-            case let value: throw "Unexpected value for font-color: \(value)"
             }
         }
         

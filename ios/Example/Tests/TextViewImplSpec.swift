@@ -11,7 +11,7 @@ import Nimble
 
 class TextViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = TextViewImpl()
+        let viewimpl = TextViewImpl(VMLContext())
         
         it("should set text align to start") {
             viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))

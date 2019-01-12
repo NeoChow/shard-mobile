@@ -8,9 +8,11 @@
 import UIKit
 
 public class VMLRoot {
+    internal let context: VMLContext
     private let root: IOSRoot
     
-    internal init(_ root: IOSRoot) {
+    internal init(_ context: VMLContext, _ root: IOSRoot) {
+        self.context = context
         self.root = root
     }
     

@@ -19,6 +19,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* VMLViewManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* VMLViewManagerSpec.swift */; };
+		7643554E21E9BD0F008AC9ED /* VMLContextSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7643554D21E9BD0F008AC9ED /* VMLContextSpec.swift */; };
 		76CF1C0621E20312001C139D /* UtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CF1C0521E20312001C139D /* UtilsSpec.swift */; };
 		76CF1C0821E20477001C139D /* ScrollViewImplSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CF1C0721E20477001C139D /* ScrollViewImplSpec.swift */; };
 		76CF1C0A21E20482001C139D /* TextViewImplSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CF1C0921E20482001C139D /* TextViewImplSpec.swift */; };
@@ -57,6 +58,7 @@
 		607FACEB1AFB9204008FA782 /* VMLViewManagerSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMLViewManagerSpec.swift; sourceTree = "<group>"; };
 		6BACD01EB82A7B0BA8A755E1 /* Pods-VMLKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VMLKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-VMLKit_Example/Pods-VMLKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		6DA8D3C09C30D1697B285E03 /* Pods-VMLKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VMLKit_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VMLKit_Example/Pods-VMLKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		7643554D21E9BD0F008AC9ED /* VMLContextSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMLContextSpec.swift; sourceTree = "<group>"; };
 		76CF1C0521E20312001C139D /* UtilsSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsSpec.swift; sourceTree = "<group>"; };
 		76CF1C0721E20477001C139D /* ScrollViewImplSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewImplSpec.swift; sourceTree = "<group>"; };
 		76CF1C0921E20482001C139D /* TextViewImplSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewImplSpec.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				135C27EB2179F5160009B77D /* JsonValueSpec.swift */,
+				7643554D21E9BD0F008AC9ED /* VMLContextSpec.swift */,
 				76CF1C0521E20312001C139D /* UtilsSpec.swift */,
 				607FACEB1AFB9204008FA782 /* VMLViewManagerSpec.swift */,
 				76CF1C0D21E20497001C139D /* BaseViewImplSpec.swift */,
@@ -401,6 +404,7 @@
 				135C27EC2179F5160009B77D /* JsonValueSpec.swift in Sources */,
 				76CF1C0E21E20497001C139D /* BaseViewImplSpec.swift in Sources */,
 				76CF1C0821E20477001C139D /* ScrollViewImplSpec.swift in Sources */,
+				7643554E21E9BD0F008AC9ED /* VMLContextSpec.swift in Sources */,
 				135C27EE2179FBEF0009B77D /* ImageViewImplSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

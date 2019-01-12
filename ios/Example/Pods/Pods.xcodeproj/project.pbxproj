@@ -123,6 +123,8 @@
 		74605907C211553B00F09768BEF12834 /* EndWith.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916A530D564CDCAA3B24D573A890BF0A /* EndWith.swift */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		746D0DBAF8EB27CA816CFD021DE2A7A1 /* SatisfyAnyOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2575AFBAB4B7EB7334775EA24B8F0ACA /* SatisfyAnyOf.swift */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
 		7485AAEB633B78268D656D019B77E023 /* SatisfyAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = F619C84DC5B5195DF68BFF0E8189CF0B /* SatisfyAllOf.swift */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
+		7643554C21E9BA37008AC9ED /* VMLContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7643554B21E9BA37008AC9ED /* VMLContext.swift */; };
+		7643555021E9CFA2008AC9ED /* VMLColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7643554F21E9CFA2008AC9ED /* VMLColor.swift */; };
 		76761BD0F83F2CC40BAC1F0A05F020FE /* ConstraintPriorityTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42D1C2394C48A07A4BA85E60C03CE06 /* ConstraintPriorityTarget.swift */; };
 		76998F4421E3FBA2007463EA /* VMLRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76998F4321E3FBA2007463EA /* VMLRoot.swift */; };
 		76998F4621E405D9007463EA /* VMLRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76998F4521E405D9007463EA /* VMLRootView.swift */; };
@@ -458,6 +460,8 @@
 		754D22181C4EC88F25E6577CCF78F15C /* AuthenticationChallengeResponsable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthenticationChallengeResponsable.swift; path = Sources/Networking/AuthenticationChallengeResponsable.swift; sourceTree = "<group>"; };
 		7565FBEDE69F047DC65E4B6280BB3074 /* ConstraintConstantTarget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConstraintConstantTarget.swift; path = Source/ConstraintConstantTarget.swift; sourceTree = "<group>"; };
 		759FCE1577F7E879EF29A7990F3882EF /* SnapKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SnapKit.modulemap; sourceTree = "<group>"; };
+		7643554B21E9BA37008AC9ED /* VMLContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VMLContext.swift; path = ios/VMLKit/Classes/VMLContext.swift; sourceTree = "<group>"; };
+		7643554F21E9CFA2008AC9ED /* VMLColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VMLColor.swift; path = ios/VMLKit/Classes/VMLColor.swift; sourceTree = "<group>"; };
 		76998F4321E3FBA2007463EA /* VMLRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VMLRoot.swift; path = ios/VMLKit/Classes/VMLRoot.swift; sourceTree = "<group>"; };
 		76998F4521E405D9007463EA /* VMLRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VMLRootView.swift; path = ios/VMLKit/Classes/VMLRootView.swift; sourceTree = "<group>"; };
 		77D5EFC70755BCB7C3CF30E030CF384B /* Nimble.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Nimble.modulemap; sourceTree = "<group>"; };
@@ -1159,6 +1163,7 @@
 			isa = PBXGroup;
 			children = (
 				FC436D138915C1A9377ED035156D5078 /* JsonValue.swift */,
+				7643554F21E9CFA2008AC9ED /* VMLColor.swift */,
 				14F8670852BFAFB87C6D35DCB64DAA5F /* utils.swift */,
 				BA421FC70E0156CC5B2FF9863D2DFF1C /* BaseViewImpl.swift */,
 				6BE7EE9805A5A8A3421094BC32846317 /* FlexboxViewImpl.swift */,
@@ -1170,6 +1175,7 @@
 				BDF3EBF51AD9B9FDD0D5FC837FDEC145 /* VMLViewManager.swift */,
 				76998F4321E3FBA2007463EA /* VMLRoot.swift */,
 				76998F4521E405D9007463EA /* VMLRootView.swift */,
+				7643554B21E9BA37008AC9ED /* VMLContext.swift */,
 				515120E29AA892124030F5536D110370 /* Pod */,
 				94D3334575E743FFE385B1654039AE37 /* Support Files */,
 				74203077804EB03C3EF470A1673A27DC /* VMLCore */,
@@ -1778,9 +1784,11 @@
 				4B8118AB6B8BFF14EEDBBC5021D048DC /* BaseViewImpl.swift in Sources */,
 				9F975F758B087B85A27197A4EB75C637 /* FlexboxViewImpl.swift in Sources */,
 				1D5C64210F1CB78522D8320D82CC2664 /* ImageViewImpl.swift in Sources */,
+				7643554C21E9BA37008AC9ED /* VMLContext.swift in Sources */,
 				76998F4421E3FBA2007463EA /* VMLRoot.swift in Sources */,
 				DE644BD2472100334D840675C864E4DC /* JsonValue.swift in Sources */,
 				F903C26413BE2FDC590E3514890E6199 /* ScrollViewImpl.swift in Sources */,
+				7643555021E9CFA2008AC9ED /* VMLColor.swift in Sources */,
 				89CFE038E1CD3E47E8DF3269153D06A0 /* SolidColorViewImpl.swift in Sources */,
 				76998F4621E405D9007463EA /* VMLRootView.swift in Sources */,
 				586FEBC73F7087E3930847370AB56207 /* TextViewImpl.swift in Sources */,
