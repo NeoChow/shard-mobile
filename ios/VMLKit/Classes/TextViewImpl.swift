@@ -25,7 +25,7 @@ internal class TextViewImpl: BaseViewImpl {
         super.setProp(key: key, value: value)
         
         switch key {
-        case "span": self.text = try! attributedString(from: try! value.asObject())
+        case "span": self.text = try! attributedString(from: try! value.asObject(), attributes: [:])
         case "max-lines": self.numberOfLines = Int(try! value.asNumber())
         case "line-height": self.lineHeightMultiple = try! value.asObject()["value"]!.asNumber()
         case "text-align":
@@ -55,17 +55,8 @@ internal class TextViewImpl: BaseViewImpl {
         view.numberOfLines = self.numberOfLines
     }
     
-    func attributedString(from props: [String: JsonValue]) throws -> NSAttributedString {
-        let string: NSMutableAttributedString = try props.get("text") {
-            switch $0 {
-            case .String(let value):
-                return NSMutableAttributedString(string: value)
-            case .Array(let value):
-                let parts = try value.map({ try attributedString(from: $0.asObject()) })
-                return NSMutableAttributedString(attributedString: parts.reduce(NSAttributedString(), { $0 + $1 }))
-            case let value: throw "Unexpected value for text: \(value)"
-            }
-        }
+    func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any]) throws -> NSAttributedString {
+        var attributes = attributes
         
         let family: String = try props.get("font-family") {
             switch $0 {
@@ -75,11 +66,11 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
-        let italic: Bool = try props.get("font-style") {
+        let italic: Bool? = try props.get("font-style") {
             switch $0 {
             case .String(let value) where value == "normal": return false
             case .String(let value) where value == "italic": return true
-            case .Null: return false
+            case .Null: return nil
             case let value: throw "Unexpected value for font-style: \(value)"
             }
         }
@@ -101,29 +92,48 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
-        if size != nil || weight != nil || italic {
-            let descriptor = UIFontDescriptor(fontAttributes: [
-                .family: family,
-                .traits: [
-                    UIFontDescriptor.TraitKey.weight: weight ?? UIFont.Weight.regular,
-                    UIFontDescriptor.TraitKey.slant: italic ? 1 : 0,
-                ]
-                ])
+        if size != nil || weight != nil || italic != nil {
+            let current = attributes[.font] as! UIFont?
+            var traits: UIFontDescriptor.SymbolicTraits = current?.fontDescriptor.symbolicTraits ?? []
             
-            string.addAttribute(
-                .font,
-                value: UIFont(descriptor: descriptor, size: size ?? 12),
-                range: NSRange(location: 0, length: string.length))
+            if let weight = weight {
+                if weight == UIFont.Weight.bold {
+                    traits.insert(.traitBold)
+                } else {
+                    traits.remove(.traitBold)
+                }
+            }
+            
+            if let italic = italic {
+                if italic {
+                    traits.insert(.traitItalic)
+                } else {
+                    traits.remove(.traitItalic)
+                }
+            }
+            
+            let descriptor = UIFontDescriptor(fontAttributes: [.family: family]).withSymbolicTraits(traits)!
+            attributes[.font] = UIFont(descriptor: descriptor, size: size ?? current?.pointSize ?? 12)
         }
         
         try props.get("font-color") {
             switch $0 {
             case .Null: ()
             case let value:
-                string.addAttribute(
-                    .foregroundColor,
-                    value: try value.asColor().default,
-                    range: NSRange(location: 0, length: string.length))
+                attributes[.foregroundColor] =  try value.asColor().default
+            }
+        }
+        
+        let string: NSMutableAttributedString = try props.get("text") {
+            switch $0 {
+            case .String(let value):
+                let string = NSMutableAttributedString(string: value)
+                string.addAttributes(attributes, range: NSRange(location: 0, length: string.length))
+                return string
+            case .Array(let value):
+                let parts = try value.map({ try attributedString(from: $0.asObject(), attributes: attributes) })
+                return NSMutableAttributedString(attributedString: parts.reduce(NSAttributedString(), { $0 + $1 }))
+            case let value: throw "Unexpected value for text: \(value)"
             }
         }
         
