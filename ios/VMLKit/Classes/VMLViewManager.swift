@@ -24,8 +24,8 @@ public class VMLViewManager {
     internal var implFactories: Dictionary<String, ViewImplFactory> = [:]
     
     private init() {
-        let context = Unmanaged.passUnretained(self).toOpaque()
-        self.rust_ptr = vml_view_manager_new(context, vml_view_manager_create_view)
+        let self_ptr = Unmanaged.passUnretained(self).toOpaque()
+        self.rust_ptr = vml_view_manager_new(self_ptr, vml_view_manager_create_view)
         
         setViewImpl("flexbox", { FlexboxViewImpl($0) })
         setViewImpl("image", { ImageViewImpl($0) })
