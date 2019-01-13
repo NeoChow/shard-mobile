@@ -10,7 +10,7 @@ import VMLKit
 import CoreData
 import Alamofire
 
-struct Sample {
+struct Example {
     let title: String
     let description: String
     let url: String
@@ -26,7 +26,7 @@ struct Sample {
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
     var shards: [Shard] = []
-    var samples: [Sample] = []
+    var examples: [Example] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,18 +47,18 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         let result = try! context.fetch(request)
         self.shards = result as! [Shard]
         
-        initSamples()
+        loadExamples()
     }
     
-    func initSamples() {
+    func loadExamples() {
         fetchData(url: URL(string: "https://shard.visly.app/api/shards/examples")!) { json in
             do {
-                let samples = try json.asArray()
-                for sample in samples {
-                    self.samples = [try Sample(json: sample)] + self.samples
+                let examples = try json.asArray()
+                for example in examples {
+                    self.examples = [try Example(json: example)] + self.examples
                 }
             } catch {
-                self.samples = []
+                self.examples = []
             }
             self.tableView.reloadData()
         }
@@ -81,7 +81,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case 0:
             return "Previous shards"
         case 1:
-            return "Samples"
+            return "Examples"
         default:
             return nil
         }
@@ -92,7 +92,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case 0:
             return shards.count
         case 1:
-            return samples.count
+            return examples.count
         default:
             return 0
         }
@@ -108,9 +108,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             cell.detailTextLabel?.text = shard.instance
             break
         case 1:
-            let sample = samples[indexPath.row]
-            cell.textLabel?.text = sample.title
-            cell.detailTextLabel?.text = sample.description
+            let example = examples[indexPath.row]
+            cell.textLabel?.text = example.title
+            cell.detailTextLabel?.text = example.description
             break
         default:
             break
@@ -139,9 +139,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                     shardVC.url = URL(string: shard.instance!)
                     break
                 case 1:
-                    let sample = self.samples[tableView.indexPathForSelectedRow!.row]
-                    shardVC.title = sample.title
-                    shardVC.url = URL(string: sample.url)
+                    let example = self.examples[tableView.indexPathForSelectedRow!.row]
+                    shardVC.title = example.title
+                    shardVC.url = URL(string: example.url)
                     break
                 default:
                     break
