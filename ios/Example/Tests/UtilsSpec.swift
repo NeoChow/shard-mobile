@@ -16,5 +16,22 @@ class UtilsSpec: QuickSpec {
             expect(try! UIColor(hex: "#ff0000")).to(equal(UIColor.red))
             expect(try! UIColor(hex: "#ffff0000")).to(equal(UIColor.red))
         }
+        
+        it("should convert string to VMLColor") {
+            let color = try! JsonValue.String("#F00").asColor()
+            
+            expect(color.default).to(equal(UIColor.red))
+            expect(color.pressed).to(beNil())
+        }
+        
+        it("should convert object to VMLColor") {
+            let color = try! JsonValue.Object([
+                "default": JsonValue.String("#F00"),
+                "pressed": JsonValue.String("#00F")]
+            ).asColor()
+            
+            expect(color.default).to(equal(UIColor.red))
+            expect(color.pressed).to(equal(UIColor.blue))
+        }
     }
 }

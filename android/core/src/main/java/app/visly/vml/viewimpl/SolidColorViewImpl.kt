@@ -7,25 +7,16 @@
 
 package app.visly.vml.viewimpl
 
-import android.content.Context
 import android.view.View
-import app.visly.vml.JsonValue
 import app.visly.vml.Size
+import app.visly.vml.VMLContext
 
-class SolidColorViewImpl(ctx: Context): BaseViewImpl<View>(ctx) {
+class SolidColorViewImpl(ctx: VMLContext): BaseViewImpl<View>(ctx) {
     override fun measure(width: Float?, height: Float?): Size {
         return Size(width ?: 0f, height ?: 0f)
     }
 
-    override fun setProp(key: String, value: JsonValue) {
-        super.setProp(key, value)
-    }
-
     override fun createView(): View {
         return View(ctx)
-    }
-
-    override fun bindView(view: View) {
-        super.bindView(view)
     }
 }

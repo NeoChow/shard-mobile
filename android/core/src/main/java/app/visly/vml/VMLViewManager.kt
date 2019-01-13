@@ -52,7 +52,7 @@ class VMLViewManager internal constructor() {
     private external fun render(ctx: Context, json: String): Long
 
     private val httpClient = OkHttpClient()
-    internal val implFactories: MutableMap<String, (Context) -> VMLViewImpl<View>> = mutableMapOf()
+    internal val implFactories: MutableMap<String, (VMLContext) -> VMLViewImpl<View>> = mutableMapOf()
 
     init {
         setViewImpl("flexbox") { FlexboxViewImpl(it) }
@@ -84,15 +84,16 @@ class VMLViewManager internal constructor() {
 
     fun loadJson(ctx: Context, json: String): VMLRoot {
         assert(hasCalledInit) { "Must call VMLViewManager.init() from your Application class" }
+        val ctx = VMLContext(ctx)
         return VMLRoot(ctx, render(ctx, json))
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun setViewImpl(kind: String, implFactory: (Context) -> VMLViewImpl<out View>) {
-        implFactories[kind] = implFactory as (Context) -> VMLViewImpl<View>
+    fun setViewImpl(kind: String, implFactory: (VMLContext) -> VMLViewImpl<out View>) {
+        implFactories[kind] = implFactory as (VMLContext) -> VMLViewImpl<View>
     }
 
-    @DoNotStrip private fun createView(ctx: Context, kind: String): VMLView {
+    @DoNotStrip private fun createView(ctx: VMLContext, kind: String): VMLView {
         return VMLView(ctx, implFactories[kind]!!(ctx))
     }
 }

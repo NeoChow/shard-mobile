@@ -7,11 +7,12 @@
 
 package app.visly.vml.viewimpl
 
-import android.graphics.Color
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import app.visly.vml.JsonValue
+import app.visly.vml.Color
 import app.visly.vml.Size
+import app.visly.vml.VMLContext
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.Before
@@ -26,7 +27,8 @@ class BaseViewImplTest {
 
     @Before
     fun setup() {
-        viewImpl = object: BaseViewImpl<View>(ApplicationProvider.getApplicationContext()) {
+        val context = VMLContext(ApplicationProvider.getApplicationContext())
+        viewImpl = object: BaseViewImpl<View>(context) {
             override fun measure(width: Float?, height: Float?): Size = Size(0f, 0f)
             override fun createView(): View = View(ctx)
         }
@@ -35,13 +37,22 @@ class BaseViewImplTest {
     @Test
     fun testSetBackgroundColor() {
         viewImpl.setProp("background-color", JsonValue.String("#f00"))
-        assertEquals(viewImpl.backgroundColor, Color.RED)
+        assertEquals(viewImpl.backgroundColor, Color(android.graphics.Color.RED, null))
+    }
+
+    @Test
+    fun testSetBackgroundColorPressed() {
+        viewImpl.setProp("background-color", JsonValue.Object(mapOf(
+                "default" to JsonValue.String("#F00"),
+                "pressed" to JsonValue.String("#00F")
+        )))
+        assertEquals(viewImpl.backgroundColor, Color(android.graphics.Color.RED, android.graphics.Color.BLUE))
     }
 
     @Test
     fun testSetBorderColor() {
         viewImpl.setProp("border-color", JsonValue.String("#f00"))
-        assertEquals(viewImpl.borderColor, Color.RED)
+        assertEquals(viewImpl.borderColor, android.graphics.Color.RED)
     }
 
     @Test

@@ -7,25 +7,27 @@
 
 package app.visly.vml
 
-import android.graphics.Color
-import app.visly.vml.parseColor
-import com.facebook.soloader.SoLoader
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class UtilsTest {
 
     @Test
-    fun testParseColor() {
-        assertEquals(parseColor("#F00"), Color.RED)
-        assertEquals(parseColor("#FF0000"), Color.RED)
-        assertEquals(parseColor("#FFFF0000"), Color.RED)
+    fun testParseSimpleColor() {
+        assertEquals(JsonValue.String("#F00").toColor(), Color(android.graphics.Color.RED, null))
+        assertEquals(JsonValue.String("#FF0000").toColor(), Color(android.graphics.Color.RED, null))
+        assertEquals(JsonValue.String("#FFFF0000").toColor(), Color(android.graphics.Color.RED, null))
+    }
+
+    @Test
+    fun testParseComplexColor() {
+        assertEquals(JsonValue.Object(mapOf("default" to JsonValue.String("#F00"))).toColor(), Color(android.graphics.Color.RED, null))
+        assertEquals(JsonValue.Object(mapOf(
+                "default" to JsonValue.String("#F00"),
+                "pressed" to JsonValue.String("#00F")
+        )).toColor(), Color(android.graphics.Color.RED, android.graphics.Color.BLUE))
     }
 }

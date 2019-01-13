@@ -14,15 +14,16 @@ use stretch::geometry::Size;
 use stretch::number::*;
 
 pub struct IOSViewManager {
-    context: *const c_void,
-    create_view: fn(*const c_void, *const c_char) -> *mut IOSView,
+    swift_ptr: *const c_void,
+    create_view: fn(*const c_void, *const c_void, *const c_char) -> *mut IOSView,
 }
 
 impl core::VMLViewManager for IOSViewManager {
-    fn create_view(&self, _: &Any, kind: &str) -> Box<core::VMLView> {
+    fn create_view(&self, context: &Any, kind: &str) -> Box<core::VMLView> {
+        let context = context.downcast_ref::<*const c_void>().unwrap();
         let kind = CString::new(kind).unwrap();
         let create_view = self.create_view;
-        let view = create_view(self.context, kind.as_ptr());
+        let view = create_view(self.swift_ptr, *context, kind.as_ptr());
         unsafe { Box::from_raw(view) }
     }
 }
@@ -35,7 +36,7 @@ pub struct CSize {
 
 #[repr(C)]
 pub struct IOSView {
-    context: *const c_void,
+    swift_ptr: *const c_void,
     set_frame: fn(*const c_void, f32, f32, f32, f32) -> (),
     set_prop: fn(*const c_void, *const c_char, *const c_char) -> (),
     add_child: fn(*const c_void, *const c_void) -> (),
@@ -46,7 +47,7 @@ impl core::VMLView for IOSView {
     fn add_child(&mut self, child: &core::VMLView) {
         let add_child = self.add_child;
         let child = child.as_any().downcast_ref::<IOSView>().unwrap();
-        add_child(self.context, child.context);
+        add_child(self.swift_ptr, child.swift_ptr);
     }
 
     fn measure(&self, constraints: Size<Number>) -> Size<f32> {
@@ -54,7 +55,7 @@ impl core::VMLView for IOSView {
         let width = constraints.width.or_else(f32::NAN);
         let height = constraints.height.or_else(f32::NAN);
         let csize = CSize { width, height };
-        let size = measure(self.context, &csize as *const CSize);
+        let size = measure(self.swift_ptr, &csize as *const CSize);
         Size { width: size.width, height: size.height }
     }
 
@@ -62,12 +63,12 @@ impl core::VMLView for IOSView {
         let key = CString::new(key).unwrap();
         let value = CString::new(value.dump()).unwrap();
         let set_prop = self.set_prop;
-        set_prop(self.context, key.as_ptr(), value.as_ptr());
+        set_prop(self.swift_ptr, key.as_ptr(), value.as_ptr());
     }
 
     fn set_frame(&mut self, frame: Rect<f32>) {
         let set_frame = self.set_frame;
-        set_frame(self.context, frame.start, frame.end, frame.top, frame.bottom);
+        set_frame(self.swift_ptr, frame.start, frame.end, frame.top, frame.bottom);
     }
 
     fn as_any(&self) -> &Any {
@@ -94,9 +95,9 @@ pub extern "C" fn vml_root_measure(root: IOSRoot, size: CSize) {
 pub extern "C" fn vml_root_get_view(root: IOSRoot) -> *const c_void {
     let root: Box<core::Root> = unsafe { Box::from_raw(root.root_ptr as *mut core::Root) };
     let view = root.view_node.vml_view.as_any().downcast_ref::<IOSView>().unwrap();
-    let context = view.context;
+    let swift_ptr = view.swift_ptr;
     Box::leak(root);
-    context
+    swift_ptr
 }
 
 #[no_mangle]
@@ -106,13 +107,13 @@ pub extern "C" fn vml_root_free(root: IOSRoot) {
 
 #[no_mangle]
 pub extern "C" fn vml_view_new(
-    context: *const c_void,
+    swift_ptr: *const c_void,
     set_frame: fn(*const c_void, f32, f32, f32, f32) -> (),
     set_prop: fn(*const c_void, *const c_char, *const c_char) -> (),
     add_child: fn(*const c_void, *const c_void) -> (),
     measure: fn(*const c_void, *const CSize) -> CSize,
 ) -> *mut IOSView {
-    Box::into_raw(Box::new(IOSView { context, set_frame, set_prop, add_child, measure }))
+    Box::into_raw(Box::new(IOSView { swift_ptr, set_frame, set_prop, add_child, measure }))
 }
 
 #[no_mangle]
@@ -124,10 +125,10 @@ pub extern "C" fn vml_view_free(view: *mut IOSView) {
 
 #[no_mangle]
 pub extern "C" fn vml_view_manager_new(
-    context: *const c_void,
-    create_view: fn(*const c_void, *const c_char) -> *mut IOSView,
+    swift_ptr: *const c_void,
+    create_view: fn(*const c_void, *const c_void, *const c_char) -> *mut IOSView,
 ) -> *const IOSViewManager {
-    Box::into_raw(Box::new(IOSViewManager { context, create_view }))
+    Box::into_raw(Box::new(IOSViewManager { swift_ptr, create_view }))
 }
 
 #[no_mangle]
@@ -138,10 +139,9 @@ pub extern "C" fn vml_view_manager_free(view_manager: *mut IOSViewManager) {
 }
 
 #[no_mangle]
-pub extern "C" fn vml_render(view_manager: *mut IOSViewManager, json: *const c_char) -> IOSRoot {
+pub extern "C" fn vml_render(view_manager: *mut IOSViewManager, context: *const c_void, json: *const c_char) -> IOSRoot {
     let view_manager = unsafe { Box::from_raw(view_manager) };
     let json = unsafe { CStr::from_ptr(json).to_str().unwrap() };
-    let context: Option<&Any> = None;
     let root = core::render_root(Box::leak(view_manager), &context, json);
 
     IOSRoot { root_ptr: Box::into_raw(Box::new(root)) as *mut c_void }

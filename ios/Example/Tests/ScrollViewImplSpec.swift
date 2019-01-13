@@ -11,7 +11,7 @@ import Nimble
 
 class ScrollViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = ScrollViewImpl()
+        let viewimpl = ScrollViewImpl(VMLContext())
         
         it("should set direction vertical") {
             viewimpl.setProp(key: "direction", value: JsonValue.String("vertical"))

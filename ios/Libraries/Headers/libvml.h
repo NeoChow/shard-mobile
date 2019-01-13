@@ -14,14 +14,14 @@ typedef struct {
 } CSize;
 
 typedef struct {
-  const void *context;
+  const void *swift_ptr;
   void (*set_frame)(const void*, float, float, float, float);
   void (*set_prop)(const void*, const char*, const char*);
   void (*add_child)(const void*, const void*);
   CSize (*measure)(const void*, const CSize*);
 } IOSView;
 
-IOSRoot vml_render(IOSViewManager *view_manager, const char *json);
+IOSRoot vml_render(IOSViewManager *view_manager, const void *context, const char *json);
 
 void vml_root_free(IOSRoot root);
 
@@ -33,10 +33,10 @@ void vml_view_free(IOSView *view);
 
 void vml_view_manager_free(IOSViewManager *view_manager);
 
-const IOSViewManager *vml_view_manager_new(const void *context,
-                                           IOSView *(*create_view)(const void*, const char*));
+const IOSViewManager *vml_view_manager_new(const void *swift_ptr,
+                                           IOSView *(*create_view)(const void*, const void*, const char*));
 
-IOSView *vml_view_new(const void *context,
+IOSView *vml_view_new(const void *swift_ptr,
                       void (*set_frame)(const void*, float, float, float, float),
                       void (*set_prop)(const void*, const char*, const char*),
                       void (*add_child)(const void*, const void*),

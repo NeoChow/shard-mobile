@@ -44,7 +44,7 @@ impl core::VMLViewManager for JavaObject {
 
         let j_view = self.call_method(
             "createView",
-            "(Landroid/content/Context;Ljava/lang/String;)Lapp/visly/vml/VMLView;",
+            "(Lapp/visly/vml/VMLContext;Ljava/lang/String;)Lapp/visly/vml/VMLView;",
             &[JValue::from(context.as_obj()), JValue::from(JObject::from(kind))],
         );
         rust_obj(&self.env, j_view.l().unwrap())

@@ -7,26 +7,26 @@
 
 import UIKit
 
-private func vml_view_set_frame(_ context: UnsafeRawPointer?, _ start: Float, _ end: Float, _ top: Float, _ bottom: Float) {
-    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
+private func vml_view_set_frame(_ self_ptr: UnsafeRawPointer?, _ start: Float, _ end: Float, _ top: Float, _ bottom: Float) {
+    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     view.frame = CGRect(x: CGFloat(start), y: CGFloat(top), width: CGFloat(end - start), height: CGFloat(bottom - top))
 }
 
-private func vml_view_set_prop(_ context: UnsafeRawPointer?, _ key: UnsafePointer<Int8>?, _ value: UnsafePointer<Int8>?) {
-    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
+private func vml_view_set_prop(_ self_ptr: UnsafeRawPointer?, _ key: UnsafePointer<Int8>?, _ value: UnsafePointer<Int8>?) {
+    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let key = String(cString: key!)
     let value = String(cString: value!)
     view.setProp(key, value)
 }
 
-private func vml_view_add_child(_ context: UnsafeRawPointer?, _ child: UnsafeRawPointer?) {
-    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
-    let child: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(child!)).takeUnretainedValue()
+private func vml_view_add_child(_ self_ptr: UnsafeRawPointer?, _ child_ptr: UnsafeRawPointer?) {
+    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
+    let child: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(child_ptr!)).takeUnretainedValue()
     view.children.append(child)
 }
 
-private func vml_view_measure(_ context: UnsafeRawPointer?, _ size: UnsafePointer<CSize>?) -> CSize {
-    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(context!)).takeUnretainedValue()
+private func vml_view_measure(_ self_ptr: UnsafeRawPointer?, _ size: UnsafePointer<CSize>?) -> CSize {
+    let view: VMLView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     return view.measure(size!.pointee)
 }
 

@@ -5,15 +5,28 @@ import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 
+typealias ActionHandler = (JsonValue?) -> Unit
+
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class VMLRootView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) : AbsoluteLayout(context, attrs, defStyleAttr, defStyleRes) {
     private var root: VMLRoot? = null
+    private val actionHandlers: MutableMap<String, ActionHandler> = mutableMapOf()
+    private val actionDelegate: ActionDelegate = object: ActionDelegate {
+        override fun on(action: String, value: JsonValue?) {
+            actionHandlers[action]?.invoke(value)
+        }
+    }
 
     fun setRoot(root: VMLRoot) {
         val oldRoot = this.root
         this.root = root
 
-        oldRoot?.apply { removeView(this.view) }
+        oldRoot?.apply {
+            oldRoot.ctx.actionDelegate = null
+            removeView(this.view)
+        }
+
+        root.ctx.actionDelegate = actionDelegate
         addView(root.view)
     }
 
@@ -44,5 +57,13 @@ class VMLRootView @JvmOverloads constructor(context: Context, attrs: AttributeSe
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val root = this.root
         root?.view?.layout(0, 0, root.view.measuredWidth, root.view.measuredHeight)
+    }
+
+    fun on(action: String, callback: ActionHandler) {
+        actionHandlers[action] = callback
+    }
+
+    fun off(action: String) {
+        actionHandlers.remove(action)
     }
 }

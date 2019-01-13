@@ -128,3 +128,16 @@ internal extension Dictionary where Key == String, Value == JsonValue {
         }
     }
 }
+
+internal extension JsonValue {
+    func asColor() throws -> VMLColor {
+        switch self {
+        case .String(let value): return VMLColor(default: try UIColor(hex: value), pressed: nil)
+        case .Object(let value):
+            return VMLColor(
+                default: try UIColor(hex: value["default"]!.asString()),
+                pressed: value["pressed"] != nil ? try UIColor(hex: value["pressed"]!.asString()) : nil)
+        case let value: throw "Unexpected value: \(value)"
+        }
+    }
+}

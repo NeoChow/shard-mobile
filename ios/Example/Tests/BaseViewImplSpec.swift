@@ -11,11 +11,20 @@ import Nimble
 
 class BaseViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = BaseViewImpl()
+        let viewimpl = BaseViewImpl(VMLContext())
         
         it("should set background color") {
             viewimpl.setProp(key: "background-color", value: JsonValue.String("#f00"))
-            expect(viewimpl.backgroundColor).to(equal(UIColor.red))
+            expect(viewimpl.backgroundColor.default).to(equal(UIColor.red))
+        }
+        
+        it("should set clickable background color") {
+            viewimpl.setProp(key: "background-color", value: JsonValue.Object([
+                "default": JsonValue.String("#F00"),
+                "pressed": JsonValue.String("#00F")]
+            ))
+            expect(viewimpl.backgroundColor.default).to(equal(UIColor.red))
+            expect(viewimpl.backgroundColor.pressed).to(equal(UIColor.blue))
         }
 
         it("should set border color") {

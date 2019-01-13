@@ -11,7 +11,7 @@ import Nimble
 
 class ImageViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = ImageViewImpl()
+        let viewimpl = ImageViewImpl(VMLContext())
         
         it("should set src") {
             viewimpl.setProp(key: "src", value: JsonValue.String("https://visly.app"))
