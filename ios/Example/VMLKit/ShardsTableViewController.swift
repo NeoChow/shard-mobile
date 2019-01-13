@@ -10,17 +10,23 @@ import VMLKit
 import CoreData
 import Alamofire
 
-struct SampleShard {
-    var title: String
-    var url: String
+struct Sample {
+    let title: String
+    let description: String
+    let url: String
+    
+    init(json: JsonValue) throws {
+        let values = try json.asObject()
+        self.title = try values["title"]!.asString()
+        self.description = try values["description"]!.asString()
+        self.url = try values["url"]!.asString()
+    }
 }
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
     var shards: [Shard] = []
-    var samples = [
-        SampleShard(title: "Quickstart", url: "http://localhost:3000")
-    ]
+    var samples: [Sample] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +46,30 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         let result = try! context.fetch(request)
         self.shards = result as! [Shard]
+        
+        initSamples()
+    }
+    
+    func initSamples() {
+        fetchData(url: URL(string: "https://shard.visly.app/api/shards/examples")!) { json in
+            do {
+                let samples = try json.asArray()
+                for sample in samples {
+                    self.samples = [try Sample(json: sample)] + self.samples
+                }
+            } catch {
+                self.samples = []
+            }
+            self.tableView.reloadData()
+        }
+    }
+    
+    func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
+        let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
+            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
+            DispatchQueue.main.async { onComplete(json) }
+        }
+        task.resume()
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -80,7 +110,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case 1:
             let sample = samples[indexPath.row]
             cell.textLabel?.text = sample.title
-            cell.detailTextLabel?.text = nil
+            cell.detailTextLabel?.text = sample.description
             break
         default:
             break
