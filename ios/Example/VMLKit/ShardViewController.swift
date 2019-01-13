@@ -7,6 +7,7 @@
 
 import UIKit
 import VMLKit
+import SafariServices
 
 class ShardViewController: UIViewController {
     @IBOutlet weak var root: VMLRootView!
@@ -15,6 +16,12 @@ class ShardViewController: UIViewController {
     
     override func viewDidLoad() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh))
+        
+        self.root.on("open-url") {
+            let url = try! $0!.asString()
+            self.present(SFSafariViewController(url: URL(string: url)!), animated: true, completion: nil)
+        }
+        
         refresh()
     }
     
