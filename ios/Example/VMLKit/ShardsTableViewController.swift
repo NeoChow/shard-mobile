@@ -10,9 +10,23 @@ import VMLKit
 import CoreData
 import Alamofire
 
+struct Example {
+    let title: String
+    let description: String
+    let url: String
+    
+    init(json: JsonValue) throws {
+        let values = try json.asObject()
+        self.title = try values["title"]!.asString()
+        self.description = try values["description"]!.asString()
+        self.url = try values["url"]!.asString()
+    }
+}
+
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
     var shards: [Shard] = []
+    var examples: [Example] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,26 +46,75 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         let result = try! context.fetch(request)
         self.shards = result as! [Shard]
+        
+        loadExamples()
+    }
+    
+    func loadExamples() {
+        fetchData(url: URL(string: "https://shard.visly.app/api/shards/examples")!) { json in
+            do {
+                let examples = try json.asArray()
+                for example in examples {
+                    self.examples = [try Example(json: example)] + self.examples
+                }
+            } catch {
+                self.examples = []
+            }
+            self.tableView.reloadData()
+        }
+    }
+    
+    func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
+        let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
+            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
+            DispatchQueue.main.async { onComplete(json) }
+        }
+        task.resume()
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Previous shards"
+        switch section {
+        case 0:
+            return "Previous shards"
+        case 1:
+            return "Examples"
+        default:
+            return nil
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return shards.count
+        switch section {
+        case 0:
+            return shards.count
+        case 1:
+            return examples.count
+        default:
+            return 0
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "shardcell", for: indexPath)
-        let shard = shards[indexPath.row]
         
-        cell.textLabel?.text = shard.title
-        cell.detailTextLabel?.text = shard.instance
+        switch indexPath.section {
+        case 0:
+            let shard = shards[indexPath.row]
+            cell.textLabel?.text = shard.title
+            cell.detailTextLabel?.text = shard.instance
+            break
+        case 1:
+            let example = examples[indexPath.row]
+            cell.textLabel?.text = example.title
+            cell.detailTextLabel?.text = example.description
+            break
+        default:
+            break
+        }
         
         return cell
     }
@@ -68,9 +131,21 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 shardVC.title =  "localhost"
                 shardVC.url = URL(string:  "http://localhost:3000")
             } else {
-                let shard = self.shards[tableView.indexPathForSelectedRow!.row]
-                shardVC.title = shard.title
-                shardVC.url = URL(string: shard.instance!)
+                let indexPath = tableView.indexPathForSelectedRow!
+                switch indexPath.section {
+                case 0:
+                    let shard = self.shards[tableView.indexPathForSelectedRow!.row]
+                    shardVC.title = shard.title
+                    shardVC.url = URL(string: shard.instance!)
+                    break
+                case 1:
+                    let example = self.examples[tableView.indexPathForSelectedRow!.row]
+                    shardVC.title = example.title
+                    shardVC.url = URL(string: example.url)
+                    break
+                default:
+                    break
+                }
             }
         }
     }
