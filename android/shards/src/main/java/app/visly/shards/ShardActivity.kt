@@ -13,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import app.visly.vml.VMLRootView
 import app.visly.vml.VMLViewManager
+import android.content.Intent
+import android.net.Uri
+import app.visly.vml.JsonValue
+
 
 class ShardActivity : AppCompatActivity() {
     lateinit var root: VMLRootView
@@ -27,6 +31,10 @@ class ShardActivity : AppCompatActivity() {
 //        val revision = intent.extras!!.getInt("revision")!!
 
         root = findViewById(R.id.vml_root)
+        root.on("open-url") {
+            val url = (it as JsonValue.String).value
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.activity_shard)
