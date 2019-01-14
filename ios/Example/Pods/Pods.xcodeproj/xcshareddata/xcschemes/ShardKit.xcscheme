@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+               BlueprintIdentifier = "4F58944F68625CFCE2F4CDEA23246F02"
                BuildableName = "ShardKit.framework"
                BlueprintName = "ShardKit"
                ReferencedContainer = "container:Pods.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "ShardKit_Tests.xctest"
-               BlueprintName = "ShardKit_Tests"
-               ReferencedContainer = "container:../ShardKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -56,7 +42,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BlueprintIdentifier = "4F58944F68625CFCE2F4CDEA23246F02"
             BuildableName = "ShardKit.framework"
             BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
@@ -78,7 +64,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BlueprintIdentifier = "4F58944F68625CFCE2F4CDEA23246F02"
             BuildableName = "ShardKit.framework"
             BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
@@ -96,7 +82,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BlueprintIdentifier = "4F58944F68625CFCE2F4CDEA23246F02"
             BuildableName = "ShardKit.framework"
             BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
