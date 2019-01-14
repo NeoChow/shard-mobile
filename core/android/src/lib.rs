@@ -37,24 +37,24 @@ impl JavaObject {
     }
 }
 
-impl core::VMLViewManager for JavaObject {
-    fn create_view(&self, context: &Any, kind: &str) -> Box<core::VMLView> {
+impl core::ShardViewManager for JavaObject {
+    fn create_view(&self, context: &Any, kind: &str) -> Box<core::ShardView> {
         let kind = self.env.new_string(kind).unwrap();
         let context = context.downcast_ref::<GlobalRef>().unwrap();
 
         let j_view = self.call_method(
             "createView",
-            "(Lapp/visly/vml/VMLContext;Ljava/lang/String;)Lapp/visly/vml/VMLView;",
+            "(Lapp/visly/shard/ShardContext;Ljava/lang/String;)Lapp/visly/shard/ShardView;",
             &[JValue::from(context.as_obj()), JValue::from(JObject::from(kind))],
         );
         rust_obj(&self.env, j_view.l().unwrap())
     }
 }
 
-impl core::VMLView for JavaObject {
-    fn add_child(&mut self, child: &core::VMLView) {
+impl core::ShardView for JavaObject {
+    fn add_child(&mut self, child: &core::ShardView) {
         let child = child.as_any().downcast_ref::<JavaObject>().unwrap();
-        self.call_method("addChild", "(Lapp/visly/vml/VMLView;)V", &[JValue::from(child.instance.as_obj())]);
+        self.call_method("addChild", "(Lapp/visly/shard/ShardView;)V", &[JValue::from(child.instance.as_obj())]);
     }
 
     fn set_prop(&mut self, key: &str, value: &JsonValue) {
@@ -80,7 +80,7 @@ impl core::VMLView for JavaObject {
         let size = self
             .call_method(
                 "measure",
-                "(FF)Lapp/visly/vml/Size;",
+                "(FF)Lapp/visly/shard/Size;",
                 &[
                     JValue::from(constraints.width.or_else(f32::NAN)),
                     JValue::from(constraints.height.or_else(f32::NAN)),
@@ -102,19 +102,19 @@ impl core::VMLView for JavaObject {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_bind(env: JNIEnv<'static>, instance: JObject) -> jlong {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardViewManager_bind(env: JNIEnv<'static>, instance: JObject) -> jlong {
     Box::into_raw(JavaObject::new(env, instance)) as jlong
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLViewManager_free(env: JNIEnv<'static>, instance: JObject) {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardViewManager_free(env: JNIEnv<'static>, instance: JObject) {
     let _view_manager = rust_obj(&env, instance);
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_app_visly_vml_VMLViewManager_render(
+pub extern "C" fn Java_app_visly_shard_ShardViewManager_render(
     env: JNIEnv<'static>,
     instance: JObject,
     context: JObject,
@@ -131,10 +131,10 @@ pub extern "C" fn Java_app_visly_vml_VMLViewManager_render(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLRoot_getView(env: JNIEnv<'static>, instance: JObject) -> jobject {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_getView(env: JNIEnv<'static>, instance: JObject) -> jobject {
     let rust_ptr = env.get_field(instance, "rustPtr", "J").unwrap();
     let root = Box::from_raw(rust_ptr.j().unwrap() as *mut core::Root);
-    let view = root.view_node.vml_view.as_any().downcast_ref::<JavaObject>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<JavaObject>().unwrap();
     let local = env.new_local_ref::<JObject>(view.instance.as_obj()).unwrap().into_inner();
     Box::leak(root);
     local
@@ -142,7 +142,11 @@ pub unsafe extern "C" fn Java_app_visly_vml_VMLRoot_getView(env: JNIEnv<'static>
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLRoot_measure(env: JNIEnv<'static>, instance: JObject, size: JObject) {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_measure(
+    env: JNIEnv<'static>,
+    instance: JObject,
+    size: JObject,
+) {
     let rust_ptr = env.get_field(instance, "rustPtr", "J").unwrap();
     let mut root = Box::from_raw(rust_ptr.j().unwrap() as *mut core::Root);
 
@@ -159,18 +163,18 @@ pub unsafe extern "C" fn Java_app_visly_vml_VMLRoot_measure(env: JNIEnv<'static>
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLRoot_free(env: JNIEnv<'static>, instance: JObject) {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_free(env: JNIEnv<'static>, instance: JObject) {
     let _root = rust_obj(&env, instance);
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLView_bind(env: JNIEnv<'static>, instance: JObject) -> jlong {
+pub unsafe extern "C" fn Java_app_visly_shard_ShardView_bind(env: JNIEnv<'static>, instance: JObject) -> jlong {
     Box::into_raw(JavaObject::new(env, instance)) as jlong
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_app_visly_vml_VMLView_free(env: JNIEnv<'static>, instance: JObject) {
-    let _vml_view = rust_obj(&env, instance);
+pub unsafe extern "C" fn Java_app_visly_shard_ShardView_free(env: JNIEnv<'static>, instance: JObject) {
+    let _shard_view = rust_obj(&env, instance);
 }

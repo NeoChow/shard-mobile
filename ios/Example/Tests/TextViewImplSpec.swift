@@ -7,11 +7,11 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class TextViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = TextViewImpl(VMLContext())
+        let viewimpl = TextViewImpl(ShardContext())
         
         it("should set text align to start") {
             viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))

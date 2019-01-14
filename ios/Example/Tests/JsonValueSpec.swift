@@ -7,7 +7,7 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class JsonValueSpec: QuickSpec {
     override func spec() {

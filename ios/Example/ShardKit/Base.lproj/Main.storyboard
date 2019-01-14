@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="GaV-9f-m73">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Shards-->
+        <scene sceneID="Mo0-1H-rne">
+            <objects>
+                <tableViewController id="jjF-8c-00w" customClass="ShardsTableViewController" customModule="ShardKit_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="I1C-Mz-SMm">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="shardcell" editingAccessoryType="checkmark" textLabel="CCc-89-w74" detailTextLabel="gY2-OP-IjT" style="IBUITableViewCellStyleSubtitle" id="s03-0A-lcG">
+                                <rect key="frame" x="0.0" y="55.5" width="600" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="s03-0A-lcG" id="iNl-Ji-u1m">
+                                    <rect key="frame" x="0.0" y="0.0" width="562" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="CCc-89-w74">
+                                            <rect key="frame" x="20" y="3" width="31.5" height="22"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="16"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="gY2-OP-IjT">
+                                            <rect key="frame" x="20" y="25" width="42" height="16.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="12"/>
+                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="5f5-CB-tGX" kind="show" identifier="viewShard" id="e8q-76-9cw">
+                                        <segue key="commit" inheritsFrom="parent" id="AQV-hn-XTR"/>
+                                        <segue key="preview" inheritsFrom="commit" id="IJo-PP-vsZ"/>
+                                    </segue>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="jjF-8c-00w" id="sBo-hQ-bSQ"/>
+                            <outlet property="delegate" destination="jjF-8c-00w" id="Gf4-hK-a1S"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Shards" id="koS-9Z-I4z">
+                        <barButtonItem key="leftBarButtonItem" enabled="NO" title="Item" image="tiny_logo" id="YXB-B4-GVW">
+                            <color key="tintColor" red="0.8723954558" green="0.2668153942" blue="0.52138745779999995" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="&lt;/&gt;" id="0zn-ig-5lL">
+                            <connections>
+                                <segue destination="5f5-CB-tGX" kind="show" identifier="localhost" id="KdQ-Xl-5ri"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ypi-vz-NBs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1474" y="134"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="HVQ-Oj-cH4">
+            <objects>
+                <navigationController id="GaV-9f-m73" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" largeTitles="YES" id="iyP-2C-sgC">
+                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" red="0.8723954558" green="0.2668153942" blue="0.52138745779999995" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <textAttributes key="titleTextAttributes">
+                            <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="17"/>
+                        </textAttributes>
+                        <textAttributes key="largeTitleTextAttributes">
+                            <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="30"/>
+                        </textAttributes>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="jjF-8c-00w" kind="relationship" relationship="rootViewController" id="Bef-wx-LsJ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lef-Zk-cAA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="508" y="134"/>
+        </scene>
+        <!--Shard View Controller-->
+        <scene sceneID="nV7-4b-KTJ">
+            <objects>
+                <viewController id="5f5-CB-tGX" customClass="ShardViewController" customModule="ShardKit_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="dL9-ka-Dhl"/>
+                        <viewControllerLayoutGuide type="bottom" id="fWO-ld-4fL"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" misplaced="YES" id="LLC-lJ-7au">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g9A-xj-Qon" customClass="ShardRootView" customModule="ShardKit">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="484"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="g9A-xj-Qon" firstAttribute="leading" secondItem="LLC-lJ-7au" secondAttribute="leading" id="bVf-XZ-5xp"/>
+                            <constraint firstItem="g9A-xj-Qon" firstAttribute="top" secondItem="dL9-ka-Dhl" secondAttribute="bottom" id="boy-Vz-c8B"/>
+                            <constraint firstAttribute="trailing" secondItem="g9A-xj-Qon" secondAttribute="trailing" id="gk2-f6-YLC"/>
+                            <constraint firstAttribute="bottom" secondItem="g9A-xj-Qon" secondAttribute="bottom" id="z12-xB-phd"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="root" destination="g9A-xj-Qon" id="D0o-or-odh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Caq-QN-Ggl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2286" y="134"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="tiny_logo" width="22" height="20"/>
+    </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="KdQ-Xl-5ri"/>
+    </inferredMetricsTieBreakers>
+</document>

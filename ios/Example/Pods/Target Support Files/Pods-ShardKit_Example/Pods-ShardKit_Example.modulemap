@@ -1,0 +1,6 @@
+framework module Pods_ShardKit_Example {
+  umbrella header "Pods-ShardKit_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

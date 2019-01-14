@@ -7,11 +7,11 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class ImageViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = ImageViewImpl(VMLContext())
+        let viewimpl = ImageViewImpl(ShardContext())
         
         it("should set src") {
             viewimpl.setProp(key: "src", value: JsonValue.String("https://visly.app"))

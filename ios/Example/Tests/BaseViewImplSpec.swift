@@ -7,11 +7,11 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class BaseViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = BaseViewImpl(VMLContext())
+        let viewimpl = BaseViewImpl(ShardContext())
         
         it("should set background color") {
             viewimpl.setProp(key: "background-color", value: JsonValue.String("#f00"))

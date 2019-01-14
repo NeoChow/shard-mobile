@@ -1,16 +1,14 @@
-# VML Mobile libraries
-[![CircleCI](https://circleci.com/gh/vislyhq/vml-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/vml-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/android-vml-client/images/download.svg) ](https://bintray.com/visly/maven/android-vml-client)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/VMLKit/badge.png)](https://cocoadocs.org/docsets/VMLKit)
+# Shard Mobile libraries
+[![CircleCI](https://circleci.com/gh/vislyhq/shard-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/shard-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/android-shard-client/images/download.svg) ](https://bintray.com/visly/maven/android-shard-client)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/ShardKit/badge.png)](https://cocoadocs.org/docsets/ShardKit)
 
-Mobile client libraries for https://visly.app. VML is currently in an experimental state so if you are interested in integrating it into your app please contact us at hello@visly.app so we can make sure it is a good fit and offer any assistance if needed.
-
-VML is a cross-platform mobile framework for rendering server-side driven UIs. We want VML to be a replacement for webviews, with many of the same benefits but with native performance. Benefits of using VML include *over the air updates*, *cross platform*, *server-side controlled*.
+Mobile client libraries for https://shardlib.com. If you are interested in integrating it into your app feel free to contact us at hello@visly.app or post an issue on the repo.
 
 ## Overview
-This repo contains both the Android and iOS libraries for VML written in Kotlin/Swift as well as the shared core written in rust. The shared rust core manages the non platform specific aspects of rendering a VML UI such as parsing the server response, efficiently managing updates, and performing layout. Layout is based on [flexbox using the stretch library](https://github.com/vislyhq/stretch).
+This repo contains both the Android and iOS libraries for Shard written in Kotlin/Swift as well as the shared core written in rust. The shared rust core manages the non platform specific aspects of rendering a Shard UI such as parsing the server response, efficiently managing updates, and performing layout. Layout is based on [flexbox using the stretch library](https://github.com/vislyhq/stretch).
 
 ## Getting started
 ### Android
-To get started using `VML` in your Android app start by adding our bintray maven repo and then the vml dependency itself.
+To get started using Shard in your Android app start by adding our bintray maven repo and then the Shard dependency itself.
 
 ```groovy
 repositories {
@@ -20,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'app.visly.vml:core:0.1.4'
+    implementation 'app.visly.shard:core:0.1.4'
 }
 ```
 
@@ -31,12 +29,12 @@ class ShardsApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        VMLViewManager.init(this)
+        ShardViewManager.init(this)
     }
 }
 ```
 
-Now you're ready to load your first vml view. Your can either load it via a url pointing to an endpoint on your server built with [node-vml-server](https://github.com/vislyhq/node-vml-server) or using a raw json string. We will use the raw json approach here for simplicity.
+Now you're ready to load your first Shard view. Your can either load it via a url pointing to an endpoint on your server built with [node-shard-server](https://github.com/vislyhq/node-shard-server) or using a raw json string. We will use the raw json approach here for simplicity.
 
 ```kotlin
 class MainActivity : Activity() {
@@ -44,7 +42,7 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val result = VMLViewManager.instance.loadJson(this, """{
+        val result = ShardViewManager.instance.loadJson(this, """{
             "root": {
                 "kind": "flexbox",
                 "props": {"background-color": "#f00"},
@@ -55,35 +53,35 @@ class MainActivity : Activity() {
             }
         }""")
 
-        val root: VMLRootView = findViewById(R.id.vml_root)
+        val root: ShardRootView = findViewById(R.id.shard_root)
         root.setRoot(result)
     }
 }
 ```
 
 ### iOS
-To get started using `VML` in your iOS app start by adding the cocoapods dependency.
+To get started using Shard in your iOS app start by adding the cocoapods dependency.
 
 ```ruby
 platform :ios, '11.0'
 use_frameworks!
 
 target 'ios' do
-  pod 'VMLKit', '~> 0.1.2'
+  pod 'ShardKit', '~> 0.1.2'
 end
 ```
 
-Now you're ready to load your first vml view. Your can either load it via a url pointing to an endpoint on your server built with [node-vml-server](https://github.com/vislyhq/node-vml-server) or using a raw json string. We will use the raw json approach here for simplicity.
+Now you're ready to load your first Shard view. Your can either load it via a url pointing to an endpoint on your server built with [node-shard-server](https://github.com/vislyhq/node-shard-server) or using a raw json string. We will use the raw json approach here for simplicity.
 
 ```swift
 import UIKit
-import VMLKit
+import ShardKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var vmlRoot: VMLRootView!
+    @IBOutlet weak var shardRoot: ShardRootView!
     
     override func viewDidLoad() {
-        let result = VMLViewManager.shared.loadJson("""
+        let result = ShardViewManager.shared.loadJson("""
         {
             "root": {
                 "kind": "flexbox",
@@ -96,28 +94,28 @@ class ViewController: UIViewController {
         }
         """)
 
-        self.vmlRoot.setRoot(result)
+        self.shardRoot.setRoot(result)
     }
 }
 ```
 
 ## Developing
-Start by installing the Android and iOS toolchains by downloading Xcode and Android studio. For android you will also need to set your `$ANDROID_HOME`. Right now we only support building on macOS, however you can use the vml library via jcenter / cocoapods on any platform.
+Start by installing the Android and iOS toolchains by downloading Xcode and Android studio. For android you will also need to set your `$ANDROID_HOME`. Right now we only support building on macOS, however you can use the shard library via jcenter / cocoapods on any platform.
 
 Once you have the Android and iOS toolchains installed it's time to clone the repo and get setup. We have prepared a few Make scripts to hopefully simpligy this process. These scripts prepare your local environment for building the rust core. If you are just planning on developing in Kotlin / Swift then there is no need to run any of the make scripts.
 
 ```bash
-git clone https://github.com/vislyhq/vml-mobile.git
-cd vml-mobile
+git clone https://github.com/vislyhq/shard-mobile.git
+cd shard-mobile
 make setup
 make install
 ```
 
-Once that is all done you should be good to go. Open `vml-mobile/ios/Examples/VMLKit.xcworkspace` in Xcode or `vml-mobile/android` in Android Studio.
+Once that is all done you should be good to go. Open `shard-mobile/ios/Examples/ShardKit.xcworkspace` in Xcode or `shard-mobile/android` in Android Studio.
 
-All the shared rust code is located in `vml-mobile/core` with platform bindings in `vml-mobile/core/ios` and `vml-mobile/core/android`. After making any edits to rust files make sure to run `make install` from the root directory to build and package the rust library for use in Android and iOS.
+All the shared rust code is located in `shard-mobile/core` with platform bindings in `shard-mobile/core/ios` and `shard-mobile/core/android`. After making any edits to rust files make sure to run `make install` from the root directory to build and package the rust library for use in Android and iOS.
 
-If you want to make any changes or additions to the layout engine powering VML head over to [github.com/vislyhq/stretch](https://github.com/vislyhq/stretch).
+If you want to make any changes or additions to the layout engine powering Shard head over to [github.com/vislyhq/stretch](https://github.com/vislyhq/stretch).
 
 # LICENCE
 ```

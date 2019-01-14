@@ -65,16 +65,16 @@ dependencies {
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'android-vml-client'
+    bintrayName = 'android-shard-client'
 
-    publishedGroupId = 'app.visly.vml'
+    publishedGroupId = 'app.visly.shard'
     libraryName = bintrayName
     artifact = 'core'
 
-    libraryDescription = 'Android VML client library'
+    libraryDescription = 'Android Shard client library'
 
     siteUrl = 'https://visly.app'
-    gitUrl = 'https://github.com/vislyhq/vml-mobile.git'
+    gitUrl = 'https://github.com/vislyhq/shard-mobile.git'
 
     libraryVersion = '0.1.4'
 
@@ -83,7 +83,7 @@ ext {
     developerEmail = 'android@visly.app'
 
     licenseName = 'MIT'
-    licenseUrl = 'https://github.com/vislyhq/vml-mobile/blob/master/LICENSE'
+    licenseUrl = 'https://github.com/vislyhq/shard-mobile/blob/master/LICENSE'
     allLicenses = ["MIT"]
 }
 

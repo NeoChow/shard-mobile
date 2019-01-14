@@ -11,20 +11,20 @@ PODS:
   - Kingfisher (5.0.1)
   - Nimble (7.3.1)
   - Quick (1.3.2)
+  - ShardKit (0.1.2):
+    - Kingfisher (~> 5.0.1)
+    - ShardKit/ShardCore (= 0.1.2)
+  - ShardKit/ShardCore (0.1.2):
+    - Kingfisher (~> 5.0.1)
   - SnapKit (4.2.0)
-  - VMLKit (0.1.1):
-    - Kingfisher (~> 5.0.1)
-    - VMLKit/VMLCore (= 0.1.1)
-  - VMLKit/VMLCore (0.1.1):
-    - Kingfisher (~> 5.0.1)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8)
   - AppCenter (~> 1.12)
   - Nimble (~> 7.3.1)
   - Quick (~> 1.3.2)
+  - ShardKit (from `../../`)
   - SnapKit (~> 4.2.0)
-  - VMLKit (from `../../`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -36,7 +36,7 @@ SPEC REPOS:
     - SnapKit
 
 EXTERNAL SOURCES:
-  VMLKit:
+  ShardKit:
     :path: "../../"
 
 SPEC CHECKSUMS:
@@ -45,9 +45,9 @@ SPEC CHECKSUMS:
   Kingfisher: 4f771421b9208185217550528a06fd48756cb7c2
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 2623cb30d7a7f41ca62f684f679586558f483d46
+  ShardKit: 4fc1be7d1489d594330071773765013664520c9d
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
-  VMLKit: a6c3f29ffdcf32203f2d1d56118cd1ad4c86944d
 
-PODFILE CHECKSUM: 8c4806b5965f0463b4ed875702934b889f1d7805
+PODFILE CHECKSUM: e09991e884111ca00c2bb01c1a9966b631b7e00b
 
 COCOAPODS: 1.6.0.beta.2

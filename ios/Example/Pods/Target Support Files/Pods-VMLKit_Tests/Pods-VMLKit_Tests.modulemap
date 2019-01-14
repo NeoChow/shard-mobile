@@ -1,6 +1,0 @@
-framework module Pods_VMLKit_Tests {
-  umbrella header "Pods-VMLKit_Tests-umbrella.h"
-
-  export *
-  module * { export * }
-}

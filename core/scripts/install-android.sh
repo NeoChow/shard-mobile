@@ -27,6 +27,6 @@ mkdir $JNI_LIBS/arm64
 mkdir $JNI_LIBS/armeabi
 mkdir $JNI_LIBS/x86
 
-cp target/aarch64-linux-android/release/libvml.so $JNI_LIBS/arm64/libvml.so
-cp target/armv7-linux-androideabi/release/libvml.so $JNI_LIBS/armeabi/libvml.so
-cp target/i686-linux-android/release/libvml.so $JNI_LIBS/x86/libvml.so
+cp target/aarch64-linux-android/release/libshard.so $JNI_LIBS/arm64/libshard.so
+cp target/armv7-linux-androideabi/release/libshard.so $JNI_LIBS/armeabi/libshard.so
+cp target/i686-linux-android/release/libshard.so $JNI_LIBS/x86/libshard.so

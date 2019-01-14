@@ -8,8 +8,7 @@
 package app.visly.shards
 
 import android.app.Application
-import android.view.ViewManager
-import app.visly.vml.VMLViewManager
+import app.visly.shard.ShardViewManager
 import com.microsoft.appcenter.crashes.Crashes
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.AppCenter
@@ -22,6 +21,6 @@ class ShardsApplication: Application() {
             AppCenter.start(this, BuildConfig.APPCENTER_SECRET, Analytics::class.java, Crashes::class.java)
         }
 
-        VMLViewManager.init(this)
+        ShardViewManager.init(this)
     }
 }

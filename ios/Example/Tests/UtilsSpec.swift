@@ -7,7 +7,7 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class UtilsSpec: QuickSpec {
     override func spec() {
@@ -17,14 +17,14 @@ class UtilsSpec: QuickSpec {
             expect(try! UIColor(hex: "#ffff0000")).to(equal(UIColor.red))
         }
         
-        it("should convert string to VMLColor") {
+        it("should convert string to ShardColor") {
             let color = try! JsonValue.String("#F00").asColor()
             
             expect(color.default).to(equal(UIColor.red))
             expect(color.pressed).to(beNil())
         }
         
-        it("should convert object to VMLColor") {
+        it("should convert object to ShardColor") {
             let color = try! JsonValue.Object([
                 "default": JsonValue.String("#F00"),
                 "pressed": JsonValue.String("#00F")]

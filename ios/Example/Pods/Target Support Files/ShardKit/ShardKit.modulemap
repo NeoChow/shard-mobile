@@ -1,0 +1,6 @@
+framework module ShardKit {
+  umbrella header "ShardKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

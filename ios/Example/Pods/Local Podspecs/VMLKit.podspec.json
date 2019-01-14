@@ -1,5 +1,5 @@
 {
-  "name": "VMLKit",
+  "name": "ShardKit",
   "version": "0.1.1",
   "summary": "iOS implementation of https://visly.app",
   "homepage": "https://visly.app",
@@ -7,7 +7,7 @@
     "Visly Inc.": "emil@visly.app"
   },
   "source": {
-    "git": "https://github.com/vislyhq/vml-mobile.git",
+    "git": "https://github.com/vislyhq/shard-mobile.git",
     "tag": "0.1.1"
   },
   "license": {
@@ -18,7 +18,7 @@
   "platforms": {
     "ios": "10.0"
   },
-  "source_files": "ios/VMLKit/Classes/**/*",
+  "source_files": "ios/ShardKit/Classes/**/*",
   "dependencies": {
     "Kingfisher": [
       "~> 5.0.1"
@@ -26,15 +26,15 @@
   },
   "subspecs": [
     {
-      "name": "VMLCore",
+      "name": "ShardCore",
       "source_files": "ios/Libraries/Headers/*.h",
-      "vendored_libraries": "ios/Libraries/libvml.a",
+      "vendored_libraries": "ios/Libraries/libshard.a",
       "xcconfig": {
-        "HEADER_SEARCH_PATHS": "${PODS_ROOT}/VMLCore/Libraries/Headers"
+        "HEADER_SEARCH_PATHS": "${PODS_ROOT}/ShardCore/Libraries/Headers"
       },
       "preserve_paths": [
-        "ios/Libraries/libvml.a",
-        "ios/Libraries/Headers/libvml.h"
+        "ios/Libraries/libshard.a",
+        "ios/Libraries/Headers/libshard.h"
       ],
       "public_header_files": "ios/Libraries/Headers/*.h",
       "requires_arc": false

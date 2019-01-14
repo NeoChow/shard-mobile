@@ -18,8 +18,8 @@ pub struct View {
     pub child_count: u32,
 }
 
-impl core::VMLView for View {
-    fn add_child(&mut self, _: &core::VMLView) {
+impl core::ShardView for View {
+    fn add_child(&mut self, _: &core::ShardView) {
         self.child_count += 1;
     }
 
@@ -42,8 +42,8 @@ impl core::VMLView for View {
 
 pub struct ViewManager {}
 
-impl core::VMLViewManager for ViewManager {
-    fn create_view(&self, _: &Any, kind: &str) -> Box<core::VMLView> {
+impl core::ShardViewManager for ViewManager {
+    fn create_view(&self, _: &Any, kind: &str) -> Box<core::ShardView> {
         Box::new(View {
             kind: kind.to_string(),
             props: HashMap::new(),

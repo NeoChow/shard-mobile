@@ -18,8 +18,8 @@ pub struct IOSViewManager {
     create_view: fn(*const c_void, *const c_void, *const c_char) -> *mut IOSView,
 }
 
-impl core::VMLViewManager for IOSViewManager {
-    fn create_view(&self, context: &Any, kind: &str) -> Box<core::VMLView> {
+impl core::ShardViewManager for IOSViewManager {
+    fn create_view(&self, context: &Any, kind: &str) -> Box<core::ShardView> {
         let context = context.downcast_ref::<*const c_void>().unwrap();
         let kind = CString::new(kind).unwrap();
         let create_view = self.create_view;
@@ -43,8 +43,8 @@ pub struct IOSView {
     measure: fn(*const c_void, *const CSize) -> CSize,
 }
 
-impl core::VMLView for IOSView {
-    fn add_child(&mut self, child: &core::VMLView) {
+impl core::ShardView for IOSView {
+    fn add_child(&mut self, child: &core::ShardView) {
         let add_child = self.add_child;
         let child = child.as_any().downcast_ref::<IOSView>().unwrap();
         add_child(self.swift_ptr, child.swift_ptr);
@@ -82,7 +82,7 @@ pub struct IOSRoot {
 }
 
 #[no_mangle]
-pub extern "C" fn vml_root_measure(root: IOSRoot, size: CSize) {
+pub extern "C" fn shard_root_measure(root: IOSRoot, size: CSize) {
     let mut root: Box<core::Root> = unsafe { Box::from_raw(root.root_ptr as *mut core::Root) };
     root.measure(Size {
         width: if size.width.is_nan() { Number::Undefined } else { Number::Defined(size.width) },
@@ -92,21 +92,21 @@ pub extern "C" fn vml_root_measure(root: IOSRoot, size: CSize) {
 }
 
 #[no_mangle]
-pub extern "C" fn vml_root_get_view(root: IOSRoot) -> *const c_void {
+pub extern "C" fn shard_root_get_view(root: IOSRoot) -> *const c_void {
     let root: Box<core::Root> = unsafe { Box::from_raw(root.root_ptr as *mut core::Root) };
-    let view = root.view_node.vml_view.as_any().downcast_ref::<IOSView>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<IOSView>().unwrap();
     let swift_ptr = view.swift_ptr;
     Box::leak(root);
     swift_ptr
 }
 
 #[no_mangle]
-pub extern "C" fn vml_root_free(root: IOSRoot) {
+pub extern "C" fn shard_root_free(root: IOSRoot) {
     let _root: Box<core::Root> = unsafe { Box::from_raw(root.root_ptr as *mut core::Root) };
 }
 
 #[no_mangle]
-pub extern "C" fn vml_view_new(
+pub extern "C" fn shard_view_new(
     swift_ptr: *const c_void,
     set_frame: fn(*const c_void, f32, f32, f32, f32) -> (),
     set_prop: fn(*const c_void, *const c_char, *const c_char) -> (),
@@ -117,14 +117,14 @@ pub extern "C" fn vml_view_new(
 }
 
 #[no_mangle]
-pub extern "C" fn vml_view_free(view: *mut IOSView) {
+pub extern "C" fn shard_view_free(view: *mut IOSView) {
     unsafe {
         Box::from_raw(view);
     }
 }
 
 #[no_mangle]
-pub extern "C" fn vml_view_manager_new(
+pub extern "C" fn shard_view_manager_new(
     swift_ptr: *const c_void,
     create_view: fn(*const c_void, *const c_void, *const c_char) -> *mut IOSView,
 ) -> *const IOSViewManager {
@@ -132,14 +132,18 @@ pub extern "C" fn vml_view_manager_new(
 }
 
 #[no_mangle]
-pub extern "C" fn vml_view_manager_free(view_manager: *mut IOSViewManager) {
+pub extern "C" fn shard_view_manager_free(view_manager: *mut IOSViewManager) {
     unsafe {
         Box::from_raw(view_manager);
     }
 }
 
 #[no_mangle]
-pub extern "C" fn vml_render(view_manager: *mut IOSViewManager, context: *const c_void, json: *const c_char) -> IOSRoot {
+pub extern "C" fn shard_render(
+    view_manager: *mut IOSViewManager,
+    context: *const c_void,
+    json: *const c_char,
+) -> IOSRoot {
     let view_manager = unsafe { Box::from_raw(view_manager) };
     let json = unsafe { CStr::from_ptr(json).to_str().unwrap() };
     let root = core::render_root(Box::leak(view_manager), &context, json);

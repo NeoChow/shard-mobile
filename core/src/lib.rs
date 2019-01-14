@@ -12,20 +12,20 @@ use stretch::style::Dimension;
 use json::JsonValue;
 use std::any::Any;
 
-pub trait VMLView: Any {
-    fn add_child(&mut self, child: &VMLView);
+pub trait ShardView: Any {
+    fn add_child(&mut self, child: &ShardView);
     fn set_prop(&mut self, key: &str, value: &JsonValue);
     fn set_frame(&mut self, frame: Rect<f32>);
     fn measure(&self, constraints: Size<Number>) -> Size<f32>;
     fn as_any(&self) -> &Any;
 }
 
-pub trait VMLViewManager {
-    fn create_view(&self, context: &Any, kind: &str) -> Box<VMLView>;
+pub trait ShardViewManager {
+    fn create_view(&self, context: &Any, kind: &str) -> Box<ShardView>;
 }
 
 pub struct ViewNode {
-    pub vml_view: Box<VMLView>,
+    pub shard_view: Box<ShardView>,
     pub children: Vec<ViewNode>,
 }
 
@@ -41,7 +41,7 @@ impl Root {
 }
 
 fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
-    view_node.vml_view.set_frame(Rect {
+    view_node.shard_view.set_frame(Rect {
         start: layout.location.x,
         end: layout.location.x + layout.size.width,
         top: layout.location.y,
@@ -55,14 +55,14 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
     }
 }
 
-pub fn render_root(platform: &VMLViewManager, context: &Any, json: &str) -> Root {
+pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Root {
     let json = json::parse(json).unwrap();
     render(platform, context, &json["root"])
 }
 
-fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
-    let mut vml_view = platform.create_view(context, json["kind"].as_str().expect("Expected kind"));
-    json["props"].entries().for_each(|(key, value)| vml_view.set_prop(key, value));
+fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Root {
+    let mut shard_view = platform.create_view(context, json["kind"].as_str().expect("Expected kind"));
+    json["props"].entries().for_each(|(key, value)| shard_view.set_prop(key, value));
 
     let mut children: Vec<ViewNode> = vec![];
     let mut node_children: Vec<stretch::style::Node> = vec![];
@@ -73,9 +73,9 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         node_children.push(root.stretch_node);
     });
 
-    let raw_vml_view = &*vml_view as *const VMLView;
+    let raw_shard_view = &*shard_view as *const ShardView;
 
-    children.iter().for_each(|child| vml_view.add_child(&*child.vml_view));
+    children.iter().for_each(|child| shard_view.add_child(&*child.shard_view));
 
     let layout = match json["layout"] {
         JsonValue::Object(ref value) => value,
@@ -219,8 +219,8 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         },
 
         measure: Some(Box::new(move |constraint| {
-            let vml_view = unsafe { &*raw_vml_view };
-            vml_view.measure(constraint)
+            let shard_view = unsafe { &*raw_shard_view };
+            shard_view.measure(constraint)
         })),
 
         children: node_children,
@@ -228,7 +228,7 @@ fn render(platform: &VMLViewManager, context: &Any, json: &JsonValue) -> Root {
         ..Default::default()
     };
 
-    Root { view_node: ViewNode { vml_view, children }, stretch_node }
+    Root { view_node: ViewNode { shard_view, children }, stretch_node }
 }
 
 fn parse_dimension(json: &JsonValue, default: Dimension) -> Dimension {

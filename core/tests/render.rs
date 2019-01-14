@@ -25,7 +25,7 @@ fn render_view_of_kind() {
     );
     root.measure(Size::undefined());
 
-    let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.kind, "test");
 }
 
@@ -69,7 +69,7 @@ fn render_view_with_size() {
     );
     root.measure(Size::undefined());
 
-    let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
 }
 
@@ -96,7 +96,7 @@ fn render_view_with_children() {
     assert_eq!(root.view_node.children.len(), 2);
     assert_eq!(root.stretch_node.children.len(), 2);
 
-    let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.child_count, 2);
 }
 
@@ -120,7 +120,7 @@ fn render_view_with_props() {
     );
     root.measure(Size::undefined());
 
-    let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.props["one"], "\"hello\"");
     assert_eq!(view.props["two"], "\"world\"");
 }
@@ -141,6 +141,6 @@ fn render_view_intrinsic_size() {
     );
     root.measure(Size::undefined());
 
-    let view = root.view_node.vml_view.as_any().downcast_ref::<test::View>().unwrap();
+    let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
 }

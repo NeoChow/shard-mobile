@@ -7,11 +7,11 @@
 
 import Quick
 import Nimble
-@testable import VMLKit
+@testable import ShardKit
 
 class ScrollViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = ScrollViewImpl(VMLContext())
+        let viewimpl = ScrollViewImpl(ShardContext())
         
         it("should set direction vertical") {
             viewimpl.setProp(key: "direction", value: JsonValue.String("vertical"))

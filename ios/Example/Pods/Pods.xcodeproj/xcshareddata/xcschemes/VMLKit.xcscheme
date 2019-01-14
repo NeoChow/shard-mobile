@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
-               BuildableName = "VMLKit.framework"
-               BlueprintName = "VMLKit"
+               BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+               BuildableName = "ShardKit.framework"
+               BlueprintName = "ShardKit"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "VMLKit_Tests.xctest"
-               BlueprintName = "VMLKit_Tests"
-               ReferencedContainer = "container:../VMLKit.xcodeproj">
+               BuildableName = "ShardKit_Tests.xctest"
+               BlueprintName = "ShardKit_Tests"
+               ReferencedContainer = "container:../ShardKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,18 +47,18 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "VMLKit_Tests.xctest"
-               BlueprintName = "VMLKit_Tests"
-               ReferencedContainer = "container:../VMLKit.xcodeproj">
+               BuildableName = "ShardKit_Tests.xctest"
+               BlueprintName = "ShardKit_Tests"
+               ReferencedContainer = "container:../ShardKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
-            BuildableName = "VMLKit.framework"
-            BlueprintName = "VMLKit"
+            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BuildableName = "ShardKit.framework"
+            BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -78,9 +78,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
-            BuildableName = "VMLKit.framework"
-            BlueprintName = "VMLKit"
+            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BuildableName = "ShardKit.framework"
+            BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -96,9 +96,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E4BAF18A744E0171B95203BE1DFCCA76"
-            BuildableName = "VMLKit.framework"
-            BlueprintName = "VMLKit"
+            BlueprintIdentifier = "B195F27AEC6F13FB51AAFE1F63B89442"
+            BuildableName = "ShardKit.framework"
+            BlueprintName = "ShardKit"
             ReferencedContainer = "container:Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

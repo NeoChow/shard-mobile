@@ -10,15 +10,15 @@ package app.visly.shards
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import app.visly.vml.VMLRootView
-import app.visly.vml.VMLViewManager
+import app.visly.shard.ShardRootView
+import app.visly.shard.ShardViewManager
 import android.content.Intent
 import android.net.Uri
-import app.visly.vml.JsonValue
+import app.visly.shard.JsonValue
 
 
 class ShardActivity : AppCompatActivity() {
-    lateinit var root: VMLRootView
+    lateinit var root: ShardRootView
     lateinit var instance: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +29,7 @@ class ShardActivity : AppCompatActivity() {
         val title = intent.extras!!.getString("title")!!
 //        val revision = intent.extras!!.getInt("revision")!!
 
-        root = findViewById(R.id.vml_root)
+        root = findViewById(R.id.shard_root)
         root.on("open-url") {
             val url = (it as JsonValue.String).value
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -56,7 +56,7 @@ class ShardActivity : AppCompatActivity() {
     }
 
     fun refresh() {
-        VMLViewManager.instance.loadUrl(this, instance) {
+        ShardViewManager.instance.loadUrl(this, instance) {
             root.setRoot(it)
         }
     }
