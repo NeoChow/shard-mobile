@@ -14,7 +14,7 @@ private func vml_view_manager_create_view(_ self_ptr: UnsafeRawPointer?, _ conte
     return view.rust_ptr;
 }
 
-typealias ViewImplFactory = (VMLContext) -> VMLViewImpl
+public typealias ViewImplFactory = (VMLContext) -> VMLViewImpl
 
 public class VMLViewManager {
     public static let shared = VMLViewManager()
@@ -38,7 +38,7 @@ public class VMLViewManager {
         vml_view_manager_free(rust_ptr)
     }
     
-    func setViewImpl(_ kind: String, _ factory: @escaping ViewImplFactory) {
+    public func setViewImpl(_ kind: String, _ factory: @escaping ViewImplFactory) {
         self.implFactories[kind] = factory
     }
     

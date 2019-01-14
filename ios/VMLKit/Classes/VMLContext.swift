@@ -11,10 +11,10 @@ internal protocol VMLContextDelegate {
     func onActionDispatched(action: String, value: JsonValue?)
 }
 
-class VMLContext {
+public class VMLContext {
     internal var delegate: VMLContextDelegate? = nil
     
-    func dispatch(action: String, value: JsonValue?) {
+    public func dispatch(action: String, value: JsonValue?) {
         delegate?.onActionDispatched(action: action, value: value)
     }
 }
