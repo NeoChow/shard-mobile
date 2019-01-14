@@ -24,6 +24,9 @@
       "~> 5.0.1"
     ]
   },
+  "xcconfig": {
+    "ENABLE_BITCODE": "NO"
+  },
   "subspecs": [
     {
       "name": "ShardCore",

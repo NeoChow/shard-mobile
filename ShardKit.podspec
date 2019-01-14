@@ -14,6 +14,8 @@ Pod::Spec.new do |s|
 
   s.dependency 'Kingfisher', '~> 5.0.1'
 
+  s.xcconfig = { "ENABLE_BITCODE" => "NO" }
+
   s.subspec 'ShardCore' do |core|
     core.source_files = 'ios/Libraries/Headers/*.h'
     core.vendored_libraries = "ios/Libraries/libshard.a"

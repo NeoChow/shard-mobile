@@ -1,4 +1,5 @@
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+ENABLE_BITCODE = NO
 FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher" "${PODS_CONFIGURATION_BUILD_DIR}/ShardKit" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit" "${PODS_ROOT}/AppCenter/AppCenter-SDK-Apple/iOS"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/Alamofire/Alamofire.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/ShardKit/ShardKit.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/SnapKit/SnapKit.framework/Headers" ${PODS_ROOT}/ShardCore/Libraries/Headers
