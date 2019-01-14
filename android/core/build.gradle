@@ -65,7 +65,7 @@ dependencies {
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'android-shard-client'
+    bintrayName = 'shard-android-client'
 
     publishedGroupId = 'app.visly.shard'
     libraryName = bintrayName
@@ -73,14 +73,14 @@ ext {
 
     libraryDescription = 'Android Shard client library'
 
-    siteUrl = 'https://visly.app'
+    siteUrl = 'https://shardlib.com'
     gitUrl = 'https://github.com/vislyhq/shard-mobile.git'
 
-    libraryVersion = '0.1.4'
+    libraryVersion = '0.1.0'
 
     developerId = 'visly'
     developerName = 'Visly'
-    developerEmail = 'android@visly.app'
+    developerEmail = 'emil@visly.app'
 
     licenseName = 'MIT'
     licenseUrl = 'https://github.com/vislyhq/shard-mobile/blob/master/LICENSE'
