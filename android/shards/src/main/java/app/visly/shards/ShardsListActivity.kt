@@ -135,7 +135,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         setHasStableIds(true)
 
         service = Retrofit.Builder()
-                .baseUrl("https://shard.visly.app/")
+                .baseUrl("https://playground.shardlib.com/")
                 .build()
                 .create<ShardService>(ShardService::class.java)
     }
@@ -183,7 +183,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 vh.scanner.setHasPermission(cameraPermissionGranted)
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
                 vh.scanner.delegate.didScanUrl = { url ->
-                    if (url.host == "shard.visly.app") {
+                    if (url.host == "playground.shardlib.com") {
                         val parts = url.path.split("/")
                         val instance = parts[0]
                         val revision = parts[1].toInt()
@@ -218,7 +218,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
             is ShardViewHolder -> {
                 val shard = shards[position - SHARD_OFFSET]
                 vh.title.text = shard.title
-                vh.subtitle.text = "https://visly.app/${shard.instance}/${shard.revision}"
+                vh.subtitle.text = "https://playground.shardlib.com/${shard.instance}/${shard.revision}"
                 vh.itemView.setOnClickListener {
                     startShardActivity(shard)
                 }

@@ -1,8 +1,8 @@
 {
   "name": "ShardKit",
   "version": "0.1.2",
-  "summary": "iOS implementation of https://visly.app",
-  "homepage": "https://visly.app",
+  "summary": "iOS implementation of https://shardlib.com",
+  "homepage": "https://shardlib.com",
   "authors": {
     "Visly Inc.": "emil@visly.app"
   },

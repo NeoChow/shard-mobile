@@ -14,8 +14,8 @@ class ImageViewImplSpec: QuickSpec {
         let viewimpl = ImageViewImpl(ShardContext())
         
         it("should set src") {
-            viewimpl.setProp(key: "src", value: JsonValue.String("https://visly.app"))
-            expect(viewimpl.src).to(equal(URL(string: "https://visly.app")))
+            viewimpl.setProp(key: "src", value: JsonValue.String("https://shardlib.com"))
+            expect(viewimpl.src).to(equal(URL(string: "https://shardlib.com")))
         }
         
         it("should set content mode to cover") {

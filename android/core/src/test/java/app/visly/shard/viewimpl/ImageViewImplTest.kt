@@ -30,8 +30,8 @@ class ImageViewImplTest {
     @Test
     fun testSetSrc() {
         val viewImpl = ImageViewImpl(context)
-        viewImpl.setProp("src", JsonValue.String("https://visly.app"))
-        assertEquals(viewImpl.src, "https://visly.app")
+        viewImpl.setProp("src", JsonValue.String("https://shardlib.com"))
+        assertEquals(viewImpl.src, "https://shardlib.com")
     }
 
     @Test

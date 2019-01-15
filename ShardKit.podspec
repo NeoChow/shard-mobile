@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name             = 'ShardKit'
   s.version          = '0.1.3'
-  s.summary          = 'iOS implementation of https://visly.app'
-  s.homepage         = 'https://visly.app'
+  s.summary          = 'iOS implementation of https://shardlib.com'
+  s.homepage         = 'https://shardlib.com'
   s.author           = { 'Visly Inc.' => 'emil@visly.app' }
   s.source           = { :git => 'https://github.com/vislyhq/shard-mobile.git', :tag => s.version.to_s }
   s.license          = { :type => 'MIT', :file => 'LICENSE' }

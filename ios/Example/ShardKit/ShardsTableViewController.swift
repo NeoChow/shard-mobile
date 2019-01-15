@@ -51,7 +51,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     func loadExamples() {
-        fetchData(url: URL(string: "https://shard.visly.app/api/shards/examples")!) { json in
+        fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { json in
             do {
                 let examples = try json.asArray()
                 for example in examples {
@@ -158,7 +158,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     func didScan(url: URL) {
         guard
-            url.host == "shard.visly.app"
+            url.host == "playground.shardlib.com"
         else {
             return
         }
