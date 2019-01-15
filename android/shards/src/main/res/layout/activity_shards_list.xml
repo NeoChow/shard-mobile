@@ -26,7 +26,7 @@ LICENSE file in the root directory of this source tree.
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:logo="@drawable/ic_logo"
+            app:logo="@mipmap/ic_logo"
             app:title="@string/app_name"
             app:titleMarginStart="30dp"
             app:contentInsetStart="20dp"/>
