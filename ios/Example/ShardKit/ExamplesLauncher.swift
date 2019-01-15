@@ -1,10 +1,9 @@
-//
-//  ExamplesLauncher.swift
-//  ShardKit_Example
-//
-//  Created by Anna Viklund on 2019-01-15.
-//  Copyright © 2019 CocoaPods. All rights reserved.
-//
+/**
+ * Copyright (c) Visly Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 import UIKit
 import ShardKit
@@ -38,23 +37,25 @@ class ExamplesLauncher: NSObject {
             window.addSubview(rootView)
             rootView.setRoot(content)
             
-            let size = content.measure(width: window.frame.width, height: window.frame.height)
+            let safeGuide = window.safeAreaLayoutGuide
+            let safeFrame = example!.position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
+            let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
             switch example!.position {
             case "top":
-                initY = 0 - size.height
-                finalY = 0
+                initY = window.frame.minY - size.height
+                finalY = safeFrame.minY
                 initAlpha = 1
                 finalAlpha = 1
                 break
             case "bottom":
-                initY = window.frame.height
-                finalY = window.frame.height - size.height
+                initY = window.frame.maxY
+                finalY = safeFrame.maxY - size.height
                 initAlpha = 1
                 finalAlpha = 1
                 break
             default:
-                initY = (window.frame.height - size.height) / 2
+                initY = safeFrame.midY - (size.height / 2)
                 finalY = self.initY
                 initAlpha = 0
                 finalAlpha = 1
@@ -62,9 +63,8 @@ class ExamplesLauncher: NSObject {
             }
             
             rootView.alpha = initAlpha!
-            
             rootView.frame = CGRect(
-                x: 0,
+                x: safeFrame.minX,
                 y: initY!,
                 width: size.width,
                 height: size.height
@@ -74,7 +74,7 @@ class ExamplesLauncher: NSObject {
                 self.backgroundView.alpha = 1
                 self.rootView.alpha = self.finalAlpha!
                 self.rootView.frame = CGRect(
-                    x: 0,
+                    x: self.rootView.frame.minX,
                     y: self.finalY!,
                     width: self.rootView.frame.size.width,
                     height: self.rootView.frame.size.height
