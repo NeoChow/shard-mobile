@@ -1,5 +1,5 @@
 # Shard Mobile libraries
-[![CircleCI](https://circleci.com/gh/vislyhq/shard-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/shard-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/android-shard-client/images/download.svg) ](https://bintray.com/visly/maven/android-shard-client)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/ShardKit/badge.png)](https://cocoadocs.org/docsets/ShardKit)
+[![CircleCI](https://circleci.com/gh/vislyhq/shard-mobile.svg?style=svg)](https://circleci.com/gh/vislyhq/shard-mobile)[ ![Download](https://api.bintray.com/packages/visly/maven/shard-android-client/images/download.svg) ](https://bintray.com/visly/maven/shard-android-client)[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/ShardKit/badge.png)](https://cocoadocs.org/docsets/ShardKit)
 
 Mobile client libraries for https://shardlib.com. If you are interested in integrating it into your app feel free to contact us at hello@visly.app or post an issue on the repo.
 
@@ -8,17 +8,11 @@ This repo contains both the Android and iOS libraries for Shard written in Kotli
 
 ## Getting started
 ### Android
-To get started using Shard in your Android app start by adding our bintray maven repo and then the Shard dependency itself.
+To get started using Shard in your Android app just add the Shard core dependency.
 
 ```groovy
-repositories {
-    maven {
-        url  "https://dl.bintray.com/visly/maven"
-    }
-}
-
 dependencies {
-    implementation 'app.visly.shard:core:0.1.4'
+    implementation 'app.visly.shard:core:0.1.5'
 }
 ```
 
@@ -67,7 +61,7 @@ platform :ios, '11.0'
 use_frameworks!
 
 target 'ios' do
-  pod 'ShardKit', '~> 0.1.2'
+  pod 'ShardKit', '~> 0.1.5'
 end
 ```
 
