@@ -129,7 +129,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             self.performSegue(withIdentifier: "viewShard", sender: self)
             break
         case 1:
-            self.examplesLauncher.showExample()
+            let example = self.examples[indexPath.row]
+            self.examplesLauncher.load(example)
             break
         default:
             break
