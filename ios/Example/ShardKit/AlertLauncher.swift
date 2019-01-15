@@ -8,11 +8,11 @@
 import UIKit
 import ShardKit
 
-class ExamplesLauncher: NSObject {
+class AlertLauncher: NSObject {
     let backgroundView = UIView()
     let rootView = ShardRootView()
     
-    var example: Example? = nil
+    var shard: ShardData? = nil
     var initAlpha: CGFloat? = nil
     var finalAlpha: CGFloat? = nil
     var initY: CGFloat? = nil
@@ -22,15 +22,15 @@ class ExamplesLauncher: NSObject {
         super.init()
     }
     
-    func load(_ example: Example) {
-        self.example = example
-        let url = URL(string: example.url)
+    public func load(withShard shard: ShardData) {
+        self.shard = shard
+        let url = URL(string: shard.url)
         ShardViewManager.shared.loadUrl(url: url!) { result in
-            self.showExample(withContent: result)
+            self.showAlert(withContent: result)
         }
     }
     
-    func showExample(withContent content: ShardRoot) {
+    private func showAlert(withContent content: ShardRoot) {
         if let window = UIApplication.shared.keyWindow {
             setupBackgroundView(inWindow: window)
             
@@ -38,10 +38,10 @@ class ExamplesLauncher: NSObject {
             rootView.setRoot(content)
             
             let safeGuide = window.safeAreaLayoutGuide
-            let safeFrame = example!.position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
+            let safeFrame = shard!.position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
             let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
-            switch example!.position {
+            switch shard!.position {
             case "top":
                 initY = window.frame.minY - size.height
                 finalY = safeFrame.minY
@@ -83,16 +83,16 @@ class ExamplesLauncher: NSObject {
         }
     }
     
-    func setupBackgroundView(inWindow window: UIWindow) {
+    private func setupBackgroundView(inWindow window: UIWindow) {
         backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         backgroundView.alpha = 0
-        backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissExample)))
+        backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissAlert)))
         
         window.addSubview(backgroundView)
         backgroundView.frame = window.frame
     }
     
-    @objc func dismissExample() {
+    @objc private func dismissAlert() {
         UIView.animate(withDuration: 0.5, animations: {
             self.backgroundView.alpha = 0
             self.rootView.alpha = self.initAlpha!

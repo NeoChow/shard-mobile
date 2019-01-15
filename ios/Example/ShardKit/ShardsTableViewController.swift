@@ -10,7 +10,7 @@ import ShardKit
 import CoreData
 import Alamofire
 
-struct Example {
+struct ShardData {
     let title: String
     let description: String
     let url: String
@@ -27,10 +27,10 @@ struct Example {
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
-    let examplesLauncher = ExamplesLauncher()
+    let alertLauncher = AlertLauncher()
     
     var shards: [Shard] = []
-    var examples: [Example] = []
+    var examples: [ShardData] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,7 +67,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             do {
                 let examples = try json.asArray()
                 for example in examples {
-                    self.examples = [try Example(json: example)] + self.examples
+                    self.examples = [try ShardData(json: example)] + self.examples
                 }
             } catch {
                 self.examples = []
@@ -132,7 +132,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             break
         case 1:
             let example = self.examples[indexPath.row]
-            self.examplesLauncher.load(example)
+            self.alertLauncher.load(withShard: example)
             break
         default:
             break
