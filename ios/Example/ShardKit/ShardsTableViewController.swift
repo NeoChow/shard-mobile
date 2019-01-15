@@ -14,12 +14,14 @@ struct Example {
     let title: String
     let description: String
     let url: String
+    let position: String
     
     init(json: JsonValue) throws {
         let values = try json.asObject()
         self.title = try values["title"]!.asString()
         self.description = try values["description"]!.asString()
         self.url = try values["url"]!.asString()
+        self.position = try values["settings"]!.asObject()["position"]!.asString()
     }
 }
 
