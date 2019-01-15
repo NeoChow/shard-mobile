@@ -27,6 +27,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     let scanVC = ScanViewController()
     var shards: [Shard] = []
     var examples: [Example] = []
+    let backgroundView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +51,14 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         loadExamples()
     }
     
+    func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
+        let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
+            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
+            DispatchQueue.main.async { onComplete(json) }
+        }
+        task.resume()
+    }
+    
     func loadExamples() {
         fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { json in
             do {
@@ -64,12 +73,25 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
-    func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
-        let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
-            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
-            DispatchQueue.main.async { onComplete(json) }
+    func showExample() {
+        if let window = UIApplication.shared.keyWindow {
+            backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+            backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissExample)))
+            
+            window.addSubview(backgroundView)
+            backgroundView.frame = window.frame
+            backgroundView.alpha = 0
+            
+            UIView.animate(withDuration: 0.5, animations: {
+                self.backgroundView.alpha = 1
+            })
         }
-        task.resume()
+    }
+    
+    @objc func dismissExample() {
+        UIView.animate(withDuration: 0.5, animations: {
+            self.backgroundView.alpha = 0
+        })
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -121,6 +143,17 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        switch indexPath.section {
+        case 0:
+            self.performSegue(withIdentifier: "viewShard", sender: self)
+            break
+        case 1:
+            self.showExample()
+            break
+        default:
+            break
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -132,19 +165,10 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 shardVC.url = URL(string:  "http://localhost:3000")
             } else {
                 let indexPath = tableView.indexPathForSelectedRow!
-                switch indexPath.section {
-                case 0:
+                if (indexPath.section == 0) {
                     let shard = self.shards[tableView.indexPathForSelectedRow!.row]
                     shardVC.title = shard.title
                     shardVC.url = URL(string: shard.instance!)
-                    break
-                case 1:
-                    let example = self.examples[tableView.indexPathForSelectedRow!.row]
-                    shardVC.title = example.title
-                    shardVC.url = URL(string: example.url)
-                    break
-                default:
-                    break
                 }
             }
         }
