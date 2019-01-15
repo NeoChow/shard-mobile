@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ShardKit'
-  s.version          = '0.1.3'
+  s.version          = '0.1.5'
   s.summary          = 'iOS implementation of https://shardlib.com'
   s.homepage         = 'https://shardlib.com'
   s.author           = { 'Visly Inc.' => 'emil@visly.app' }

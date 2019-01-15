@@ -76,7 +76,7 @@ ext {
     siteUrl = 'https://shardlib.com'
     gitUrl = 'https://github.com/vislyhq/shard-mobile.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.5'
 
     developerId = 'visly'
     developerName = 'Visly'
