@@ -19,15 +19,13 @@ import app.visly.shard.JsonValue
 
 class ShardActivity : AppCompatActivity() {
     lateinit var root: ShardRootView
-    lateinit var instance: String
+    lateinit var url: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shard)
 
-        instance = intent.extras!!.getString("instance")!!
-        val title = intent.extras!!.getString("title")!!
-//        val revision = intent.extras!!.getInt("revision")!!
+        url = intent.extras!!.getString("url")!!
 
         root = findViewById(R.id.shard_root)
         root.on("open-url") {
@@ -37,7 +35,7 @@ class ShardActivity : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.activity_shard)
-        toolbar.title = title
+        toolbar.title = intent.extras!!.getString("title")!!
 
         toolbar.setNavigationOnClickListener {
             finish()
@@ -56,7 +54,7 @@ class ShardActivity : AppCompatActivity() {
     }
 
     fun refresh() {
-        ShardViewManager.instance.loadUrl(this, instance) {
+        ShardViewManager.instance.loadUrl(this, url) {
             root.setRoot(it)
         }
     }

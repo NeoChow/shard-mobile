@@ -7,12 +7,19 @@
 
 package app.visly.shards
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+data class ShardSettings(
+        val display: String,
+        val position: String
+)
+
 @Entity data class Shard(
-        @PrimaryKey(autoGenerate = true) val id : Int? = null,
+        @PrimaryKey val id : String,
         val title: String,
-        val instance: String,
-        val revision: Int
+        val url: String,
+        val description: String?,
+        @Embedded val settings: ShardSettings
 )

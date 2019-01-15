@@ -92,6 +92,14 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
                 adapter.shards = shards.await()
             }
         }
+
+        ShardService.instance.getExamples().enqueue(object: Callback<List<Shard>> {
+            override fun onResponse(call: Call<List<Shard>>, response: Response<List<Shard>>) {
+                adapter.examples = response.body()!!
+            }
+
+            override fun onFailure(call: Call<List<Shard>>, t: Throwable) {}
+        })
     }
 
     fun didRequestPermission() {
@@ -125,19 +133,21 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         set(value) {
             field = value
             notifyDataSetChanged()
+
+        }
+
+    var examples: List<Shard> = listOf()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+
         }
 
     private val inflater = LayoutInflater.from(activity)
-    private val service: ShardService
     private var cameraPermissionGranted: Boolean = false
 
     init {
         setHasStableIds(true)
-
-        service = Retrofit.Builder()
-                .baseUrl("https://playground.shardlib.com/")
-                .build()
-                .create<ShardService>(ShardService::class.java)
     }
 
     companion object {
@@ -145,25 +155,41 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         const val VIEW_TYPE_HEADER = 1
         const val VIEW_TYPE_SHARD = 2
 
+        const val ID_SCANNER = 0L
+        const val ID_HEADER_EXAMPLES = 1L
+        const val ID_HEADER_SHARDS = 2L
+
         const val SHARD_OFFSET = 2
     }
 
     override fun getItemCount(): Int {
-        return SHARD_OFFSET + shards.size
+        return  1 /* scanner */ +
+                1 /* examples header */ +
+                1 /* shards header */ +
+                shards.size + examples.size
+    }
+
+    fun shardAtPosition(position: Int): Shard {
+        return if (position < SHARD_OFFSET + examples.size) {
+            examples[position - SHARD_OFFSET]
+        } else {
+            shards[position - SHARD_OFFSET - examples.size - 1]
+        }
     }
 
     override fun getItemId(position: Int): Long {
         return when (position) {
-            0 -> 0
-            1 -> 1
-            else -> (shards[position - SHARD_OFFSET].id!! + SHARD_OFFSET).toLong()
+            0 -> ID_SCANNER
+            1 -> ID_HEADER_EXAMPLES
+            SHARD_OFFSET + examples.size -> ID_HEADER_SHARDS
+            else -> shardAtPosition(position).url.hashCode().toLong()
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> VIEW_TYPE_SCANNER
-            1 -> VIEW_TYPE_HEADER
+            1, SHARD_OFFSET + examples.size -> VIEW_TYPE_HEADER
             else -> VIEW_TYPE_SHARD
         }
     }
@@ -186,12 +212,10 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                     if (url.host == "playground.shardlib.com") {
                         val parts = url.path.split("/")
                         val instance = parts[0]
-                        val revision = parts[1].toInt()
 
-                        service.getShard(instance).enqueue(object: Callback<ShardResponse> {
-                            override fun onResponse(call: Call<ShardResponse>, response: Response<ShardResponse>) {
-                                val shard = Shard(title = response.body()!!.title, instance = instance, revision = revision)
-
+                        ShardService.instance.getShard(instance).enqueue(object: Callback<Shard> {
+                            override fun onResponse(call: Call<Shard>, response: Response<Shard>) {
+                                val shard = response.body()!!
                                 shards.add(0, shard)
                                 notifyItemInserted(0)
 
@@ -205,20 +229,24 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                                 startShardActivity(shard)
                             }
 
-                            override fun onFailure(call: Call<ShardResponse>, t: Throwable) {}
+                            override fun onFailure(call: Call<Shard>, t: Throwable) {}
                         })
                     }
                 }
             }
 
             is HeaderViewHolder -> {
-                vh.label.text = activity.getString(R.string.previous_shards)
+                if (position == 1) {
+                    vh.label.text = activity.getString(R.string.examples)
+                } else {
+                    vh.label.text = activity.getString(R.string.previous_shards)
+                }
             }
 
             is ShardViewHolder -> {
-                val shard = shards[position - SHARD_OFFSET]
+                val shard = shardAtPosition(position)
                 vh.title.text = shard.title
-                vh.subtitle.text = "https://playground.shardlib.com/${shard.instance}/${shard.revision}"
+                vh.subtitle.text = shard.url
                 vh.itemView.setOnClickListener {
                     startShardActivity(shard)
                 }
@@ -229,8 +257,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
     fun startShardActivity(shard: Shard) {
         activity.startActivity(Intent(activity, ShardActivity::class.java).apply {
             putExtra("title", shard.title)
-            putExtra("instance", shard.instance)
-            putExtra("revision", shard.revision)
+            putExtra("url", shard.url)
         })
     }
 
