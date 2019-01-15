@@ -12,7 +12,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import com.facebook.common.internal.DoNotStrip
+import androidx.annotation.Keep
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.soloader.SoLoader
 import kotlinx.coroutines.GlobalScope
@@ -45,7 +45,7 @@ class ShardViewManager internal constructor() {
         }
     }
 
-    @DoNotStrip private var rustPtr: Long = 0
+    @Keep private var rustPtr: Long = 0
     private fun finalize() { free() }
     private external fun bind(): Long
     private external fun free()
@@ -93,7 +93,7 @@ class ShardViewManager internal constructor() {
         implFactories[kind] = implFactory as (ShardContext) -> ShardViewImpl<View>
     }
 
-    @DoNotStrip private fun createView(ctx: ShardContext, kind: String): ShardView {
+    @Keep private fun createView(ctx: ShardContext, kind: String): ShardView {
         return ShardView(ctx, implFactories[kind]!!(ctx))
     }
 }

@@ -9,7 +9,7 @@ package app.visly.shard
 
 import android.graphics.RectF
 import android.view.View
-import com.facebook.common.internal.DoNotStrip
+import androidx.annotation.Keep
 import kotlin.math.ceil
 
 interface ShardViewImpl<T: View> {
@@ -20,7 +20,7 @@ interface ShardViewImpl<T: View> {
 }
 
 class ShardView(private val ctx: ShardContext, internal val impl: ShardViewImpl<View>) {
-    @DoNotStrip private val rustPtr = bind()
+    @Keep private val rustPtr = bind()
     private fun finalize() { free() }
     private external fun bind(): Long
     private external fun free()
@@ -34,20 +34,20 @@ class ShardView(private val ctx: ShardContext, internal val impl: ShardViewImpl<
         impl.createView()
     }
 
-    @DoNotStrip private fun setFrame(start: Float, end: Float, top: Float, bottom: Float) {
+    @Keep private fun setFrame(start: Float, end: Float, top: Float, bottom: Float) {
         val density = ctx.resources.displayMetrics.density
         this.frame = RectF(start * density, top * density, end * density, bottom * density)
     }
 
-    @DoNotStrip private fun addChild(child: ShardView) {
+    @Keep private fun addChild(child: ShardView) {
         children.add(child)
     }
 
-    @DoNotStrip private fun setProp(key: String, value: String) {
+    @Keep private fun setProp(key: String, value: String) {
         impl.setProp(key, JsonValue.parse(value))
     }
 
-    @DoNotStrip private fun measure(width: Float, height: Float): Size {
+    @Keep private fun measure(width: Float, height: Float): Size {
         val density = ctx.resources.displayMetrics.density
         val size = impl.measure(
                 if (width.isNaN()) null else width * density,

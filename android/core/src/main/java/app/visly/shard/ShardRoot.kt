@@ -1,10 +1,10 @@
 package app.visly.shard
 
 import android.view.View
-import com.facebook.common.internal.DoNotStrip
+import androidx.annotation.Keep
 import java.lang.RuntimeException
 
-class ShardRoot(internal val ctx: ShardContext, @DoNotStrip internal val rustPtr: Long) {
+class ShardRoot(internal val ctx: ShardContext, @Keep internal val rustPtr: Long) {
     private fun finalize() { free() }
     private external fun free()
     private external fun getView(): ShardView
