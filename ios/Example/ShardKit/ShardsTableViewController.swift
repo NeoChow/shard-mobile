@@ -29,8 +29,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
     
-    var shards: [Shard] = []
     var examples: [ShardData] = []
+    var shards: [Shard] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,9 +83,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0:
-            return "Previous shards"
-        case 1:
             return "Examples"
+        case 1:
+            return "Previous shards"
         default:
             return nil
         }
@@ -94,9 +94,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
-            return shards.count
-        case 1:
             return examples.count
+        case 1:
+            return shards.count
         default:
             return 0
         }
@@ -107,14 +107,14 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         switch indexPath.section {
         case 0:
-            let shard = shards[indexPath.row]
-            cell.textLabel?.text = shard.title
-            cell.detailTextLabel?.text = shard.instance
-            break
-        case 1:
             let example = examples[indexPath.row]
             cell.textLabel?.text = example.title
             cell.detailTextLabel?.text = example.description
+            break
+        case 1:
+            let shard = shards[indexPath.row]
+            cell.textLabel?.text = shard.title
+            cell.detailTextLabel?.text = shard.instance
             break
         default:
             break
@@ -128,11 +128,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         switch indexPath.section {
         case 0:
-            self.performSegue(withIdentifier: "viewShard", sender: self)
-            break
-        case 1:
             let example = self.examples[indexPath.row]
             self.alertLauncher.load(withShard: example)
+            break
+        case 1:
+            self.performSegue(withIdentifier: "viewShard", sender: self)
             break
         default:
             break
@@ -148,7 +148,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 shardVC.url = URL(string:  "http://localhost:3000")
             } else {
                 let indexPath = tableView.indexPathForSelectedRow!
-                if (indexPath.section == 0) {
+                if (indexPath.section == 1) {
                     let shard = self.shards[tableView.indexPathForSelectedRow!.row]
                     shardVC.title = shard.title
                     shardVC.url = URL(string: shard.instance!)
