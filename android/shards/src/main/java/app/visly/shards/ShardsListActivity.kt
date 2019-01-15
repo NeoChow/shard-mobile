@@ -10,11 +10,9 @@ package app.visly.shards
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -31,7 +29,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IllegalArgumentException
-import retrofit2.Retrofit
+import android.view.*
+import android.widget.FrameLayout
+import android.widget.PopupWindow
+import app.visly.shard.JsonValue
+import app.visly.shard.ShardRootView
+import app.visly.shard.ShardViewManager
+
 
 class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -62,11 +66,13 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_localhost -> {
-                        startActivity(Intent(this, ShardActivity::class.java).apply {
-                            putExtra("title", "localhost")
-                            putExtra("instance", "http://10.0.2.2:3000")
-                            putExtra("revision", 0)
-                        })
+                        showShard(Shard(
+                                id = "localhost",
+                                title = "localhost",
+                                url = "http://10.0.2.2:3000",
+                                description = null,
+                                settings = ShardSettings(display = "popup", position = "center")
+                        ))
                         true
                     }
                     else -> throw IllegalArgumentException()
@@ -92,6 +98,14 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
                 adapter.shards = shards.await()
             }
         }
+
+        ShardService.instance.getExamples().enqueue(object: Callback<List<Shard>> {
+            override fun onResponse(call: Call<List<Shard>>, response: Response<List<Shard>>) {
+                adapter.examples = response.body()!!
+            }
+
+            override fun onFailure(call: Call<List<Shard>>, t: Throwable) {}
+        })
     }
 
     fun didRequestPermission() {
@@ -103,6 +117,45 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 adapter.setPermissionGranted(true)
             }
+        }
+    }
+
+    fun showShard(shard: Shard, onDismiss: () -> Unit = {}) {
+        val popupView = layoutInflater.inflate(R.layout.shard_popup, null, false)
+        val shardRoot = popupView.findViewById<ShardRootView>(R.id.shard_root)
+        val activityRoot = findViewById<View>(android.R.id.content)
+
+        val popWindow = PopupWindow(
+                popupView,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                true)
+
+        shardRoot.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                when (shard.settings.position) {
+                    "top" -> Gravity.TOP
+                    "bottom" -> Gravity.BOTTOM
+                    else -> Gravity.CENTER
+                }
+        )
+
+        popWindow.isFocusable = true
+        popWindow.showAtLocation(activityRoot, Gravity.CENTER, 0, 0)
+        popWindow.setOnDismissListener { onDismiss() }
+
+        ShardViewManager.instance.loadUrl(this, shard.url) {
+            shardRoot.setRoot(it)
+        }
+
+        shardRoot.on("open-url") {
+            val url = (it as JsonValue.String).value
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        }
+
+        popupView.setOnClickListener {
+            popWindow.dismiss()
         }
     }
 }
@@ -125,19 +178,21 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         set(value) {
             field = value
             notifyDataSetChanged()
+
+        }
+
+    var examples: List<Shard> = listOf()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+
         }
 
     private val inflater = LayoutInflater.from(activity)
-    private val service: ShardService
     private var cameraPermissionGranted: Boolean = false
 
     init {
         setHasStableIds(true)
-
-        service = Retrofit.Builder()
-                .baseUrl("https://playground.shardlib.com/")
-                .build()
-                .create<ShardService>(ShardService::class.java)
     }
 
     companion object {
@@ -145,25 +200,41 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         const val VIEW_TYPE_HEADER = 1
         const val VIEW_TYPE_SHARD = 2
 
+        const val ID_SCANNER = 0L
+        const val ID_HEADER_EXAMPLES = 1L
+        const val ID_HEADER_SHARDS = 2L
+
         const val SHARD_OFFSET = 2
     }
 
     override fun getItemCount(): Int {
-        return SHARD_OFFSET + shards.size
+        return  1 /* scanner */ +
+                1 /* examples header */ +
+                1 /* shards header */ +
+                shards.size + examples.size
+    }
+
+    fun shardAtPosition(position: Int): Shard {
+        return if (position < SHARD_OFFSET + examples.size) {
+            examples[position - SHARD_OFFSET]
+        } else {
+            shards[position - SHARD_OFFSET - examples.size - 1]
+        }
     }
 
     override fun getItemId(position: Int): Long {
         return when (position) {
-            0 -> 0
-            1 -> 1
-            else -> (shards[position - SHARD_OFFSET].id!! + SHARD_OFFSET).toLong()
+            0 -> ID_SCANNER
+            1 -> ID_HEADER_EXAMPLES
+            SHARD_OFFSET + examples.size -> ID_HEADER_SHARDS
+            else -> shardAtPosition(position).url.hashCode().toLong()
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> VIEW_TYPE_SCANNER
-            1 -> VIEW_TYPE_HEADER
+            1, SHARD_OFFSET + examples.size -> VIEW_TYPE_HEADER
             else -> VIEW_TYPE_SHARD
         }
     }
@@ -184,14 +255,13 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
                 vh.scanner.delegate.didScanUrl = { url ->
                     if (url.host == "playground.shardlib.com") {
+                        vh.scanner.paused = true
                         val parts = url.path.split("/")
                         val instance = parts[0]
-                        val revision = parts[1].toInt()
 
-                        service.getShard(instance).enqueue(object: Callback<ShardResponse> {
-                            override fun onResponse(call: Call<ShardResponse>, response: Response<ShardResponse>) {
-                                val shard = Shard(title = response.body()!!.title, instance = instance, revision = revision)
-
+                        ShardService.instance.getShard(instance).enqueue(object: Callback<Shard> {
+                            override fun onResponse(call: Call<Shard>, response: Response<Shard>) {
+                                val shard = response.body()!!
                                 shards.add(0, shard)
                                 notifyItemInserted(0)
 
@@ -202,36 +272,34 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                                     }
                                 }
 
-                                startShardActivity(shard)
+                                activity.showShard(shard) {
+                                    vh.scanner.paused = false
+                                }
                             }
 
-                            override fun onFailure(call: Call<ShardResponse>, t: Throwable) {}
+                            override fun onFailure(call: Call<Shard>, t: Throwable) {}
                         })
                     }
                 }
             }
 
             is HeaderViewHolder -> {
-                vh.label.text = activity.getString(R.string.previous_shards)
+                if (position == 1) {
+                    vh.label.text = activity.getString(R.string.examples)
+                } else {
+                    vh.label.text = activity.getString(R.string.previous_shards)
+                }
             }
 
             is ShardViewHolder -> {
-                val shard = shards[position - SHARD_OFFSET]
+                val shard = shardAtPosition(position)
                 vh.title.text = shard.title
-                vh.subtitle.text = "https://playground.shardlib.com/${shard.instance}/${shard.revision}"
+                vh.subtitle.text = shard.description ?: shard.url
                 vh.itemView.setOnClickListener {
-                    startShardActivity(shard)
+                    activity.showShard(shard)
                 }
             }
         }
-    }
-
-    fun startShardActivity(shard: Shard) {
-        activity.startActivity(Intent(activity, ShardActivity::class.java).apply {
-            putExtra("title", shard.title)
-            putExtra("instance", shard.instance)
-            putExtra("revision", shard.revision)
-        })
     }
 
     fun setPermissionGranted(granted: Boolean) {

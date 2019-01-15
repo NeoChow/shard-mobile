@@ -24,6 +24,7 @@ class ScanView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private val requestPermission: Button
 
     val delegate = Delegate()
+    var paused: Boolean = false
 
     init {
         View.inflate(context, R.layout.view_scan, this)
@@ -45,8 +46,10 @@ class ScanView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun barcodeResult(result: BarcodeResult?) {
-        val url = URI.create(result!!.text)
-        delegate.didScanUrl?.invoke(url)
+        if (!paused) {
+            val url = URI.create(result!!.text)
+            delegate.didScanUrl?.invoke(url)
+        }
     }
 
     override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) { }
