@@ -120,7 +120,7 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
         }
     }
 
-    fun showShard(shard: Shard) {
+    fun showShard(shard: Shard, onDismiss: () -> Unit = {}) {
         val popupView = layoutInflater.inflate(R.layout.shard_popup, null, false)
         val shardRoot = popupView.findViewById<ShardRootView>(R.id.shard_root)
         val activityRoot = findViewById<View>(android.R.id.content)
@@ -143,6 +143,7 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
 
         popWindow.isFocusable = true
         popWindow.showAtLocation(activityRoot, Gravity.CENTER, 0, 0)
+        popWindow.setOnDismissListener { onDismiss() }
 
         ShardViewManager.instance.loadUrl(this, shard.url) {
             shardRoot.setRoot(it)
@@ -254,6 +255,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
                 vh.scanner.delegate.didScanUrl = { url ->
                     if (url.host == "playground.shardlib.com") {
+                        vh.scanner.paused = true
                         val parts = url.path.split("/")
                         val instance = parts[0]
 
@@ -270,7 +272,9 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                                     }
                                 }
 
-                                activity.showShard(shard)
+                                activity.showShard(shard) {
+                                    vh.scanner.paused = false
+                                }
                             }
 
                             override fun onFailure(call: Call<Shard>, t: Throwable) {}
