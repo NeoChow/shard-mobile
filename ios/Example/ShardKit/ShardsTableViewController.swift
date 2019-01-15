@@ -25,9 +25,10 @@ struct Example {
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
     let scanVC = ScanViewController()
+    let examplesLauncher = ExamplesLauncher()
+    
     var shards: [Shard] = []
     var examples: [Example] = []
-    let backgroundView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,27 +72,6 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             }
             self.tableView.reloadData()
         }
-    }
-    
-    func showExample() {
-        if let window = UIApplication.shared.keyWindow {
-            backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-            backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissExample)))
-            
-            window.addSubview(backgroundView)
-            backgroundView.frame = window.frame
-            backgroundView.alpha = 0
-            
-            UIView.animate(withDuration: 0.5, animations: {
-                self.backgroundView.alpha = 1
-            })
-        }
-    }
-    
-    @objc func dismissExample() {
-        UIView.animate(withDuration: 0.5, animations: {
-            self.backgroundView.alpha = 0
-        })
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -149,7 +129,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             self.performSegue(withIdentifier: "viewShard", sender: self)
             break
         case 1:
-            self.showExample()
+            self.examplesLauncher.showExample()
             break
         default:
             break
