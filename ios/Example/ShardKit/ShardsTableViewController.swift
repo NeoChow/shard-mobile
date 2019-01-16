@@ -9,6 +9,7 @@ import UIKit
 import ShardKit
 import CoreData
 import Alamofire
+import SafariServices
 
 struct ShardData {
     let url: String
@@ -39,7 +40,7 @@ struct ShardData {
     }
 }
 
-class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate {
+class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
     
@@ -67,9 +68,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         scanVC.delegate = self
         scanVC.view.frame = CGRect(x: 0, y: 0, width: 200, height: 300)
         self.tableView.tableHeaderView = scanVC.view
-        alertLauncher.onDismiss = {
-            self.scanVC.paused = false
-        }
+        
+        alertLauncher.delegate = self
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
@@ -213,5 +213,15 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             
             self.alertLauncher.load(withShard: shardData)
         }
+    }
+    
+    // MARK: - ScanViewControllerDelegate
+
+    func didDismiss() {
+        self.scanVC.paused = true
+    }
+    
+    func didOpenUrl(_ url: URL) {
+        self.present(SFSafariViewController(url: url), animated: true, completion: nil)
     }
 }
