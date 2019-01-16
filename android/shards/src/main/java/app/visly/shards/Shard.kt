@@ -9,6 +9,7 @@ package app.visly.shards
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 data class ShardSettings(
@@ -16,7 +17,8 @@ data class ShardSettings(
         val position: String
 )
 
-@Entity data class Shard(
+@Entity(indices = [Index(value = ["url"], unique = true)])
+data class Shard(
         @PrimaryKey val id : String,
         val title: String,
         val url: String,

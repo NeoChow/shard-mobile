@@ -13,6 +13,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -36,10 +38,10 @@ import app.visly.shard.JsonValue
 import app.visly.shard.ShardRootView
 import app.visly.shard.ShardViewManager
 
-
 class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     lateinit var adapter: ShardsListAdapter
+    var showingShard = false
 
     companion object {
         const val CAMERA_PERMISSION = 0
@@ -120,7 +122,7 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
         }
     }
 
-    fun showShard(shard: Shard, onDismiss: () -> Unit = {}) {
+    fun showShard(shard: Shard) {
         val popupView = layoutInflater.inflate(R.layout.shard_popup, null, false)
         val shardRoot = popupView.findViewById<ShardRootView>(R.id.shard_root)
         val activityRoot = findViewById<View>(android.R.id.content)
@@ -143,7 +145,8 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
 
         popWindow.isFocusable = true
         popWindow.showAtLocation(activityRoot, Gravity.CENTER, 0, 0)
-        popWindow.setOnDismissListener { onDismiss() }
+        popWindow.setOnDismissListener { showingShard = false }
+        showingShard = true
 
         ShardViewManager.instance.loadUrl(this, shard.url) {
             shardRoot.setRoot(it)
@@ -178,14 +181,12 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         set(value) {
             field = value
             notifyDataSetChanged()
-
         }
 
     var examples: List<Shard> = listOf()
         set(value) {
             field = value
             notifyDataSetChanged()
-
         }
 
     private val inflater = LayoutInflater.from(activity)
@@ -254,27 +255,32 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 vh.scanner.setHasPermission(cameraPermissionGranted)
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
                 vh.scanner.delegate.didScanUrl = { url ->
-                    if (url.host == "playground.shardlib.com") {
-                        vh.scanner.paused = true
+                    if (!activity.showingShard && url.host == "playground.shardlib.com") {
+                        activity.showingShard = true
                         val parts = url.path.split("/")
-                        val instance = parts[0]
+                        val instance = parts[3]
+                        val revision = parts[4]
 
-                        ShardService.instance.getShard(instance).enqueue(object: Callback<Shard> {
+                        ShardService.instance.getShard(instance, revision).enqueue(object: Callback<Shard> {
                             override fun onResponse(call: Call<Shard>, response: Response<Shard>) {
                                 val shard = response.body()!!
-                                shards.add(0, shard)
-                                notifyItemInserted(0)
 
-                                val db = ShardsDatabase.instance(activity)
-                                ShardsDatabase.instance(activity)?.apply {
-                                    with(db?.shardDao()) {
-                                        this?.insertShard(shard)
+                                val handler = Handler(Looper.getMainLooper())
+                                GlobalScope.launch {
+                                    ShardsDatabase.instance(activity)?.apply {
+                                        with(shardDao()) {
+                                            try {
+                                                insertShard(shard)
+                                                handler.post {
+                                                    shards.add(0, shard)
+                                                    notifyItemInserted(0)
+                                                }
+                                            } catch (ignored: Exception) { }
+                                        }
                                     }
                                 }
 
-                                activity.showShard(shard) {
-                                    vh.scanner.paused = false
-                                }
+                                activity.showShard(shard)
                             }
 
                             override fun onFailure(call: Call<Shard>, t: Throwable) {}

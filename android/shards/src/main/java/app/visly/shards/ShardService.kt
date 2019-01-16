@@ -17,8 +17,8 @@ interface ShardService {
         }
     }
 
-    @GET("api/shards/{instance}")
-    fun getShard(@Path("instance") instance: String): Call<Shard>
+    @GET("api/shards/{instance}/{revision}")
+    fun getShard(@Path("instance") instance: String, @Path("revision") revision: String): Call<Shard>
 
     @GET("api/shards/examples")
     fun getExamples(): Call<List<Shard>>
