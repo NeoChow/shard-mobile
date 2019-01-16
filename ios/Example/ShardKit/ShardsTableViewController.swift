@@ -11,24 +11,31 @@ import CoreData
 import Alamofire
 
 struct ShardData {
-    let title: String
-    let description: String
     let url: String
     let position: String
+    let title: String?
+    let description: String?
+    
+    init(url: String, position: String, title: String?, description: String?) {
+        self.title = nil
+        self.description = nil
+        self.url = url
+        self.position = "center"
+    }
     
     init(json: JsonValue) throws {
         let values = try json.asObject()
-        self.title = try values["title"]!.asString()
-        self.description = try values["description"]!.asString()
         self.url = try values["url"]!.asString()
         self.position = try values["settings"]!.asObject()["position"]!.asString()
+        self.title = try values["title"]!.asString()
+        self.description = try values["description"]!.asString()
     }
     
     init(shard: Shard) {
-        self.title = shard.title!
-        self.description = shard.instance!
         self.url = shard.instance!
         self.position = "center"
+        self.title = shard.title!
+        self.description = shard.instance!
     }
 }
 
@@ -37,7 +44,17 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     let alertLauncher = AlertLauncher()
     
     var examples: [ShardData] = []
-    var shards: [ShardData] = []
+    var previous: [ShardData] = []
+    
+    @IBAction func onDevButtonPressed(_ sender: UIBarButtonItem) {
+        let shard = ShardData(
+            url: "http://localhost:3000",
+            position: "center",
+            title: nil,
+            description: nil
+        )
+        alertLauncher.load(withShard: shard)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,7 +78,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         let result = try! context.fetch(request) as! [Shard]
         
         for shard in result {
-            self.shards = [ShardData(shard: shard)] + self.shards
+            self.previous = [ShardData(shard: shard)] + self.previous
         }
         
         loadExamples()
@@ -109,7 +126,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case 0:
             return examples.count
         case 1:
-            return shards.count
+            return previous.count
         default:
             return 0
         }
@@ -117,11 +134,21 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "shardcell", for: indexPath)
-        let collection = indexPath.section == 0 ? examples : shards
-        let shard = collection[indexPath.row]
         
-        cell.textLabel?.text = shard.title
-        cell.detailTextLabel?.text = shard.description
+        switch indexPath.section {
+        case 0:
+            let shard = examples[indexPath.row]
+            cell.textLabel?.text = shard.title
+            cell.detailTextLabel?.text = shard.description
+            break
+        case 1:
+            let shard = previous[indexPath.row]
+            cell.textLabel?.text = shard.title
+            cell.detailTextLabel?.text = shard.description
+            break
+        default:
+            break
+        }
         
         return cell
     }
@@ -129,19 +156,17 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let collection = indexPath.section == 0 ? examples : shards
-        let shard = collection[indexPath.row]
-        self.alertLauncher.load(withShard: shard)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.destination is ShardViewController {
-            let shardVC = segue.destination as! ShardViewController
-            
-            if segue.identifier == "localhost" {
-                shardVC.title =  "localhost"
-                shardVC.url = URL(string:  "http://localhost:3000")
-            }
+        switch indexPath.section {
+        case 0:
+            let shard = examples[indexPath.row]
+            self.alertLauncher.load(withShard: shard)
+            break
+        case 1:
+            let shard = previous[indexPath.row]
+            self.alertLauncher.load(withShard: shard)
+            break
+        default:
+            break
         }
     }
     
@@ -183,7 +208,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             appDelegate.saveContext()
             
             let shardData = ShardData(shard: shard)
-            self.shards = [shardData] + self.shards
+            self.previous = [ShardData(shard: shard)] + self.previous
             self.tableView.reloadData()
             
             self.alertLauncher.load(withShard: shardData)
