@@ -8,19 +8,30 @@
 import UIKit
 import ShardKit
 
+protocol AlertLauncherDelegate {
+    func didDismiss()
+    func didOpenUrl(_ url: URL)
+}
+
 class AlertLauncher: NSObject {
     private let backgroundView = UIView()
     private let rootView = ShardRootView()
+    
+    var delegate: AlertLauncherDelegate?
     
     private var initAlpha: CGFloat? = nil
     private var finalAlpha: CGFloat? = nil
     private var initY: CGFloat? = nil
     private var finalY: CGFloat? = nil
     
-    var onDismiss: (() -> Void)? = nil
-    
     override init() {
         super.init()
+        
+        self.rootView.on("open-url") {
+            self.dismissAlert()
+            let url = try! $0!.asString()
+            self.delegate?.didOpenUrl(URL(string: url)!)
+        }
     }
     
     public func load(withShard shard: ShardData) {
@@ -104,6 +115,6 @@ class AlertLauncher: NSObject {
             )
         })
         
-        onDismiss?()
+        delegate?.didDismiss()
     }
 }

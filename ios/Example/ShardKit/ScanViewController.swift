@@ -154,7 +154,7 @@ class ScanViewController: UIViewController, AVCaptureMetadataOutputObjectsDelega
 
         let object = objects[0] as! AVMetadataMachineReadableCodeObject
 
-        guard let urlString = object.stringValue, let url = URL(string: urlString) else {
+        guard let shardPath = object.stringValue, let url = URL(string: "https://playground.shardlib.com/api/shards/\(shardPath)") else {
             return
         }
         
