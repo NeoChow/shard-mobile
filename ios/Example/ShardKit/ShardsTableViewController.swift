@@ -194,18 +194,26 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
             
-            let shard = Shard(context: context)
-            shard.title = title
-            shard.createdAt = Date()
-            shard.instance = instance
-            shard.revision = 1
-            appDelegate.saveContext()
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            request.predicate = NSPredicate(format: "instance = %@", instance)
+            let result = try! context.fetch(request) as! [Shard]
             
-            let shardData = ShardData(shard: shard)
-            self.previous = [ShardData(shard: shard)] + self.previous
-            self.tableView.reloadData()
-            
-            self.alertLauncher.load(withShard: shardData)
+            if (result.count > 0) {
+                self.alertLauncher.load(withShard: ShardData(shard: result.first!))
+            } else {
+                let new = Shard(context: context)
+                new.title = title
+                new.createdAt = Date()
+                new.instance = instance
+                new.revision = 1
+                appDelegate.saveContext()
+                
+                let shard = ShardData(shard: new)
+                self.previous = [shard] + self.previous
+                self.tableView.reloadData()
+                
+                self.alertLauncher.load(withShard: shard)
+            }
         }
     }
     
