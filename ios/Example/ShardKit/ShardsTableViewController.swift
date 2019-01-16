@@ -177,12 +177,6 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     // MARK: - ScanViewControllerDelegate
     
     func didScan(url: URL) {
-        guard
-            url.host == "playground.shardlib.com"
-        else {
-            return
-        }
-        
         self.scanVC.paused = true
         
         Alamofire.request(url).responseJSON { response in
@@ -218,7 +212,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     // MARK: - ScanViewControllerDelegate
 
     func didDismiss() {
-        self.scanVC.paused = true
+        self.scanVC.paused = false
     }
     
     func didOpenUrl(_ url: URL) {
