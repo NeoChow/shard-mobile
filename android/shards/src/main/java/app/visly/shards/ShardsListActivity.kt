@@ -254,12 +254,9 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
             is ScannerViewHolder -> {
                 vh.scanner.setHasPermission(cameraPermissionGranted)
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
-                vh.scanner.delegate.didScanUrl = { url ->
-                    if (!activity.showingShard && url.host == "playground.shardlib.com") {
+                vh.scanner.delegate.didScanShard = { instance, revision ->
+                    if (!activity.showingShard) {
                         activity.showingShard = true
-                        val parts = url.path.split("/")
-                        val instance = parts[3]
-                        val revision = parts[4]
 
                         ShardService.instance.getShard(instance, revision).enqueue(object: Callback<Shard> {
                             override fun onResponse(call: Call<Shard>, response: Response<Shard>) {

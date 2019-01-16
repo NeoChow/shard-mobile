@@ -11,13 +11,12 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
-import java.net.URI
 
 class ScanView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr), BarcodeCallback {
 
     class Delegate {
         var didRequestPermission: (() -> Unit)? = null
-        var didScanUrl: ((url: URI) -> Unit)? = null
+        var didScanShard: ((instance: String, revision: String) -> Unit)? = null
     }
 
     private val barcode: BarcodeView
@@ -29,7 +28,11 @@ class ScanView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         View.inflate(context, R.layout.view_scan, this)
 
         barcode = this.findViewById(R.id.barcode)
-        barcode.decoderFactory = DefaultDecoderFactory(listOf(BarcodeFormat.QR_CODE))
+        barcode.decoderFactory = DefaultDecoderFactory(
+                listOf(BarcodeFormat.QR_CODE),
+                null,
+                null,
+                1)
         barcode.decodeContinuous(this)
 
         requestPermission = findViewById(R.id.request_permission)
@@ -45,8 +48,8 @@ class ScanView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun barcodeResult(result: BarcodeResult?) {
-        val url = URI.create(result!!.text)
-        delegate.didScanUrl?.invoke(url)
+        val parts = result!!.text.split("/")
+        delegate.didScanShard?.invoke(parts[0], parts[1])
     }
 
     override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) { }
