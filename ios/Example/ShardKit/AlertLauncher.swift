@@ -9,28 +9,28 @@ import UIKit
 import ShardKit
 
 class AlertLauncher: NSObject {
-    let backgroundView = UIView()
-    let rootView = ShardRootView()
+    private let backgroundView = UIView()
+    private let rootView = ShardRootView()
     
-    var shard: ShardData? = nil
-    var initAlpha: CGFloat? = nil
-    var finalAlpha: CGFloat? = nil
-    var initY: CGFloat? = nil
-    var finalY: CGFloat? = nil
+    private var initAlpha: CGFloat? = nil
+    private var finalAlpha: CGFloat? = nil
+    private var initY: CGFloat? = nil
+    private var finalY: CGFloat? = nil
+    
+    var onDismiss: (() -> Void)? = nil
     
     override init() {
         super.init()
     }
     
     public func load(withShard shard: ShardData) {
-        self.shard = shard
         let url = URL(string: shard.url)
         ShardViewManager.shared.loadUrl(url: url!) { result in
-            self.showAlert(withContent: result)
+            self.showAlert(withContent: result, withPosition: shard.position)
         }
     }
     
-    private func showAlert(withContent content: ShardRoot) {
+    private func showAlert(withContent content: ShardRoot, withPosition position: String) {
         if let window = UIApplication.shared.keyWindow {
             setupBackgroundView(inWindow: window)
             
@@ -38,10 +38,10 @@ class AlertLauncher: NSObject {
             rootView.setRoot(content)
             
             let safeGuide = window.safeAreaLayoutGuide
-            let safeFrame = shard!.position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
+            let safeFrame = position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
             let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
-            switch shard!.position {
+            switch position {
             case "top":
                 initY = window.frame.minY - size.height
                 finalY = safeFrame.minY
@@ -103,5 +103,7 @@ class AlertLauncher: NSObject {
                 height: self.rootView.frame.height
             )
         })
+        
+        onDismiss?()
     }
 }
