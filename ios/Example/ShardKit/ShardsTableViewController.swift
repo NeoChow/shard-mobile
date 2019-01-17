@@ -84,6 +84,10 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         loadExamples()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.scanVC.paused = false
+    }
+    
     func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
         let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
             let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
@@ -106,6 +110,23 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    @objc func clearStoredShards() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+        
+        if let result = try? context.fetch(request) as! [Shard] {
+            for object in result {
+                context.delete(object)
+            }
+            appDelegate.saveContext()
+            self.previous = []
+            self.tableView.reloadData()
+        }
+    }
+    
+    // MARK: - UITableViewController
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
@@ -119,6 +140,33 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         default:
             return nil
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return (section == 1 && previous.count > 0) ? 60 : 20
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if section == 1 && previous.count > 0 {
+            let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 60))
+            
+            let clearButton = UIButton()
+            clearButton.setTitle("Clear", for: .normal)
+            clearButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+            clearButton.layer.borderColor = UIColor.black.cgColor
+            clearButton.setTitleColor(.black, for: .normal)
+            clearButton.setTitleColor(UIColor.black.withAlphaComponent(0.5), for: .highlighted)
+            clearButton.addTarget(self, action: #selector(clearStoredShards), for: .touchUpOutside)
+            
+            clearButton.translatesAutoresizingMaskIntoConstraints = false
+            footer.addSubview(clearButton)
+            clearButton.centerYAnchor.constraint(equalTo: footer.layoutMarginsGuide.centerYAnchor).isActive = true
+            clearButton.trailingAnchor.constraint(equalTo: footer.layoutMarginsGuide.trailingAnchor).isActive = true
+            
+            return footer
+        }
+        
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -168,10 +216,6 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         default:
             break
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.scanVC.paused = false
     }
     
     // MARK: - ScanViewControllerDelegate
