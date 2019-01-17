@@ -41,9 +41,12 @@ struct ShardData {
 }
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
+    let SECTION_EXAMPLES = 0
+    let SECTION_PREVIOUS = 1
+    
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
-    
+
     var examples: [ShardData] = []
     var previous: [ShardData] = []
     
@@ -142,9 +145,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0:
+        case SECTION_EXAMPLES:
             return "Examples"
-        case 1:
+        case SECTION_PREVIOUS:
             return "Previous shards"
         default:
             return nil
@@ -152,11 +155,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == 1 && previous.count > 0 ? 60 : 20
+        return section == SECTION_PREVIOUS && previous.count > 0 ? 60 : 20
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        if section == 1 && previous.count > 0 {
+        if section == SECTION_PREVIOUS && previous.count > 0 {
             let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 60))
             
             let clearButton = UIButton(type: .system)
@@ -177,9 +180,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0:
+        case SECTION_EXAMPLES:
             return examples.count
-        case 1:
+        case SECTION_PREVIOUS:
             return previous.count
         default:
             return 0
@@ -190,12 +193,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: "shardcell", for: indexPath)
         
         switch indexPath.section {
-        case 0:
+        case SECTION_EXAMPLES:
             let shard = examples[indexPath.row]
             cell.textLabel?.text = shard.title
             cell.detailTextLabel?.text = shard.description
             break
-        case 1:
+        case SECTION_PREVIOUS:
             let shard = previous[indexPath.row]
             cell.textLabel?.text = shard.title
             cell.detailTextLabel?.text = shard.description
@@ -211,11 +214,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         tableView.deselectRow(at: indexPath, animated: true)
         
         switch indexPath.section {
-        case 0:
+        case SECTION_EXAMPLES:
             let shard = examples[indexPath.row]
             self.alertLauncher.load(withShard: shard)
             break
-        case 1:
+        case SECTION_PREVIOUS:
             let shard = previous[indexPath.row]
             self.alertLauncher.load(withShard: shard)
             break
