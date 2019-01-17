@@ -41,9 +41,12 @@ struct ShardData {
 }
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
+    let SECTION_EXAMPLES = 0
+    let SECTION_PREVIOUS = 1
+    
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
-    
+
     var examples: [ShardData] = []
     var previous: [ShardData] = []
     
@@ -84,6 +87,10 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         loadExamples()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.scanVC.paused = false
+    }
+    
     func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
         let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
             let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
@@ -106,26 +113,76 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    @objc func onClearButtonPressed() {
+        let clearAlert = UIAlertController(title: "Are you sure you want to clear previous shards?", message: nil, preferredStyle: .alert)
+        
+        clearAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            
+            do {
+                try context.execute(deleteRequest)
+                self.previous = []
+                self.tableView.reloadData()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }))
+        
+        clearAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(clearAlert, animated: true, completion: nil)
+    }
+    
+    // MARK: - UITableViewController
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0:
+        case SECTION_EXAMPLES:
             return "Examples"
-        case 1:
+        case SECTION_PREVIOUS:
             return "Previous shards"
         default:
             return nil
         }
     }
     
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return section == SECTION_PREVIOUS && previous.count > 0 ? 60 : 20
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if section == SECTION_PREVIOUS && previous.count > 0 {
+            let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 60))
+            
+            let clearButton = UIButton(type: .system)
+            clearButton.setTitle("Clear", for: .normal)
+            clearButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+            clearButton.addTarget(self, action: #selector(onClearButtonPressed), for: .touchUpInside)
+            
+            clearButton.translatesAutoresizingMaskIntoConstraints = false
+            footer.addSubview(clearButton)
+            clearButton.centerYAnchor.constraint(equalTo: footer.layoutMarginsGuide.centerYAnchor).isActive = true
+            clearButton.trailingAnchor.constraint(equalTo: footer.layoutMarginsGuide.trailingAnchor).isActive = true
+            
+            return footer
+        }
+        
+        return nil
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0:
+        case SECTION_EXAMPLES:
             return examples.count
-        case 1:
+        case SECTION_PREVIOUS:
             return previous.count
         default:
             return 0
@@ -136,12 +193,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: "shardcell", for: indexPath)
         
         switch indexPath.section {
-        case 0:
+        case SECTION_EXAMPLES:
             let shard = examples[indexPath.row]
             cell.textLabel?.text = shard.title
             cell.detailTextLabel?.text = shard.description
             break
-        case 1:
+        case SECTION_PREVIOUS:
             let shard = previous[indexPath.row]
             cell.textLabel?.text = shard.title
             cell.detailTextLabel?.text = shard.description
@@ -157,21 +214,17 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         tableView.deselectRow(at: indexPath, animated: true)
         
         switch indexPath.section {
-        case 0:
+        case SECTION_EXAMPLES:
             let shard = examples[indexPath.row]
             self.alertLauncher.load(withShard: shard)
             break
-        case 1:
+        case SECTION_PREVIOUS:
             let shard = previous[indexPath.row]
             self.alertLauncher.load(withShard: shard)
             break
         default:
             break
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.scanVC.paused = false
     }
     
     // MARK: - ScanViewControllerDelegate
@@ -194,18 +247,26 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
             
-            let shard = Shard(context: context)
-            shard.title = title
-            shard.createdAt = Date()
-            shard.instance = instance
-            shard.revision = 1
-            appDelegate.saveContext()
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            request.predicate = NSPredicate(format: "instance = %@", instance)
+            let result = try! context.fetch(request) as! [Shard]
             
-            let shardData = ShardData(shard: shard)
-            self.previous = [ShardData(shard: shard)] + self.previous
-            self.tableView.reloadData()
-            
-            self.alertLauncher.load(withShard: shardData)
+            if (result.count > 0) {
+                self.alertLauncher.load(withShard: ShardData(shard: result.first!))
+            } else {
+                let new = Shard(context: context)
+                new.title = title
+                new.createdAt = Date()
+                new.instance = instance
+                new.revision = 1
+                appDelegate.saveContext()
+                
+                let shard = ShardData(shard: new)
+                self.previous = [shard] + self.previous
+                self.tableView.reloadData()
+                
+                self.alertLauncher.load(withShard: shard)
+            }
         }
     }
     
