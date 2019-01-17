@@ -110,19 +110,27 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
-    @objc func clearStoredShards() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+    @objc func onClearButtonPressed() {
+        let clearAlert = UIAlertController(title: "Are you sure you want to clear previous shards?", message: nil, preferredStyle: .alert)
         
-        if let result = try? context.fetch(request) as! [Shard] {
-            for object in result {
-                context.delete(object)
+        clearAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            
+            if let result = try? context.fetch(request) as! [Shard] {
+                for object in result {
+                    context.delete(object)
+                }
+                appDelegate.saveContext()
+                self.previous = []
+                self.tableView.reloadData()
             }
-            appDelegate.saveContext()
-            self.previous = []
-            self.tableView.reloadData()
-        }
+        }))
+        
+        clearAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(clearAlert, animated: true, completion: nil)
     }
     
     // MARK: - UITableViewController
@@ -143,20 +151,17 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return (section == 1 && previous.count > 0) ? 60 : 20
+        return section == 1 && previous.count > 0 ? 60 : 20
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if section == 1 && previous.count > 0 {
             let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 60))
             
-            let clearButton = UIButton()
+            let clearButton = UIButton(type: .system)
             clearButton.setTitle("Clear", for: .normal)
             clearButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
-            clearButton.layer.borderColor = UIColor.black.cgColor
-            clearButton.setTitleColor(.black, for: .normal)
-            clearButton.setTitleColor(UIColor.black.withAlphaComponent(0.5), for: .highlighted)
-            clearButton.addTarget(self, action: #selector(clearStoredShards), for: .touchUpOutside)
+            clearButton.addTarget(self, action: #selector(onClearButtonPressed), for: .touchUpInside)
             
             clearButton.translatesAutoresizingMaskIntoConstraints = false
             footer.addSubview(clearButton)
