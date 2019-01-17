@@ -116,15 +116,16 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         clearAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
             
-            if let result = try? context.fetch(request) as! [Shard] {
-                for object in result {
-                    context.delete(object)
-                }
-                appDelegate.saveContext()
+            do {
+                try context.execute(deleteRequest)
                 self.previous = []
                 self.tableView.reloadData()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }))
         
