@@ -144,7 +144,7 @@ class ScanViewController: UIViewController, AVCaptureMetadataOutputObjectsDelega
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if paused {
-            return;
+            return
         }
         
         let objects = metadataObjects.filter { $0.type == .qr }
