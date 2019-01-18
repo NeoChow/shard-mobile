@@ -11,39 +11,11 @@ import CoreData
 import Alamofire
 import SafariServices
 
-struct ShardData {
-    let url: String
-    let position: String
-    let title: String?
-    let description: String?
-    
-    init(url: String, position: String, title: String?, description: String?) {
-        self.title = nil
-        self.description = nil
-        self.url = url
-        self.position = "center"
-    }
-    
-    init(json: JsonValue) throws {
-        let values = try json.asObject()
-        self.url = try values["url"]!.asString()
-        self.position = try values["settings"]!.asObject()["position"]!.asString()
-        self.title = try values["title"]!.asString()
-        self.description = try values["description"]!.asString()
-    }
-    
-    init(shard: Shard) {
-        self.url = shard.instance!
-        self.position = "center"
-        self.title = shard.title!
-        self.description = shard.instance!
-    }
-}
-
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
     let SECTION_EXAMPLES = 0
     let SECTION_PREVIOUS = 1
     
+    let shardHandler = ShardHandler()
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
 
@@ -74,13 +46,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         alertLauncher.delegate = self
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        let result = try! context.fetch(request) as! [Shard]
-        
-        for shard in result {
+        let shards = try! shardHandler.get()
+        for shard in shards {
             self.previous = [ShardData(shard: shard)] + self.previous
         }
         
@@ -117,18 +84,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         let clearAlert = UIAlertController(title: "Are you sure you want to clear previous shards?", message: nil, preferredStyle: .alert)
         
         clearAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            
             do {
-                try context.execute(deleteRequest)
+                try self.shardHandler.delete()
                 self.previous = []
                 self.tableView.reloadData()
             } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                // TODO: Handle error
             }
         }))
         
@@ -232,40 +193,15 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     func didScan(url: URL) {
         self.scanVC.paused = true
         
-        Alamofire.request(url).responseJSON { response in
-            guard
-                response.error == nil,
-                response.response != nil,
-                response.response!.statusCode <= 300,
-                let json = response.result.value as? Dictionary<String, Any>,
-                let title = json["title"] as? String,
-                let instance = json["url"] as? String
-            else {
-                return
-            }
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-            
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Shard")
-            request.predicate = NSPredicate(format: "instance = %@", instance)
-            let result = try! context.fetch(request) as! [Shard]
-            
-            if (result.count > 0) {
-                self.alertLauncher.load(withShard: ShardData(shard: result.first!))
-            } else {
-                let new = Shard(context: context)
-                new.title = title
-                new.createdAt = Date()
-                new.instance = instance
-                new.revision = 1
-                appDelegate.saveContext()
-                
+        fetchData(url: url) { json in
+            do {
+                let new = try self.shardHandler.create(json: json)
                 let shard = ShardData(shard: new)
                 self.previous = [shard] + self.previous
                 self.tableView.reloadData()
-                
                 self.alertLauncher.load(withShard: shard)
+            } catch {
+                // TODO: Handle error
             }
         }
     }
