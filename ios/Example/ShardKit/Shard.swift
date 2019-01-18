@@ -10,13 +10,15 @@ import CoreData
 import ShardKit
 
 enum ShardPosition: String {
-    case Top, Bottom, Center
+    case Top = "top"
+    case Bottom = "bottom"
+    case Center = "center"
 }
 
 extension Shard {
     var position: ShardPosition {
         get {
-            return ShardPosition(rawValue: self.positionValue!)!
+            return ShardPosition(rawValue: self.positionValue!) ?? .Center
         }
         set {
             self.positionValue = newValue.rawValue
@@ -27,9 +29,9 @@ extension Shard {
         self.init(context: context)
         
         let values = try json.asObject()
-        self.sid = try values["sid"]!.asString()
+        self.sid = try values["sid"]?.asString()
         self.title = try values["title"]!.asString()
-        self.details = try values["details"]!.asString()
+        self.details = try values["description"]?.asString()
         self.instance = try values["url"]!.asString()
         self.positionValue = try values["settings"]!.asObject()["position"]!.asString()
         self.createdAt = Date()
@@ -66,7 +68,7 @@ class ShardHandler: NSObject {
             return previous
         }
         
-        let new = Shard(context: context)
+        let new = try Shard(context: context, json: json)
         appDelegate.saveContext()
         return new
     }
@@ -75,34 +77,5 @@ class ShardHandler: NSObject {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         try context.execute(deleteRequest)
-    }
-}
-
-struct ShardData {
-    let url: String
-    let position: String
-    let title: String?
-    let description: String?
-    
-    init(url: String, position: String, title: String?, description: String?) {
-        self.title = nil
-        self.description = nil
-        self.url = url
-        self.position = "center"
-    }
-    
-    init(json: JsonValue) throws {
-        let values = try json.asObject()
-        self.url = try values["url"]!.asString()
-        self.position = try values["settings"]!.asObject()["position"]!.asString()
-        self.title = try values["title"]!.asString()
-        self.description = try values["description"]!.asString()
-    }
-    
-    init(shard: Shard) {
-        self.url = shard.instance!
-        self.position = "center"
-        self.title = shard.title!
-        self.description = shard.instance!
     }
 }

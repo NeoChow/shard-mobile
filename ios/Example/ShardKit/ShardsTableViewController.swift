@@ -18,18 +18,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     let shardHandler = ShardHandler()
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
-
-    var examples: [ShardData] = []
-    var previous: [ShardData] = []
+    
+    var examples: [Shard] = []
+    var previous: [Shard] = []
     
     @IBAction func onDevButtonPressed(_ sender: UIBarButtonItem) {
-        let shard = ShardData(
-            url: "http://localhost:3000",
-            position: "center",
-            title: nil,
-            description: nil
-        )
-        alertLauncher.load(withShard: shard)
+        // TODO: Handle this!
     }
     
     override func viewDidLoad() {
@@ -46,9 +40,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         alertLauncher.delegate = self
         
-        let shards = try! shardHandler.get()
-        for shard in shards {
-            self.previous = [ShardData(shard: shard)] + self.previous
+        do {
+            let shards = try shardHandler.get()
+            previous = shards
+        } catch {
+            // TODO: Handle errors
         }
         
         loadExamples()
@@ -71,7 +67,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             do {
                 let examples = try json.asArray()
                 for example in examples {
-                    self.examples = [try ShardData(json: example)] + self.examples
+                    let shard = try self.shardHandler.create(json: example)
+                    self.examples = [shard] + self.examples
                 }
             } catch {
                 self.examples = []
@@ -157,12 +154,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case SECTION_EXAMPLES:
             let shard = examples[indexPath.row]
             cell.textLabel?.text = shard.title
-            cell.detailTextLabel?.text = shard.description
+            cell.detailTextLabel?.text = shard.details ?? shard.instance
             break
         case SECTION_PREVIOUS:
             let shard = previous[indexPath.row]
             cell.textLabel?.text = shard.title
-            cell.detailTextLabel?.text = shard.description
+            cell.detailTextLabel?.text = shard.details ?? shard.instance
             break
         default:
             break
@@ -196,10 +193,10 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         fetchData(url: url) { json in
             do {
                 let new = try self.shardHandler.create(json: json)
-                let shard = ShardData(shard: new)
-                self.previous = [shard] + self.previous
+                let updated = try self.shardHandler.get()
+                self.previous = updated
                 self.tableView.reloadData()
-                self.alertLauncher.load(withShard: shard)
+                self.alertLauncher.load(withShard: new)
             } catch {
                 // TODO: Handle error
             }
@@ -207,7 +204,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     // MARK: - ScanViewControllerDelegate
-
+    
     func didDismiss() {
         self.scanVC.paused = false
     }
