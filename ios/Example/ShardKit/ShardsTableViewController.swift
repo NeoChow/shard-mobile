@@ -7,17 +7,15 @@
 
 import UIKit
 import ShardKit
-import CoreData
-import Alamofire
 import SafariServices
 
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
     let SECTION_EXAMPLES = 0
     let SECTION_PREVIOUS = 1
     
-    let shardHandler = ShardHandler()
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
+    let shardHandler = ShardHandler()
     
     var examples: [Shard] = []
     var previous: [Shard] = []
@@ -42,10 +40,12 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         alertLauncher.delegate = self
         
         do {
-            let shards = try shardHandler.get()
-            previous = shards
+            previous = try shardHandler.get(type: .Default)
+            examples = try shardHandler.get(type: .Example)
+            
+            self.tableView.reloadData()
         } catch {
-            // TODO: Handle errors
+            print("Unexpected error: \(error).")
         }
         
         loadExamples()
@@ -65,15 +65,20 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     func loadExamples() {
         fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { json in
+            let storedExamples = self.examples
+            self.examples = []
+            
             do {
-                let examples = try json.asArray()
-                for example in examples {
-                    let shard = try self.shardHandler.create(json: example)
+                let result = try json.asArray()
+                for json in result {
+                    let shard = try self.shardHandler.create(json: json, type: .Example)
                     self.examples = [shard] + self.examples
                 }
             } catch {
-                self.examples = []
+                print("Unexpected error: \(error).")
+                self.examples = storedExamples
             }
+            
             self.tableView.reloadData()
         }
     }
@@ -83,11 +88,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         clearAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
             do {
-                try self.shardHandler.delete()
+                try self.shardHandler.delete(type: .Default)
                 self.previous = []
                 self.tableView.reloadData()
             } catch {
-                // TODO: Handle error
+                print("Unexpected error: \(error).")
             }
         }))
         
@@ -193,13 +198,15 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         fetchData(url: url) { json in
             do {
-                let new = try self.shardHandler.create(json: json)
-                let updated = try self.shardHandler.get()
+                let new = try self.shardHandler.create(json: json, type: .Default)
+                
+                let updated = try self.shardHandler.get(type: .Default)
                 self.previous = updated
                 self.tableView.reloadData()
+                
                 self.alertLauncher.load(withShard: new)
             } catch {
-                // TODO: Handle error
+                print("Unexpected error: \(error).")
             }
         }
     }

@@ -9,6 +9,10 @@ import Foundation
 import CoreData
 import ShardKit
 
+enum ShardType: Int32 {
+    case Default, Example
+}
+
 enum ShardPosition: String {
     case Top = "top"
     case Bottom = "bottom"
@@ -16,9 +20,18 @@ enum ShardPosition: String {
 }
 
 extension Shard {
+    var type: ShardType {
+        get {
+            return ShardType(rawValue: self.typeValue) ?? .Default
+        }
+        set {
+            self.typeValue = newValue.rawValue
+        }
+    }
+    
     var position: ShardPosition {
         get {
-            return ShardPosition(rawValue: self.positionValue!) ?? .Center
+            return ShardPosition(rawValue: self.positionValue ?? "center") ?? .Center
         }
         set {
             self.positionValue = newValue.rawValue
@@ -27,14 +40,20 @@ extension Shard {
     
     convenience init(context: NSManagedObjectContext, json: JsonValue) throws {
         self.init(context: context)
+        self.createdAt = Date()
         
+        try self.setValues(json: json)
+    }
+    
+    func setValues(json: JsonValue) throws {
         let values = try json.asObject()
-        self.sid = try values["sid"]?.asString()
+        
+        self.id = try values["id"]!.asString()
         self.title = try values["title"]!.asString()
-        self.details = try values["description"]?.asString()
         self.instance = try values["url"]!.asString()
         self.positionValue = try values["settings"]!.asObject()["position"]!.asString()
-        self.createdAt = Date()
+        
+        self.details = try values["description"]?.asString()
     }
 }
 
@@ -50,31 +69,39 @@ class ShardHandler: NSObject {
         super.init()
     }
     
-    func get() throws -> [Shard] {
+    func get(type: ShardType) throws -> [Shard] {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        request.predicate = NSPredicate(format: "typeValue = %d", type.rawValue)
         return try context.fetch(request) as! [Shard]
     }
     
-    func create(json: JsonValue) throws -> Shard {
+    func create(json: JsonValue, type: ShardType) throws -> Shard {
         let values = try json.asObject()
-        let instance = try values["url"]!.asString()
+        let id = try values["id"]!.asString()
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-        request.predicate = NSPredicate(format: "instance = %@", instance)
+        request.predicate = NSPredicate(format: "id = %@", id)
         let result = try context.fetch(request) as! [Shard]
         
         if let previous = result.first {
+            try previous.setValues(json: json)
+            previous.type = type
+            appDelegate.saveContext()
+            
             return previous
         }
         
         let new = try Shard(context: context, json: json)
+        new.type = type
         appDelegate.saveContext()
+        
         return new
     }
     
-    func delete() throws {
+    func delete(type: ShardType) throws {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+        fetchRequest.predicate = NSPredicate(format: "typeValue = %d", type.rawValue)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         try context.execute(deleteRequest)
     }
