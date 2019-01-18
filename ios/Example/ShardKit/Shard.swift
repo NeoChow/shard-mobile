@@ -40,7 +40,9 @@ extension Shard {
     
     convenience init(context: NSManagedObjectContext, json: JsonValue) throws {
         self.init(context: context)
+        
         self.createdAt = Date()
+        self.updatedAt = createdAt
         
         try self.setValues(json: json)
     }
@@ -71,7 +73,7 @@ class ShardHandler: NSObject {
     
     func get(type: ShardType) throws -> [Shard] {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
         request.predicate = NSPredicate(format: "typeValue = %d", type.rawValue)
         return try context.fetch(request) as! [Shard]
     }
@@ -87,6 +89,7 @@ class ShardHandler: NSObject {
         if let previous = result.first {
             try previous.setValues(json: json)
             previous.type = type
+            previous.updatedAt = Date()
             appDelegate.saveContext()
             
             return previous

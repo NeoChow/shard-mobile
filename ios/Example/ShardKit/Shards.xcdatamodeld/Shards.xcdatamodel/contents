@@ -8,8 +8,9 @@
         <attribute name="positionValue" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" attributeType="String" syncable="YES"/>
         <attribute name="typeValue" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Shard" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Shard" positionX="-63" positionY="-18" width="128" height="165"/>
     </elements>
 </model>
