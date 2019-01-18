@@ -23,7 +23,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     var previous: [Shard] = []
     
     @IBAction func onDevButtonPressed(_ sender: UIBarButtonItem) {
-        // TODO: Handle this!
+        let url = URL(string: "http://localhost:3000")
+        self.alertLauncher.load(withUrl: url!)
     }
     
     override func viewDidLoad() {

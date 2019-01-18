@@ -34,6 +34,12 @@ class AlertLauncher: NSObject {
         }
     }
     
+    public func load(withUrl url: URL) {
+        ShardViewManager.shared.loadUrl(url: url) { result in
+            self.showAlert(withContent: result, withPosition: ShardPosition.Center)
+        }
+    }
+    
     public func load(withShard shard: Shard) {
         let url = URL(string: shard.instance!)
         ShardViewManager.shared.loadUrl(url: url!) { result in
