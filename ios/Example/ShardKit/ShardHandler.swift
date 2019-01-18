@@ -86,13 +86,13 @@ class ShardHandler: NSObject {
         request.predicate = NSPredicate(format: "id = %@", id)
         let result = try context.fetch(request) as! [Shard]
         
-        if let previous = result.first {
-            try previous.setValues(json: json)
-            previous.type = type
-            previous.updatedAt = Date()
+        if let current = result.first {
+            try current.setValues(json: json)
+            current.type = type
+            current.updatedAt = Date()
             appDelegate.saveContext()
             
-            return previous
+            return current
         }
         
         let new = try Shard(context: context, json: json)
