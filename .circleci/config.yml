@@ -7,13 +7,14 @@ version: 2
 jobs:
   android:
     docker:
-      - image: circleci/android:api-25-alpha
+      - image: circleci/android:api-28
     
     environment:
       _JAVA_OPTIONS: "-Xmx1500m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2"
 
     steps:
       - checkout
+      - run: yes | sdkmanager --update || true
       - run: cd android && ./gradlew androidDependencies --no-daemon --max-workers 2
       - run: cd android && ./gradlew test --no-daemon --max-workers 2
 

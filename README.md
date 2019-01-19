@@ -96,7 +96,7 @@ class ViewController: UIViewController {
 ## Developing
 Start by installing the Android and iOS toolchains by downloading Xcode and Android studio. For android you will also need to set your `$ANDROID_HOME`. Right now we only support building on macOS, however you can use the shard library via jcenter / cocoapods on any platform.
 
-Once you have the Android and iOS toolchains installed it's time to clone the repo and get setup. We have prepared a few Make scripts to hopefully simpligy this process. These scripts prepare your local environment for building the rust core. If you are just planning on developing in Kotlin / Swift then there is no need to run any of the make scripts.
+Once you have the Android and iOS toolchains installed it's time to clone the repo and get setup. We have prepared a few Make scripts to hopefully simplify this process. These scripts prepare your local environment for building the rust core. If you are just planning on developing in Kotlin / Swift then there is no need to run any of the make scripts.
 
 ```bash
 git clone https://github.com/vislyhq/shard-mobile.git
