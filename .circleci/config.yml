@@ -14,6 +14,7 @@ jobs:
 
     steps:
       - checkout
+      - run: yes | sdkmanager --licenses
       - run: cd android && ./gradlew androidDependencies --no-daemon --max-workers 2
       - run: cd android && ./gradlew test --no-daemon --max-workers 2
 
