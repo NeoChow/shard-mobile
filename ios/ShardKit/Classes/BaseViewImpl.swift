@@ -7,6 +7,11 @@
 
 import UIKit
 
+public enum ShardControlState: String {
+    case Default = "default"
+    case Pressed = "pressed"
+}
+
 class BaseViewImpl: ShardViewImpl {
     internal let context: ShardContext
     internal lazy var tapGestureRecognizer: UILongPressGestureRecognizer = {
@@ -20,6 +25,22 @@ class BaseViewImpl: ShardViewImpl {
     internal var borderWidth = Float(0)
     internal var borderRadius = Float(0)
     internal var clickHandler: () -> () = {}
+    internal var view: UIView? = nil
+    
+    var delegate: ShardViewDelegate?
+    
+    var state: ShardControlState = .Default {
+        didSet {
+            switch state {
+            case .Pressed:
+                self.view?.backgroundColor = self.backgroundColor.pressed ?? self.backgroundColor.default
+                break
+            default:
+                self.view?.backgroundColor = self.backgroundColor.default
+                break
+            }
+        }
+    }
     
     init(_ context: ShardContext) {
         self.context = context
@@ -64,15 +85,17 @@ class BaseViewImpl: ShardViewImpl {
         view.layer.cornerRadius = borderRadius.isInfinite ? min(view.frame.width, view.frame.height) / 2 : CGFloat(borderRadius)
         view.removeGestureRecognizer(self.tapGestureRecognizer)
         view.addGestureRecognizer(self.tapGestureRecognizer)
+        
+        self.view = view
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         switch sender.state {
         case .ended:
+            self.delegate?.setState(.Default)
             self.clickHandler()
-            sender.view?.backgroundColor = self.backgroundColor.default
         case .began:
-            sender.view?.backgroundColor = self.backgroundColor.pressed ?? self.backgroundColor.default
+            self.delegate?.setState(.Pressed)
         default: ()
         }
     }
