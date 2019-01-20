@@ -27,10 +27,14 @@ class AlertLauncher: NSObject {
     override init() {
         super.init()
         
-        self.rootView.on("open-url") {
+        self.rootView.on("open-url") { value in
             self.dismissAlert()
-            let url = try! $0!.asString()
+            let url = try! value!.asString()
             self.delegate?.didOpenUrl(URL(string: url)!)
+        }
+        
+        self.rootView.on("dismiss-alert") { _ in
+            self.dismissAlert()
         }
     }
     
