@@ -7,6 +7,20 @@
 
 import UIKit
 
+struct ShardError: Error {
+    enum ErrorType {
+        case HttpStatusCodeError
+    }
+    
+    let type: ErrorType
+    let message: String
+}
+
+public enum Result<T> {
+    case Success(T)
+    case Failure(Error)
+}
+
 private func shard_view_manager_create_view(_ self_ptr: UnsafeRawPointer?, _ context_ptr: UnsafeRawPointer?, _ kind: UnsafePointer<Int8>?) -> UnsafeMutablePointer<IOSView>? {
     let viewManager: ShardViewManager = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let context: ShardContext = Unmanaged.fromOpaque(UnsafeRawPointer(context_ptr!)).takeUnretainedValue()
@@ -46,11 +60,39 @@ public class ShardViewManager {
         return ShardView(implFactories[kind]!(context))
     }
     
-    public func loadUrl(url: URL, onComplete: @escaping (ShardRoot) -> ()) {
+    public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
         let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
-            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
-            DispatchQueue.main.async { onComplete(self.loadJson(json)) }
+            guard httpError == nil else {
+                onComplete(Result.Failure(httpError!))
+                
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                let statusCode = httpResponse.statusCode
+                
+                if (statusCode != 200) {
+                    onComplete(Result.Failure(
+                        ShardError(
+                            type: .HttpStatusCodeError,
+                            message: "Server responded with status code \(statusCode)."
+                        )
+                    ))
+                    
+                    return
+                }
+                
+                do {
+                    let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
+                    DispatchQueue.main.async {
+                        onComplete(Result.Success(self.loadJson(json)))
+                    }
+                } catch let error {
+                    onComplete(Result.Failure(error))
+                }
+            }
         }
+        
         task.resume()
     }
     

@@ -36,8 +36,16 @@ class AlertLauncher: NSObject {
     
     public func load(withShard shard: ShardData) {
         let url = URL(string: shard.url)
+        
         ShardViewManager.shared.loadUrl(url: url!) { result in
-            self.showAlert(withContent: result, withPosition: shard.position)
+            switch result {
+            case .Success(let data):
+                self.showAlert(withContent: data, withPosition: shard.position)
+                break
+            case .Failure(let error):
+                print(error)
+                break
+            }
         }
     }
     
