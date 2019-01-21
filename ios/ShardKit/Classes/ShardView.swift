@@ -30,9 +30,18 @@ private func shard_view_measure(_ self_ptr: UnsafeRawPointer?, _ size: UnsafePoi
     return view.measure(size!.pointee)
 }
 
+public enum ShardControlState: String {
+    case Default = "default"
+    case Pressed = "pressed"
+}
+
+public protocol ShardViewImplDelegate {
+    func setState(_ state: ShardControlState)
+}
+
 public protocol ShardViewImpl {
     var state: ShardControlState {get set}
-    var delegate: ShardViewDelegate? {get set}
+    var delegate: ShardViewImplDelegate? {get set}
     
     func measure(width: CGFloat?, height: CGFloat?) -> CGSize
     func setProp(key: String, value: JsonValue)
@@ -40,11 +49,7 @@ public protocol ShardViewImpl {
     func bindView(_ view: UIView)
 }
 
-public protocol ShardViewDelegate {
-    func setState(_ state: ShardControlState)
-}
-
-public class ShardView: ShardViewDelegate {
+public class ShardView: ShardViewImplDelegate {
     internal var rust_ptr: UnsafeMutablePointer<IOSView>! = nil
     internal var impl: ShardViewImpl
     internal var frame: CGRect = .zero

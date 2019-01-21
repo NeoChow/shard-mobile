@@ -7,11 +7,6 @@
 
 import UIKit
 
-public enum ShardControlState: String {
-    case Default = "default"
-    case Pressed = "pressed"
-}
-
 class BaseViewImpl: ShardViewImpl {
     internal let context: ShardContext
     internal lazy var tapGestureRecognizer: UILongPressGestureRecognizer = {
@@ -27,7 +22,7 @@ class BaseViewImpl: ShardViewImpl {
     internal var clickHandler: () -> () = {}
     internal var view: UIView? = nil
     
-    var delegate: ShardViewDelegate?
+    var delegate: ShardViewImplDelegate?
     
     var state: ShardControlState = .Default {
         didSet {
