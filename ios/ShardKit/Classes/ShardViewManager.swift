@@ -10,6 +10,7 @@ import UIKit
 public struct ShardError: Error {
     public enum ShardErrorType {
         case HttpStatusCodeError
+        case ShardServerError
     }
     
     public let type: ShardErrorType
@@ -80,7 +81,6 @@ public class ShardViewManager {
                                 type: .HttpStatusCodeError,
                                 message: "Server responded with status code \(statusCode)."
                             )
-                            
                         ))
                     }
                     
@@ -89,6 +89,20 @@ public class ShardViewManager {
                 
                 do {
                     let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
+                    
+                    if let error = try json.asObject()["error"]?.asString() {
+                        DispatchQueue.main.async {
+                            onComplete(Result.Failure(
+                                ShardError(
+                                    type: .ShardServerError,
+                                    message: error
+                                )
+                            ))
+                        }
+                        
+                        return
+                    }
+                    
                     DispatchQueue.main.async {
                         onComplete(Result.Success(self.loadJson(json)))
                     }
