@@ -46,7 +46,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
-
+    
     var examples: [ShardData] = []
     var previous: [ShardData] = []
     
@@ -270,7 +270,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
-    // MARK: - ScanViewControllerDelegate
+    // MARK: - AlertLauncherDelegate
 
     func didDismiss() {
         self.scanVC.paused = false
@@ -278,5 +278,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     func didOpenUrl(_ url: URL) {
         self.present(SFSafariViewController(url: url), animated: true, completion: nil)
+    }
+    
+    func didRecieveError(_ title: String, _ message: String) {
+        let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        errorAlert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        self.present(errorAlert, animated: true, completion: nil)
     }
 }

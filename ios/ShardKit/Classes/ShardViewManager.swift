@@ -7,13 +7,13 @@
 
 import UIKit
 
-struct ShardError: Error {
-    enum ErrorType {
+public struct ShardError: Error {
+    public enum ShardErrorType {
         case HttpStatusCodeError
     }
     
-    let type: ErrorType
-    let message: String
+    public let type: ShardErrorType
+    public let message: String
 }
 
 public enum Result<T> {
@@ -63,7 +63,9 @@ public class ShardViewManager {
     public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
         let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
             guard httpError == nil else {
-                onComplete(Result.Failure(httpError!))
+                DispatchQueue.main.async {
+                    onComplete(Result.Failure(httpError!))
+                }
                 
                 return
             }
@@ -72,12 +74,15 @@ public class ShardViewManager {
                 let statusCode = httpResponse.statusCode
                 
                 if (statusCode != 200) {
-                    onComplete(Result.Failure(
-                        ShardError(
-                            type: .HttpStatusCodeError,
-                            message: "Server responded with status code \(statusCode)."
-                        )
-                    ))
+                    DispatchQueue.main.async {
+                        onComplete(Result.Failure(
+                            ShardError(
+                                type: .HttpStatusCodeError,
+                                message: "Server responded with status code \(statusCode)."
+                            )
+                            
+                        ))
+                    }
                     
                     return
                 }
@@ -88,7 +93,9 @@ public class ShardViewManager {
                         onComplete(Result.Success(self.loadJson(json)))
                     }
                 } catch let error {
-                    onComplete(Result.Failure(error))
+                    DispatchQueue.main.async {
+                        onComplete(Result.Failure(error))
+                    }
                 }
             }
         }

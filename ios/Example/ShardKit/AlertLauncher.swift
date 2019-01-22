@@ -9,6 +9,7 @@ import UIKit
 import ShardKit
 
 protocol AlertLauncherDelegate {
+    func didRecieveError(_ title: String, _ message: String)
     func didDismiss()
     func didOpenUrl(_ url: URL)
 }
@@ -43,7 +44,13 @@ class AlertLauncher: NSObject {
                 self.showAlert(withContent: data, withPosition: shard.position)
                 break
             case .Failure(let error):
-                print(error)
+                let message: String
+                if let shardError = error as? ShardError {
+                    message = shardError.message
+                } else {
+                    message = error.localizedDescription
+                }
+                self.delegate?.didRecieveError("Could not load Shard.", message)
                 break
             }
         }
