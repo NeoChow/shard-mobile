@@ -46,8 +46,33 @@ public class ShardViewManager {
         return ShardView(implFactories[kind]!(context))
     }
     
+    func getDeviceInfo() -> String {
+        let dictionary: Dictionary<String, Any> = [
+            "systemName": UIDevice.current.systemName,
+            "systemVersion": UIDevice.current.systemVersion,
+            "deviceName": UIDevice.current.name,
+            "deviceModel": UIDevice.current.model,
+            "windowSize": "\(UIScreen.main.bounds.width):\(UIScreen.main.bounds.height)",
+            "windowScale": UIScreen.main.scale,
+            "nativeSize": "\(UIScreen.main.nativeBounds.width):\(UIScreen.main.nativeBounds.height)",
+            "nativeScale": UIScreen.main.nativeScale,
+            ]
+        
+        do {
+            let data = try JSONSerialization.data(withJSONObject: dictionary, options: [])
+            return String(data: data, encoding: String.Encoding.utf8) ?? ""
+        } catch {
+            return ""
+        }
+    }
+    
     public func loadUrl(url: URL, onComplete: @escaping (ShardRoot) -> ()) {
-        let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let deviceInfo = getDeviceInfo()
+        request.addValue(deviceInfo, forHTTPHeaderField: "DeviceInfo")
+        
+        let task = self.defaultSession.dataTask(with: request) { data, response, httpError in
             let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
             DispatchQueue.main.async { onComplete(self.loadJson(json)) }
         }
