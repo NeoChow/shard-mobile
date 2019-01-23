@@ -38,14 +38,20 @@ class AlertLauncher: NSObject {
         }
     }
     
-    public func load(withShard shard: ShardData) {
-        let url = URL(string: shard.url)
+    public func load(withUrl url: URL) {
+        ShardViewManager.shared.loadUrl(url: url) { result in
+            self.showAlert(withContent: result, withPosition: ShardPosition.Center)
+        }
+    }
+    
+    public func load(withShard shard: Shard) {
+        let url = URL(string: shard.instance!)
         ShardViewManager.shared.loadUrl(url: url!) { result in
             self.showAlert(withContent: result, withPosition: shard.position)
         }
     }
     
-    private func showAlert(withContent content: ShardRoot, withPosition position: String) {
+    private func showAlert(withContent content: ShardRoot, withPosition position: ShardPosition) {
         if let window = UIApplication.shared.keyWindow {
             setupBackgroundView(inWindow: window)
             
@@ -54,7 +60,7 @@ class AlertLauncher: NSObject {
             
             var safeFrame = window.safeAreaLayoutGuide.layoutFrame
             
-            if (position == "center") {
+            if (position == ShardPosition.Center) {
                 let inset = window.layoutMargins.right + window.layoutMargins.left
                 safeFrame = safeFrame.insetBy(
                     dx: inset,
@@ -65,13 +71,13 @@ class AlertLauncher: NSObject {
             let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
             switch position {
-            case "top":
+            case .Top:
                 initY = window.frame.minY - size.height
                 finalY = safeFrame.minY
                 initAlpha = 1
                 finalAlpha = 1
                 break
-            case "bottom":
+            case .Bottom:
                 initY = window.frame.maxY
                 finalY = safeFrame.maxY - size.height
                 initAlpha = 1
