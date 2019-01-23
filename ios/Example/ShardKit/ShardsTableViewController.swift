@@ -41,7 +41,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         
         do {
             previous = try shardHandler.get(type: .Default)
-            examples = try shardHandler.get(type: .Example)
+            examples = try shardHandler.get(type: .Example).reversed()
             
             self.tableView.reloadData()
         } catch {
@@ -72,7 +72,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 let result = try json.asArray()
                 for json in result {
                     let shard = try self.shardHandler.create(json: json, type: .Example)
-                    self.examples = [shard] + self.examples
+                    self.examples = self.examples + [shard]
                 }
             } catch {
                 print("Unexpected error: \(error).")
