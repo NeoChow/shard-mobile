@@ -10,7 +10,8 @@ import UIKit
 public struct ShardError: Error {
     public enum ShardErrorType {
         case HttpStatusCodeError
-        case ShardServerError
+        case UnknownResponseError
+        case ShardJsonError
     }
     
     public let type: ShardErrorType
@@ -61,64 +62,66 @@ public class ShardViewManager {
         return ShardView(implFactories[kind]!(context))
     }
     
+    func getResult(_ data: Data?, _ response: URLResponse?, _ httpError: Error?) -> Result<ShardRoot> {
+        guard httpError == nil else {
+            return Result.Failure(httpError!)
+        }
+        
+        if let httpResponse = response as? HTTPURLResponse {
+            if (httpResponse.statusCode != 200) {
+                return Result.Failure(
+                    ShardError(
+                        type: .HttpStatusCodeError,
+                        message: "Server responded with status code \(httpResponse.statusCode)."
+                    )
+                )
+            }
+        } else {
+            return Result.Failure(
+                ShardError(
+                    type: .UnknownResponseError,
+                    message: "Unknown response type."
+                )
+            )
+        }
+        
+        do {
+            let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
+            
+            return self.loadJson(json)
+        } catch let error {
+            return Result.Failure(error)
+        }
+    }
+    
     public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
         let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
-            guard httpError == nil else {
-                DispatchQueue.main.async {
-                    onComplete(Result.Failure(httpError!))
-                }
-                
-                return
-            }
+            let result = self.getResult(data, response, httpError)
             
-            if let httpResponse = response as? HTTPURLResponse {
-                let statusCode = httpResponse.statusCode
-                
-                if (statusCode != 200) {
-                    DispatchQueue.main.async {
-                        onComplete(Result.Failure(
-                            ShardError(
-                                type: .HttpStatusCodeError,
-                                message: "Server responded with status code \(statusCode)."
-                            )
-                        ))
-                    }
-                    
-                    return
-                }
-                
-                do {
-                    let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
-                    
-                    if let error = try json.asObject()["error"]?.asString() {
-                        DispatchQueue.main.async {
-                            onComplete(Result.Failure(
-                                ShardError(
-                                    type: .ShardServerError,
-                                    message: error
-                                )
-                            ))
-                        }
-                        
-                        return
-                    }
-                    
-                    DispatchQueue.main.async {
-                        onComplete(Result.Success(self.loadJson(json)))
-                    }
-                } catch let error {
-                    DispatchQueue.main.async {
-                        onComplete(Result.Failure(error))
-                    }
-                }
+            DispatchQueue.main.async {
+                onComplete(result)
             }
         }
         
         task.resume()
     }
     
-    public func loadJson(_ json: JsonValue) -> ShardRoot {
-        return loadJson(json.toString())
+    public func loadJson(_ json: JsonValue) -> Result<ShardRoot> {
+        do {
+            if let jsonError = try json.asObject()["error"]?.asString() {
+                return Result.Failure(
+                    ShardError(
+                        type: .ShardJsonError,
+                        message: jsonError
+                    )
+                )
+            }
+        } catch let error {
+            return Result.Failure(error)
+        }
+        
+        let shardRoot = loadJson(json.toString())
+        return Result.Success(shardRoot)
     }
     
     public func loadJson(_ json: String) -> ShardRoot {

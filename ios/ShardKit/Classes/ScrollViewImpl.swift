@@ -36,7 +36,14 @@ internal class ScrollViewImpl: BaseViewImpl {
             default: return self.direction = .vertical
             }
         case "content-inset": self.contentInset = try! value.asObject().asDimension()
-        case "content": self.content = ShardViewManager.shared.loadJson(value)
+        case "content":
+            let result = ShardViewManager.shared.loadJson(value)
+            switch(result) {
+            case .Success(let content):
+                self.content = content
+            case .Failure:
+                break
+            }
         default: ()
         }
     }

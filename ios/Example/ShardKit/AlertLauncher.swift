@@ -42,7 +42,6 @@ class AlertLauncher: NSObject {
             switch result {
             case .Success(let data):
                 self.showAlert(withContent: data, withPosition: shard.position)
-                break
             case .Failure(let error):
                 let message: String
                 if let shardError = error as? ShardError {
@@ -51,7 +50,6 @@ class AlertLauncher: NSObject {
                     message = error.localizedDescription
                 }
                 self.delegate?.didRecieveError("Could not load Shard.", message)
-                break
             }
         }
     }
