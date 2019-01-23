@@ -27,10 +27,14 @@ class AlertLauncher: NSObject {
     override init() {
         super.init()
         
-        self.rootView.on("open-url") {
+        self.rootView.on("open-url") { value in
             self.dismissAlert()
-            let url = try! $0!.asString()
+            let url = try! value!.asString()
             self.delegate?.didOpenUrl(URL(string: url)!)
+        }
+        
+        self.rootView.on("dismiss-alert") { _ in
+            self.dismissAlert()
         }
     }
     
@@ -48,8 +52,16 @@ class AlertLauncher: NSObject {
             window.addSubview(rootView)
             rootView.setRoot(content)
             
-            let safeGuide = window.safeAreaLayoutGuide
-            let safeFrame = position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
+            var safeFrame = window.safeAreaLayoutGuide.layoutFrame
+            
+            if (position == "center") {
+                let inset = window.layoutMargins.right + window.layoutMargins.left
+                safeFrame = safeFrame.insetBy(
+                    dx: inset,
+                    dy: inset
+                )
+            }
+            
             let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
             switch position {
