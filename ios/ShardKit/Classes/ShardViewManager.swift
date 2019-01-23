@@ -27,7 +27,7 @@ private func shard_view_manager_create_view(_ self_ptr: UnsafeRawPointer?, _ con
     let viewManager: ShardViewManager = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let context: ShardContext = Unmanaged.fromOpaque(UnsafeRawPointer(context_ptr!)).takeUnretainedValue()
     let view = viewManager.createView(context: context, kind: String(cString: kind!))
-    return view.rust_ptr;
+    return view.rust_ptr
 }
 
 public typealias ViewImplFactory = (ShardContext) -> ShardViewImpl
