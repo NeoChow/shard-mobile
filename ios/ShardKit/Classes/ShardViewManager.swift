@@ -34,9 +34,9 @@ public typealias ViewImplFactory = (ShardContext) -> ShardViewImpl
 
 public class ShardViewManager {
     public static let shared = ShardViewManager()
+    public var session: NetworkSession = URLSession(configuration: .default)
     
     internal var rust_ptr: OpaquePointer! = nil
-    private let defaultSession = URLSession(configuration: .default)
     internal var implFactories: Dictionary<String, ViewImplFactory> = [:]
     
     private init() {
@@ -95,15 +95,13 @@ public class ShardViewManager {
     }
     
     public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
-        let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
+        session.loadData(from: url) { data, response, httpError in
             let result = self.getResult(data, response, httpError)
             
             DispatchQueue.main.async {
                 onComplete(result)
             }
         }
-        
-        task.resume()
     }
     
     public func loadJson(_ json: JsonValue) -> Result<ShardRoot> {
