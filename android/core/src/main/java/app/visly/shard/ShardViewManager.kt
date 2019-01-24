@@ -24,6 +24,7 @@ import app.visly.shard.viewimpl.ImageViewImpl
 import app.visly.shard.viewimpl.TextViewImpl
 import app.visly.shard.viewimpl.SolidColorViewImpl
 import app.visly.shard.viewimpl.ScrollViewImpl
+import java.lang.Exception
 
 class ShardViewManager internal constructor() {
 
@@ -72,9 +73,13 @@ class ShardViewManager internal constructor() {
                     .header("content-type", "application/shard")
                     .build()
 
-            val response = httpClient.newCall(request).execute()
-            val json = response.body()!!.string()
-            handler.post { completion(loadJson(ctx, json)) }
+            try {
+                val response = httpClient.newCall(request).execute()
+                val json = response.body()!!.string()
+                handler.post { completion(loadJson(ctx, json)) }
+            } catch (e: Exception) {
+                handler.post { completion(Result.error(e)) }
+            }
         }
     }
 

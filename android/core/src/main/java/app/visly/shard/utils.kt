@@ -10,35 +10,6 @@ package app.visly.shard
 import android.content.Context
 import java.lang.IllegalArgumentException
 
-class Result<T> private constructor(private val success: T?, private val error: Error?) {
-
-    companion object {
-        fun <T> success(success: T): Result<T> {
-            return Result(success, null)
-        }
-
-        fun <T> error(error: Error): Result<T> {
-            return Result(null, error)
-        }
-    }
-
-    fun isError(): Boolean {
-        return error != null
-    }
-
-    fun isSuccess(): Boolean {
-        return success != null
-    }
-
-    fun error(): Error {
-        return error!!
-    }
-
-    fun success(): T {
-        return success!!
-    }
-}
-
 data class Size(val width: Float, val height: Float)
 
 data class Color(val default: Int, val pressed: Int?)

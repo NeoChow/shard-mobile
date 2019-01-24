@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -149,7 +150,11 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
         showingShard = true
 
         ShardViewManager.instance.loadUrl(this, shard.url) {
-            shardRoot.setRoot(it)
+            if (it.isError()) {
+                Log.d("visly", it.error().toString())
+            } else {
+                shardRoot.setRoot(it.success())
+            }
         }
 
         shardRoot.on("open-url") {
