@@ -21,7 +21,6 @@ class ShardRoot(internal val ctx: ShardContext, @Keep internal val rustPtr: Long
                     root.frame.height().toInt(),
                     root.frame.left.toInt(),
                     root.frame.top.toInt())
-            root.impl.bindView(view)
 
             if (view is AbsoluteLayout) {
                 view.size = root.getSize()
@@ -39,6 +38,7 @@ class ShardRoot(internal val ctx: ShardContext, @Keep internal val rustPtr: Long
     internal val view: View by lazy {
         fun createHierarchy(root: ShardView): View {
             val view = root.view
+            root.impl.bindView(view)
 
             if (view is AbsoluteLayout) {
                 for (child in root.children) {

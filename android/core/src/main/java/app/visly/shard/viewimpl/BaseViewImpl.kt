@@ -57,6 +57,8 @@ abstract class BaseViewImpl<T: View>(val ctx: ShardContext): ShardViewImpl<T> {
 
     override fun bindView(view: T) {
         view.setOnClickListener(this.onClick)
+        view.isDuplicateParentStateEnabled = this.onClick == null
+        view.isClickable = this.onClick != null
         view.background = BackgroundDrawable(backgroundColor, borderRadius)
         view.foreground = BorderDrawable(borderWidth, borderColor, borderRadius)
     }
