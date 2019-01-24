@@ -21,13 +21,13 @@ internal class TextViewImpl: BaseViewImpl {
         return CGSize(width: width ?? ceil(size.width), height: height ?? ceil(size.height))
     }
     
-    override func setProp(key: String, value: JsonValue) {
-        super.setProp(key: key, value: value)
+    override func setProp(key: String, value: JsonValue) throws {
+        try super.setProp(key: key, value: value)
         
         switch key {
-        case "span": self.text = try! attributedString(from: try! value.asObject(), attributes: [:])
-        case "max-lines": self.numberOfLines = Int(try! value.asNumber())
-        case "line-height": self.lineHeightMultiple = try! value.asObject()["value"]!.asNumber()
+        case "span": self.text = try attributedString(from: try value.asObject(), attributes: [:])
+        case "max-lines": self.numberOfLines = Int(try value.asNumber())
+        case "line-height": self.lineHeightMultiple = try value.asObject()["value"]!.asNumber()
         case "text-align":
             switch value {
             case .String(let value) where value == "start": self.textAlignment = .left

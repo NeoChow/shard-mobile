@@ -33,23 +33,23 @@ class BaseViewImpl: ShardViewImpl {
         fatalError("Subclass must override")
     }
     
-    func setProp(key: String, value: JsonValue) {
+    func setProp(key: String, value: JsonValue) throws {
         switch key {
         case "background-color":
-            self.backgroundColor = try! value.asColor()
+            self.backgroundColor = try value.asColor()
         case "border-color":
-            self.borderColor = try! value.asColor().default
+            self.borderColor = try value.asColor().default
         case "border-width":
-            self.borderWidth = try! value.asObject().asDimension()
+            self.borderWidth = try value.asObject().asDimension()
         case "border-radius":
             switch value {
             case let .String(value) where value == "max": self.borderRadius = Float.infinity
-            case let .Object(value): self.borderRadius = try! value.asDimension()
+            case let .Object(value): self.borderRadius = try value.asDimension()
             default: self.borderRadius = 0
             }
         case "on-click":
-            let value = try! value.asObject()
-            let action = try! value["action"]!.asString()
+            let value = try value.asObject()
+            let action = try value["action"]!.asString()
             self.clickHandler = { self.context.dispatch(action: action, value: value["value"]) }
             
         default: ()
