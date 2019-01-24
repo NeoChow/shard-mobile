@@ -40,11 +40,11 @@ public protocol ShardViewImplDelegate {
 }
 
 public protocol ShardViewImpl {
-    var state: ShardControlState {get set}
     var delegate: ShardViewImplDelegate? {get set}
     
     func measure(width: CGFloat?, height: CGFloat?) -> CGSize
     func setProp(key: String, value: JsonValue)
+    func setViewState(_ state: ShardControlState, _ view: UIView)
     func createView() -> UIView
     func bindView(_ view: UIView)
 }
@@ -86,7 +86,7 @@ public class ShardView: ShardViewImplDelegate {
     }
     
     public func setState(_ state: ShardControlState) {
-        self.impl.state = state
+        self.impl.setViewState(state, view)
         
         for child in self.children {
             child.setState(state)
