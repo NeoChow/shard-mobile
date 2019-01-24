@@ -19,7 +19,7 @@ class BaseViewImpl: ShardViewImpl {
     internal var borderColor = UIColor.clear
     internal var borderWidth = Float(0)
     internal var borderRadius = Float(0)
-    internal var clickHandler: () -> () = {}
+    internal var clickHandler: (() -> ())? = nil
     internal var view: UIView? = nil
     
     var delegate: ShardViewImplDelegate?
@@ -78,19 +78,22 @@ class BaseViewImpl: ShardViewImpl {
         view.layer.borderColor = borderColor.cgColor
         view.layer.borderWidth = CGFloat(borderWidth)
         view.layer.cornerRadius = borderRadius.isInfinite ? min(view.frame.width, view.frame.height) / 2 : CGFloat(borderRadius)
-        view.removeGestureRecognizer(self.tapGestureRecognizer)
-        view.addGestureRecognizer(self.tapGestureRecognizer)
+        
+        if (self.clickHandler != nil) {
+            view.removeGestureRecognizer(self.tapGestureRecognizer)
+            view.addGestureRecognizer(self.tapGestureRecognizer)
+        }
         
         self.view = view
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         switch sender.state {
-        case .ended:
-            self.delegate?.setState(.Default)
-            self.clickHandler()
         case .began:
             self.delegate?.setState(.Pressed)
+        case .ended:
+            self.delegate?.setState(.Default)
+            self.clickHandler?()
         default: ()
         }
     }
