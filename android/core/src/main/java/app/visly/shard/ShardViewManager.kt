@@ -62,7 +62,7 @@ class ShardViewManager internal constructor() {
         setViewImpl("scroll") { ScrollViewImpl(it) }
     }
 
-    fun loadUrl(ctx: Context, url: String, completion: (ShardRoot) -> Unit) {
+    fun loadUrl(ctx: Context, url: String, completion: (Result<ShardRoot>) -> Unit) {
         assert(hasCalledInit) { "Must call ShardViewManager.init() from your Application class" }
 
         val handler = Handler(Looper.getMainLooper())
@@ -78,14 +78,14 @@ class ShardViewManager internal constructor() {
         }
     }
 
-    fun loadJson(ctx: Context, json: JsonValue): ShardRoot {
+    fun loadJson(ctx: Context, json: JsonValue): Result<ShardRoot> {
         return loadJson(ctx, json.toString())
     }
 
-    fun loadJson(ctx: Context, json: String): ShardRoot {
+    fun loadJson(ctx: Context, json: String): Result<ShardRoot> {
         assert(hasCalledInit) { "Must call ShardViewManager.init() from your Application class" }
         val ctx = ShardContext(ctx)
-        return ShardRoot(ctx, render(ctx, json))
+        return Result.success(ShardRoot(ctx, render(ctx, json)))
     }
 
     @Suppress("UNCHECKED_CAST")
