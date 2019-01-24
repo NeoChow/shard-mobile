@@ -14,22 +14,22 @@ class ImageViewImplSpec: QuickSpec {
         let viewimpl = ImageViewImpl(ShardContext())
         
         it("should set src") {
-            viewimpl.setProp(key: "src", value: JsonValue.String("https://shardlib.com"))
+            try! viewimpl.setProp(key: "src", value: JsonValue.String("https://shardlib.com"))
             expect(viewimpl.src).to(equal(URL(string: "https://shardlib.com")))
         }
         
         it("should set content mode to cover") {
-            viewimpl.setProp(key: "content-mode", value: JsonValue.String("cover"))
+            try! viewimpl.setProp(key: "content-mode", value: JsonValue.String("cover"))
             expect(viewimpl.contentMode).to(equal(UIView.ContentMode.scaleAspectFill))
         }
         
         it("should set content mode to contain") {
-            viewimpl.setProp(key: "content-mode", value: JsonValue.String("contain"))
+            try! viewimpl.setProp(key: "content-mode", value: JsonValue.String("contain"))
             expect(viewimpl.contentMode).to(equal(UIView.ContentMode.scaleAspectFit))
         }
         
         it("should set content mode to center") {
-            viewimpl.setProp(key: "content-mode", value: JsonValue.String("center"))
+            try! viewimpl.setProp(key: "content-mode", value: JsonValue.String("center"))
             expect(viewimpl.contentMode).to(equal(UIView.ContentMode.center))
         }
     }

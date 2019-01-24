@@ -14,27 +14,27 @@ class TextViewImplSpec: QuickSpec {
         let viewimpl = TextViewImpl(ShardContext())
         
         it("should set text align to start") {
-            viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))
+            try! viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))
             expect(viewimpl.textAlignment).to(equal(NSTextAlignment.left))
         }
         
         it("should set text align to end") {
-            viewimpl.setProp(key: "text-align", value: JsonValue.String("end"))
+            try! viewimpl.setProp(key: "text-align", value: JsonValue.String("end"))
             expect(viewimpl.textAlignment).to(equal(NSTextAlignment.right))
         }
         
         it("should set text align to center") {
-            viewimpl.setProp(key: "text-align", value: JsonValue.String("center"))
+            try! viewimpl.setProp(key: "text-align", value: JsonValue.String("center"))
             expect(viewimpl.textAlignment).to(equal(NSTextAlignment.center))
         }
         
         it("should set max lines") {
-            viewimpl.setProp(key: "max-lines", value: JsonValue.Number(1))
+            try! viewimpl.setProp(key: "max-lines", value: JsonValue.Number(1))
             expect(viewimpl.numberOfLines).to(equal(1))
         }
         
         it("should set line height") {
-            viewimpl.setProp(key: "line-height", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "line-height", value: JsonValue.Object([
                 "unit": JsonValue.String("points"),
                 "value": JsonValue.Number(10)
             ]))
@@ -42,14 +42,14 @@ class TextViewImplSpec: QuickSpec {
         }
         
         it("should set simple span") {
-            viewimpl.setProp(key: "span", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "span", value: JsonValue.Object([
                 "text": JsonValue.String("Hello")
                 ]))
             expect(viewimpl.text.string).to(equal("Hello"))
         }
         
         it("should set complex span") {
-            viewimpl.setProp(key: "span", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "span", value: JsonValue.Object([
                 "text": JsonValue.Array([
                     JsonValue.Object(["text": JsonValue.String("Hello")]),
                     JsonValue.Object(["text": JsonValue.String(" ")]),

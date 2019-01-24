@@ -14,12 +14,12 @@ class BaseViewImplSpec: QuickSpec {
         let viewimpl = BaseViewImpl(ShardContext())
         
         it("should set background color") {
-            viewimpl.setProp(key: "background-color", value: JsonValue.String("#f00"))
+            try! viewimpl.setProp(key: "background-color", value: JsonValue.String("#f00"))
             expect(viewimpl.backgroundColor.default).to(equal(UIColor.red))
         }
         
         it("should set clickable background color") {
-            viewimpl.setProp(key: "background-color", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "background-color", value: JsonValue.Object([
                 "default": JsonValue.String("#F00"),
                 "pressed": JsonValue.String("#00F")]
             ))
@@ -28,12 +28,12 @@ class BaseViewImplSpec: QuickSpec {
         }
 
         it("should set border color") {
-            viewimpl.setProp(key: "border-color", value: JsonValue.String("#f00"))
+            try! viewimpl.setProp(key: "border-color", value: JsonValue.String("#f00"))
             expect(viewimpl.borderColor).to(equal(UIColor.red))
         }
 
         it("should set border width") {
-            viewimpl.setProp(key: "border-width", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "border-width", value: JsonValue.Object([
                 "unit": JsonValue.String("points"),
                 "value": JsonValue.Number(10)
             ]))
@@ -41,7 +41,7 @@ class BaseViewImplSpec: QuickSpec {
         }
 
         it("should set border radius") {
-            viewimpl.setProp(key: "border-radius", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "border-radius", value: JsonValue.Object([
                 "unit": JsonValue.String("points"),
                 "value": JsonValue.Number(10)
             ]))
@@ -49,7 +49,7 @@ class BaseViewImplSpec: QuickSpec {
         }
 
         it("should set border radius to max") {
-            viewimpl.setProp(key: "border-radius", value: JsonValue.String("max"))
+            try! viewimpl.setProp(key: "border-radius", value: JsonValue.String("max"))
             expect(viewimpl.borderRadius).to(equal(Float.infinity))
         }
     }
