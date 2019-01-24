@@ -11,7 +11,6 @@ public struct ShardError: Error {
     public enum ShardErrorType {
         case HttpStatusCodeError
         case UnknownResponseError
-        case ShardJsonError
     }
     
     public let type: ShardErrorType
@@ -85,13 +84,9 @@ public class ShardViewManager {
             )
         }
         
-        do {
-            let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
-            
-            return self.loadJson(json)
-        } catch let error {
-            return Result.Failure(error)
-        }
+        let json = String(data: data!, encoding: .utf8)
+        
+        return loadJson(json!)
     }
     
     public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
@@ -105,26 +100,16 @@ public class ShardViewManager {
     }
     
     public func loadJson(_ json: JsonValue) -> Result<ShardRoot> {
-        do {
-            if let jsonError = try json.asObject()["error"]?.asString() {
-                return Result.Failure(
-                    ShardError(
-                        type: .ShardJsonError,
-                        message: jsonError
-                    )
-                )
-            }
-        } catch let error {
-            return Result.Failure(error)
-        }
-        
-        let shardRoot = loadJson(json.toString())
-        return Result.Success(shardRoot)
+        return loadJson(json.toString())
     }
     
-    public func loadJson(_ json: String) -> ShardRoot {
+    public func loadJson(_ json: String) -> Result<ShardRoot> {
         let context = ShardContext()
         let context_ptr = Unmanaged.passUnretained(context).toOpaque()
-        return ShardRoot(context, shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String))
+        let shardRoot = ShardRoot(context, shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String))
+        
+        // TODO: Catch render errors here
+        
+        return Result.Success(shardRoot)
     }
 }

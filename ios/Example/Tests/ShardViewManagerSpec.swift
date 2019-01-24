@@ -36,7 +36,7 @@ class ShardViewManagerSpec: QuickSpec {
             let sessionMock = NetworkSessionMock()
             let mockError = NSError(
                 domain: "",
-                code: -1,
+                code: -1004,
                 userInfo: [:]
             )
             sessionMock.error = mockError
