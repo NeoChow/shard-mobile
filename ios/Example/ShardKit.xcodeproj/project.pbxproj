@@ -26,6 +26,7 @@
 		76CF1C0E21E20497001C139D /* BaseViewImplSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CF1C0D21E20497001C139D /* BaseViewImplSpec.swift */; };
 		921C90462DBFD4F6EED05918 /* Pods_ShardKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F3F41B91269A8C2B1A37E0E /* Pods_ShardKit_Example.framework */; };
 		B7C9FC3021EE61370070C172 /* AlertLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9FC2F21EE61370070C172 /* AlertLauncher.swift */; };
+		B7EEDE4821F18EE70007941C /* ShardHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7EEDE4721F18EE70007941C /* ShardHandler.swift */; };
 		CB898CCA8730903A6AB4095B /* Pods_ShardKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CC4F2344A48DA481DCCE765 /* Pods_ShardKit_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +71,7 @@
 		8FB746F715B51CC82E2396CE /* Pods-ShardKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShardKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShardKit_Example/Pods-ShardKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		9F3F41B91269A8C2B1A37E0E /* Pods_ShardKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ShardKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7C9FC2F21EE61370070C172 /* AlertLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertLauncher.swift; sourceTree = "<group>"; };
+		B7EEDE4721F18EE70007941C /* ShardHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShardHandler.swift; sourceTree = "<group>"; };
 		C1C10FE9E7D8F13E88FECDDE /* Pods-ShardKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShardKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShardKit_Tests/Pods-ShardKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		CE1DB57CDB9ED7C79240CBA1 /* Pods-ShardKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShardKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShardKit_Tests/Pods-ShardKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED9FFDD9A8F22A14A4AF3E21 /* ShardKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ShardKit.podspec; path = ../ShardKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -122,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
+				B7EEDE4721F18EE70007941C /* ShardHandler.swift */,
 				B7C9FC2F21EE61370070C172 /* AlertLauncher.swift */,
 				13ADF250217BDB5500EB9333 /* ScanViewController.swift */,
 				607FACD71AFB9204008FA782 /* ShardsTableViewController.swift */,
@@ -406,6 +409,7 @@
 				607FACD81AFB9204008FA782 /* ShardsTableViewController.swift in Sources */,
 				B7C9FC3021EE61370070C172 /* AlertLauncher.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				B7EEDE4821F18EE70007941C /* ShardHandler.swift in Sources */,
 				13ADF251217BDB5500EB9333 /* ScanViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

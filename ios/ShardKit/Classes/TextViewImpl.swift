@@ -7,7 +7,7 @@
 
 import UIKit
 
-private let systemFont = UIFont.systemFont(ofSize: 12);
+private let systemFont = UIFont.systemFont(ofSize: 12)
 
 internal class TextViewImpl: BaseViewImpl {
     internal var text: NSAttributedString = NSAttributedString()

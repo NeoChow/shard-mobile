@@ -27,39 +27,57 @@ class AlertLauncher: NSObject {
     override init() {
         super.init()
         
-        self.rootView.on("open-url") {
+        self.rootView.on("open-url") { value in
             self.dismissAlert()
-            let url = try! $0!.asString()
+            let url = try! value!.asString()
             self.delegate?.didOpenUrl(URL(string: url)!)
+        }
+        
+        self.rootView.on("dismiss-alert") { _ in
+            self.dismissAlert()
         }
     }
     
-    public func load(withShard shard: ShardData) {
-        let url = URL(string: shard.url)
+    public func load(withUrl url: URL) {
+        ShardViewManager.shared.loadUrl(url: url) { result in
+            self.showAlert(withContent: result, withPosition: ShardPosition.Center)
+        }
+    }
+    
+    public func load(withShard shard: Shard) {
+        let url = URL(string: shard.instance!)
         ShardViewManager.shared.loadUrl(url: url!) { result in
             self.showAlert(withContent: result, withPosition: shard.position)
         }
     }
     
-    private func showAlert(withContent content: ShardRoot, withPosition position: String) {
+    private func showAlert(withContent content: ShardRoot, withPosition position: ShardPosition) {
         if let window = UIApplication.shared.keyWindow {
             setupBackgroundView(inWindow: window)
             
             window.addSubview(rootView)
             rootView.setRoot(content)
             
-            let safeGuide = window.safeAreaLayoutGuide
-            let safeFrame = position == "center" ? safeGuide.layoutFrame.insetBy(dx: window.layoutMargins.left + window.layoutMargins.right, dy: 0) : safeGuide.layoutFrame
+            var safeFrame = window.safeAreaLayoutGuide.layoutFrame
+            
+            if (position == ShardPosition.Center) {
+                let inset = window.layoutMargins.right + window.layoutMargins.left
+                safeFrame = safeFrame.insetBy(
+                    dx: inset,
+                    dy: inset
+                )
+            }
+            
             let size = content.measure(width: safeFrame.width, height: safeFrame.height)
             
             switch position {
-            case "top":
+            case .Top:
                 initY = window.frame.minY - size.height
                 finalY = safeFrame.minY
                 initAlpha = 1
                 finalAlpha = 1
                 break
-            case "bottom":
+            case .Bottom:
                 initY = window.frame.maxY
                 finalY = safeFrame.maxY - size.height
                 initAlpha = 1
