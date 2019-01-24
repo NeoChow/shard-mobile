@@ -9,6 +9,7 @@ package app.visly.shard
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -24,6 +25,7 @@ import app.visly.shard.viewimpl.ImageViewImpl
 import app.visly.shard.viewimpl.TextViewImpl
 import app.visly.shard.viewimpl.SolidColorViewImpl
 import app.visly.shard.viewimpl.ScrollViewImpl
+import kotlinx.coroutines.Job
 import java.lang.Exception
 
 class ShardViewManager internal constructor() {
@@ -44,6 +46,10 @@ class ShardViewManager internal constructor() {
                 hasCalledInit = true
             }
         }
+
+        private fun isInitialized(): Boolean {
+            return Build.DEVICE == "robolectric" || hasCalledInit
+        }
     }
 
     @Keep private var rustPtr: Long = 0
@@ -63,17 +69,17 @@ class ShardViewManager internal constructor() {
         setViewImpl("scroll") { ScrollViewImpl(it) }
     }
 
-    fun loadUrl(ctx: Context, url: String, completion: (Result<ShardRoot>) -> Unit) {
-        assert(hasCalledInit) { "Must call ShardViewManager.init() from your Application class" }
+    fun loadUrl(ctx: Context, url: String, completion: (Result<ShardRoot>) -> Unit): Job {
+        assert(isInitialized()) { "Must call ShardViewManager.init() from your Application class" }
 
         val handler = Handler(Looper.getMainLooper())
-        GlobalScope.launch {
-            val request = Request.Builder()
-                    .url(url)
-                    .header("content-type", "application/shard")
-                    .build()
-
+        return GlobalScope.launch {
             try {
+                val request = Request.Builder()
+                        .url(url)
+                        .header("content-type", "application/shard")
+                        .build()
+
                 val response = httpClient.newCall(request).execute()
                 val json = response.body()!!.string()
                 handler.post { completion(loadJson(ctx, json)) }
@@ -88,7 +94,7 @@ class ShardViewManager internal constructor() {
     }
 
     fun loadJson(ctx: Context, json: String): Result<ShardRoot> {
-        assert(hasCalledInit) { "Must call ShardViewManager.init() from your Application class" }
+        assert(isInitialized()) { "Must call ShardViewManager.init() from your Application class" }
         val ctx = ShardContext(ctx)
         return Result.success(ShardRoot(ctx, render(ctx, json)))
     }
