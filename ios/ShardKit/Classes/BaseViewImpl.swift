@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BaseViewImpl: ShardViewImpl {    
+class BaseViewImpl: ShardViewImpl {
     internal let context: ShardContext
     internal lazy var tapGestureRecognizer: UILongPressGestureRecognizer = {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleTap(sender:)))
