@@ -10,18 +10,19 @@ use stretch::number::Number;
 use stretch::style::Dimension;
 
 use json::JsonValue;
+use simple_error::SimpleError;
 use std::any::Any;
 
 pub trait ShardView: Any {
-    fn add_child(&mut self, child: &ShardView);
-    fn set_prop(&mut self, key: &str, value: &JsonValue);
-    fn set_frame(&mut self, frame: Rect<f32>);
-    fn measure(&self, constraints: Size<Number>) -> Size<f32>;
+    fn add_child(&mut self, child: &ShardView) -> Result<(), SimpleError>;
+    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<(), SimpleError>;
+    fn set_frame(&mut self, frame: Rect<f32>) -> Result<(), SimpleError>;
+    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>, SimpleError>;
     fn as_any(&self) -> &Any;
 }
 
 pub trait ShardViewManager {
-    fn create_view(&self, context: &Any, kind: &str) -> Box<ShardView>;
+    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<ShardView>, SimpleError>;
 }
 
 pub struct ViewNode {
@@ -35,51 +36,63 @@ pub struct Root {
 }
 
 impl Root {
-    pub fn measure(&mut self, size: Size<Number>) {
-        set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size).unwrap());
+    pub fn measure(&mut self, size: Size<Number>) -> Result<(), SimpleError> {
+        set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size)?)
     }
 }
 
-fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) {
+fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) -> Result<(), SimpleError> {
     view_node.shard_view.set_frame(Rect {
         start: layout.location.x,
         end: layout.location.x + layout.size.width,
         top: layout.location.y,
         bottom: layout.location.y + layout.size.height,
-    });
+    })?;
 
     for i in 0..view_node.children.len() {
         let view_node = &mut view_node.children[i];
         let layout = &layout.children[i];
-        set_frame(view_node, layout);
+        set_frame(view_node, layout)?;
+    }
+
+    Ok(())
+}
+
+pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Result<Root, SimpleError> {
+    match json::parse(json) {
+        Ok(json) => render(platform, context, &json["root"]),
+        Err(err) => Err(SimpleError::from(err)),
     }
 }
 
-pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Root {
-    let json = json::parse(json).unwrap();
-    render(platform, context, &json["root"])
-}
+fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Result<Root, SimpleError> {
+    let mut shard_view = match json["kind"].as_str() {
+        Some(kind) => platform.create_view(context, kind)?,
+        None => return Err(SimpleError::new("expected kind")),
+    };
 
-fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Root {
-    let mut shard_view = platform.create_view(context, json["kind"].as_str().expect("Expected kind"));
-    json["props"].entries().for_each(|(key, value)| shard_view.set_prop(key, value));
+    for (key, value) in json["props"].entries() {
+        shard_view.set_prop(key, value)?
+    }
 
     let mut children: Vec<ViewNode> = vec![];
     let mut node_children: Vec<stretch::style::Node> = vec![];
 
-    json["children"].members().for_each(|child| {
-        let root = render(platform, context, child);
+    for child in json["children"].members() {
+        let root = render(platform, context, child)?;
         children.push(root.view_node);
         node_children.push(root.stretch_node);
-    });
+    }
 
     let raw_shard_view = &*shard_view as *const ShardView;
 
-    children.iter().for_each(|child| shard_view.add_child(&*child.shard_view));
+    for child in &children {
+        shard_view.add_child(&*child.shard_view)?;
+    }
 
     let layout = match json["layout"] {
         JsonValue::Object(ref value) => value,
-        _ => panic!("Expected layout"),
+        _ => return Err(SimpleError::new("expected layout")),
     };
 
     let stretch_node = stretch::style::Node {
@@ -163,54 +176,63 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Root 
         },
 
         position: Rect {
-            start: parse_dimension(&layout["start"], Dimension::Undefined),
-            end: parse_dimension(&layout["end"], Dimension::Undefined),
-            top: parse_dimension(&layout["top"], Dimension::Undefined),
-            bottom: parse_dimension(&layout["bottom"], Dimension::Undefined),
+            start: parse_dimension(&layout["start"], Dimension::Undefined)?,
+            end: parse_dimension(&layout["end"], Dimension::Undefined)?,
+            top: parse_dimension(&layout["top"], Dimension::Undefined)?,
+            bottom: parse_dimension(&layout["bottom"], Dimension::Undefined)?,
         },
 
         margin: Rect {
-            start: parse_dimension(&layout["margin-start"], parse_dimension(&layout["margin"], Dimension::Undefined)),
-            end: parse_dimension(&layout["margin-end"], parse_dimension(&layout["margin"], Dimension::Undefined)),
-            top: parse_dimension(&layout["margin-top"], parse_dimension(&layout["margin"], Dimension::Undefined)),
-            bottom: parse_dimension(&layout["margin-bottom"], parse_dimension(&layout["margin"], Dimension::Undefined)),
+            start: parse_dimension(&layout["margin-start"], parse_dimension(&layout["margin"], Dimension::Undefined)?)?,
+            end: parse_dimension(&layout["margin-end"], parse_dimension(&layout["margin"], Dimension::Undefined)?)?,
+            top: parse_dimension(&layout["margin-top"], parse_dimension(&layout["margin"], Dimension::Undefined)?)?,
+            bottom: parse_dimension(
+                &layout["margin-bottom"],
+                parse_dimension(&layout["margin"], Dimension::Undefined)?,
+            )?,
         },
 
         padding: Rect {
-            start: parse_dimension(&layout["padding-start"], parse_dimension(&layout["padding"], Dimension::Undefined)),
-            end: parse_dimension(&layout["padding-end"], parse_dimension(&layout["padding"], Dimension::Undefined)),
-            top: parse_dimension(&layout["padding-top"], parse_dimension(&layout["padding"], Dimension::Undefined)),
+            start: parse_dimension(
+                &layout["padding-start"],
+                parse_dimension(&layout["padding"], Dimension::Undefined)?,
+            )?,
+            end: parse_dimension(&layout["padding-end"], parse_dimension(&layout["padding"], Dimension::Undefined)?)?,
+            top: parse_dimension(&layout["padding-top"], parse_dimension(&layout["padding"], Dimension::Undefined)?)?,
             bottom: parse_dimension(
                 &layout["padding-bottom"],
-                parse_dimension(&layout["padding"], Dimension::Undefined),
-            ),
+                parse_dimension(&layout["padding"], Dimension::Undefined)?,
+            )?,
         },
 
         border: Rect {
-            start: parse_dimension(&layout["border-start"], parse_dimension(&layout["border"], Dimension::Undefined)),
-            end: parse_dimension(&layout["border-end"], parse_dimension(&layout["border"], Dimension::Undefined)),
-            top: parse_dimension(&layout["border-top"], parse_dimension(&layout["border"], Dimension::Undefined)),
-            bottom: parse_dimension(&layout["border-bottom"], parse_dimension(&layout["border"], Dimension::Undefined)),
+            start: parse_dimension(&layout["border-start"], parse_dimension(&layout["border"], Dimension::Undefined)?)?,
+            end: parse_dimension(&layout["border-end"], parse_dimension(&layout["border"], Dimension::Undefined)?)?,
+            top: parse_dimension(&layout["border-top"], parse_dimension(&layout["border"], Dimension::Undefined)?)?,
+            bottom: parse_dimension(
+                &layout["border-bottom"],
+                parse_dimension(&layout["border"], Dimension::Undefined)?,
+            )?,
         },
 
         flex_grow: layout["flex-grow"].as_f32().unwrap_or(0.0),
         flex_shrink: layout["flex-shrink"].as_f32().unwrap_or(1.0),
 
-        flex_basis: parse_dimension(&layout["flex-basis"], Dimension::Auto),
+        flex_basis: parse_dimension(&layout["flex-basis"], Dimension::Auto)?,
 
         size: Size {
-            width: parse_dimension(&layout["width"], Dimension::Auto),
-            height: parse_dimension(&layout["height"], Dimension::Auto),
+            width: parse_dimension(&layout["width"], Dimension::Auto)?,
+            height: parse_dimension(&layout["height"], Dimension::Auto)?,
         },
 
         min_size: Size {
-            width: parse_dimension(&layout["min-width"], Dimension::Auto),
-            height: parse_dimension(&layout["min-height"], Dimension::Auto),
+            width: parse_dimension(&layout["min-width"], Dimension::Auto)?,
+            height: parse_dimension(&layout["min-height"], Dimension::Auto)?,
         },
 
         max_size: Size {
-            width: parse_dimension(&layout["max-width"], Dimension::Auto),
-            height: parse_dimension(&layout["max-height"], Dimension::Auto),
+            width: parse_dimension(&layout["max-width"], Dimension::Auto)?,
+            height: parse_dimension(&layout["max-height"], Dimension::Auto)?,
         },
 
         aspect_ratio: match layout["aspect-ratio"] {
@@ -228,16 +250,22 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Root 
         ..Default::default()
     };
 
-    Root { view_node: ViewNode { shard_view, children }, stretch_node }
+    Ok(Root { view_node: ViewNode { shard_view, children }, stretch_node })
 }
 
-fn parse_dimension(json: &JsonValue, default: Dimension) -> Dimension {
+fn parse_dimension(json: &JsonValue, default: Dimension) -> Result<Dimension, SimpleError> {
     let value = &json["value"];
 
     match json["unit"] {
-        JsonValue::Short(ref unit) if unit == "auto" => Dimension::Auto,
-        JsonValue::Short(ref unit) if unit == "points" => Dimension::Points(value.as_f32().unwrap()),
-        JsonValue::Short(ref unit) if unit == "percent" => Dimension::Percent(value.as_f32().unwrap()),
-        _ => default,
+        JsonValue::Short(ref unit) if unit == "auto" => Ok(Dimension::Auto),
+        JsonValue::Short(ref unit) if unit == "points" => match value.as_f32() {
+            Some(value) => Ok(Dimension::Points(value)),
+            None => Err(SimpleError::new("expected float")),
+        },
+        JsonValue::Short(ref unit) if unit == "percent" => match value.as_f32() {
+            Some(value) => Ok(Dimension::Percent(value)),
+            None => Err(SimpleError::new("expected float")),
+        },
+        _ => Ok(default),
     }
 }
