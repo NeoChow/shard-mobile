@@ -9,11 +9,18 @@ import UIKit
 
 private let systemFont = UIFont.systemFont(ofSize: 12)
 
-internal class TextViewImpl: BaseViewImpl {
+internal class TextViewImpl: BaseViewImpl {    
     internal var text: NSAttributedString = NSAttributedString()
     internal var numberOfLines: Int = -1
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
+    internal var substringClickHandler: ((_ sender: UITapGestureRecognizer) -> ())? = nil
+    
+    internal lazy var substringTapGestureRecognizer: UILongPressGestureRecognizer = {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleSubstringTap(sender:)))
+        gesture.minimumPressDuration = 0
+        return gesture
+    }()
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -43,6 +50,7 @@ internal class TextViewImpl: BaseViewImpl {
         let label = UILabel()
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 12)
+        label.isUserInteractionEnabled = true
         return label
     }
     
@@ -53,9 +61,14 @@ internal class TextViewImpl: BaseViewImpl {
         view.attributedText = textWithLineHeight()
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
+        
+        if (self.substringClickHandler != nil) {
+            view.removeGestureRecognizer(self.substringTapGestureRecognizer)
+            view.addGestureRecognizer(self.substringTapGestureRecognizer)
+        }
     }
     
-    func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any]) throws -> NSAttributedString {
+    func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any], location: Int? = nil) throws -> NSAttributedString {
         var attributes = attributes
         
         let family: String = try props.get("font-family") {
@@ -114,6 +127,8 @@ internal class TextViewImpl: BaseViewImpl {
             
             let descriptor = UIFontDescriptor(fontAttributes: [.family: family]).withSymbolicTraits(traits)!
             attributes[.font] = UIFont(descriptor: descriptor, size: size ?? current?.pointSize ?? 12)
+        } else {
+            attributes[.font] = systemFont // TODO: Set to parent?
         }
         
         try props.get("font-color") {
@@ -129,10 +144,35 @@ internal class TextViewImpl: BaseViewImpl {
             case .String(let value):
                 let string = NSMutableAttributedString(string: value)
                 string.addAttributes(attributes, range: NSRange(location: 0, length: string.length))
+                
+                try props.get("link") {
+                    switch $0 {
+                    case .Null: ()
+                    case let value:
+                        let value = try value.asObject()
+                        let action = try value["action"]!.asString()
+                        let range = NSRange(location: location ?? 0, length: string.length)
+                        
+                        self.substringClickHandler = { sender -> () in
+                            let label = sender.view as! UILabel
+                            if sender.didTapAttributedTextInLabel(label: label, inRange: range) {
+                                print("Trigger event: \(action):\(try! value["value"]!.asString())")
+                            }
+                        }
+                    }
+                }
+                
                 return string
-            case .Array(let value):
-                let parts = try value.map({ try attributedString(from: $0.asObject(), attributes: attributes) })
-                return NSMutableAttributedString(attributedString: parts.reduce(NSAttributedString(), { $0 + $1 }))
+            case .Array(let values):
+                var location = 0
+                let parts = try values.map({ (value) -> NSAttributedString in
+                    let part = try attributedString(from: value.asObject(), attributes: attributes, location: location)
+                    location += part.length
+                    return part
+                })
+                return NSMutableAttributedString(
+                    attributedString: parts.reduce(NSAttributedString(), { $0 + $1 })
+                )
             case let value: throw "Unexpected value for text: \(value)"
             }
         }
@@ -152,5 +192,64 @@ internal class TextViewImpl: BaseViewImpl {
             range: NSRange(location: 0, length: string.length))
         
         return string
+    }
+    
+    @objc func handleSubstringTap(sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .began: ()
+        case .ended:
+            self.substringClickHandler?(sender)
+        default: ()
+        }
+    }
+}
+
+internal extension UITapGestureRecognizer {
+    func didTapAttributedTextInLabel(label: UILabel, inRange characterRange: NSRange) -> Bool {
+        guard let attributedString = label.attributedText else {
+            return false
+        }
+        
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: .zero)
+        let textStorage = NSTextStorage(attributedString: attributedString)
+        
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        textContainer.lineFragmentPadding = 0
+        textContainer.lineBreakMode = label.lineBreakMode
+        textContainer.maximumNumberOfLines = label.numberOfLines
+        textContainer.size = label.bounds.size
+        
+        let textBoundingBox = layoutManager.usedRect(for: textContainer)
+        
+        let textContainerOffset = CGPoint(
+            x: (textContainer.size.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
+            y: (textContainer.size.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
+        )
+        
+        let locationOfTouchInLabel = self.location(in: label)
+        
+        let locationOfTouchInTextContainer = CGPoint(
+            x: locationOfTouchInLabel.x - textContainerOffset.x,
+            y: locationOfTouchInLabel.y - textContainerOffset.y
+        )
+        
+        let characterIndex = layoutManager.glyphIndex(
+            for: locationOfTouchInTextContainer,
+            in: textContainer
+        )
+        
+        let characterRect = layoutManager.boundingRect(
+            forGlyphRange: NSRange(location: characterIndex, length: 1),
+            in: textContainer
+        )
+        
+        if !characterRect.contains(locationOfTouchInTextContainer) {
+            return false
+        }
+        
+        return NSLocationInRange(characterIndex, characterRange)
     }
 }
