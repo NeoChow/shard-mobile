@@ -48,7 +48,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             print("Unexpected error: \(error).")
         }
         
-        loadExamples()
+        // loadExamples()
     }
     
     override func viewWillAppear(_ animated: Bool) {

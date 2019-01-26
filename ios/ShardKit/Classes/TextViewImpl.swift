@@ -9,7 +9,7 @@ import UIKit
 
 private let systemFont = UIFont.systemFont(ofSize: 12)
 
-internal class TextViewImpl: BaseViewImpl {    
+internal class TextViewImpl: BaseViewImpl {
     internal var text: NSAttributedString = NSAttributedString()
     internal var numberOfLines: Int = -1
     internal var textAlignment: NSTextAlignment = .left
@@ -59,6 +59,7 @@ internal class TextViewImpl: BaseViewImpl {
         
         let view = view as! UILabel
         view.attributedText = textWithLineHeight()
+        
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
         
@@ -149,26 +150,9 @@ internal class TextViewImpl: BaseViewImpl {
                 let string = NSMutableAttributedString(string: value)
                 string.addAttributes(attributes, range: NSRange(location: 0, length: string.length))
                 
-                try props.get("link") {
-                    switch $0 {
-                    case .Null: ()
-                    case let value:
-                        let value = try value.asObject()
-                        let action = try value["action"]!.asString()
-                        let range = NSRange(location: location ?? 0, length: string.length)
-                        
-                        self.substringClickHandler = { sender -> () in
-                            let label = sender.view as! UILabel
-                            if sender.didTapAttributedTextInLabel(label: label, inRange: range) {
-                                print("Trigger event: \(action):\(try! value["value"]!.asString())")
-                            }
-                        }
-                    }
-                }
-                
                 return string
             case .Array(let values):
-                var location = 0
+                var location = location ?? 0
                 let parts = try values.map({ (value) -> NSAttributedString in
                     let part = try attributedString(from: value.asObject(), attributes: attributes, location: location)
                     location += part.length
@@ -181,6 +165,23 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
+        try props.get("link") {
+            switch $0 {
+            case .Null: ()
+            case let value:
+                let value = try value.asObject()
+                let action = try value["action"]!.asString()
+                let range = NSRange(location: location ?? 0, length: string.length)
+                
+                self.substringClickHandler = { sender -> () in
+                    let label = sender.view as! UILabel
+                    if sender.didTapAttributedTextInLabel(label: label, inRange: range) {
+                        print("Trigger event: \(action):\(try! value["value"]!.asString())")
+                    }
+                }
+            }
+        }
+        
         return string
     }
     
@@ -189,6 +190,7 @@ internal class TextViewImpl: BaseViewImpl {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = .byWordWrapping
         paragraphStyle.lineHeightMultiple = CGFloat(lineHeightMultiple)
+        paragraphStyle.alignment = textAlignment
         
         string.addAttribute(
             .paragraphStyle,
@@ -226,22 +228,10 @@ internal extension UITapGestureRecognizer {
         textContainer.maximumNumberOfLines = label.numberOfLines
         textContainer.size = label.bounds.size
         
-        let textBoundingBox = layoutManager.usedRect(for: textContainer)
-        
-        let textContainerOffset = CGPoint(
-            x: (textContainer.size.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
-            y: (textContainer.size.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
-        )
-        
         let locationOfTouchInLabel = self.location(in: label)
         
-        let locationOfTouchInTextContainer = CGPoint(
-            x: locationOfTouchInLabel.x - textContainerOffset.x,
-            y: locationOfTouchInLabel.y - textContainerOffset.y
-        )
-        
         let characterIndex = layoutManager.glyphIndex(
-            for: locationOfTouchInTextContainer,
+            for: locationOfTouchInLabel,
             in: textContainer
         )
         
@@ -250,7 +240,7 @@ internal extension UITapGestureRecognizer {
             in: textContainer
         )
         
-        if !characterRect.contains(locationOfTouchInTextContainer) {
+        if !characterRect.contains(locationOfTouchInLabel) {
             return false
         }
         
