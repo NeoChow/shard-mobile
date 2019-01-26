@@ -22,8 +22,7 @@ fn render_view_of_kind() {
             "layout": {}
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -45,8 +44,7 @@ fn render_view_with_flex_direction() {
             }
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     assert_eq!(root.stretch_node.flex_direction, stretch::style::FlexDirection::Column);
@@ -68,8 +66,7 @@ fn render_view_with_size() {
             }
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -93,8 +90,7 @@ fn render_view_with_children() {
             ]
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     assert_eq!(root.view_node.children.len(), 2);
@@ -121,8 +117,7 @@ fn render_view_with_props() {
             }
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
@@ -143,8 +138,7 @@ fn render_view_intrinsic_size() {
             "layout": {}
         }
     }"#,
-    )
-    .unwrap();
+    );
     root.measure(Size::undefined());
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
