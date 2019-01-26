@@ -49,7 +49,7 @@ internal class TextViewImpl: BaseViewImpl {
     override func createView() -> UIView {
         let label = UILabel()
         label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = systemFont
         label.isUserInteractionEnabled = true
         return label
     }
@@ -70,12 +70,25 @@ internal class TextViewImpl: BaseViewImpl {
     
     func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any], location: Int? = nil) throws -> NSAttributedString {
         var attributes = attributes
+        let currentFont = attributes[.font] as! UIFont?
         
         let family: String = try props.get("font-family") {
             switch $0 {
-            case .String(let value): return value
-            case .Null: return systemFont.familyName
+            case .String(let value):
+                if !UIFont.familyNames.contains(value) {
+                    throw "Unexpected value for font-family: \(value)"
+                }
+                return value
+            case .Null: return currentFont?.familyName ?? systemFont.familyName
             case let value: throw "Unexpected value for font-family: \(value)"
+            }
+        }
+        
+        let size: CGFloat = try props.get("font-size") {
+            switch $0 {
+            case .Object(let value): return CGFloat(try value.asDimension())
+            case .Null: return currentFont?.pointSize ?? systemFont.pointSize
+            case let value: throw "Unexpected value for font-size: \(value)"
             }
         }
         
@@ -88,14 +101,6 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
-        let size: CGFloat? = try props.get("font-size") {
-            switch $0 {
-            case .Object(let value): return CGFloat(try value.asDimension())
-            case .Null: return nil
-            case let value: throw "Unexpected value for font-size: \(value)"
-            }
-        }
-        
         let weight: UIFont.Weight? = try props.get("font-weight") {
             switch $0 {
             case .String(let value) where value == "regular": return UIFont.Weight.regular
@@ -105,9 +110,8 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
-        if size != nil || weight != nil || italic != nil {
-            let current = attributes[.font] as! UIFont?
-            var traits: UIFontDescriptor.SymbolicTraits = current?.fontDescriptor.symbolicTraits ?? []
+        if weight != nil || italic != nil {
+            var traits: UIFontDescriptor.SymbolicTraits = currentFont?.fontDescriptor.symbolicTraits ?? []
             
             if let weight = weight {
                 if weight == UIFont.Weight.bold {
@@ -126,9 +130,9 @@ internal class TextViewImpl: BaseViewImpl {
             }
             
             let descriptor = UIFontDescriptor(fontAttributes: [.family: family]).withSymbolicTraits(traits)!
-            attributes[.font] = UIFont(descriptor: descriptor, size: size ?? current?.pointSize ?? 12)
+            attributes[.font] = UIFont(descriptor: descriptor, size: size)
         } else {
-            attributes[.font] = systemFont // TODO: Set to parent?
+            attributes[.font] = UIFont(name: family, size: size)
         }
         
         try props.get("font-color") {
