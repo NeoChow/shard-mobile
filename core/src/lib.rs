@@ -7,22 +7,22 @@
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::Number;
+use stretch::result::Result;
 use stretch::style::Dimension;
 
 use json::JsonValue;
-use simple_error::SimpleError;
 use std::any::Any;
 
 pub trait ShardView: Any {
-    fn add_child(&mut self, child: &ShardView) -> Result<(), SimpleError>;
-    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<(), SimpleError>;
-    fn set_frame(&mut self, frame: Rect<f32>) -> Result<(), SimpleError>;
-    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>, SimpleError>;
+    fn add_child(&mut self, child: &ShardView) -> Result<()>;
+    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<()>;
+    fn set_frame(&mut self, frame: Rect<f32>) -> Result<()>;
+    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>>;
     fn as_any(&self) -> &Any;
 }
 
 pub trait ShardViewManager {
-    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<ShardView>, SimpleError>;
+    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<ShardView>>;
 }
 
 pub struct ViewNode {
@@ -36,12 +36,12 @@ pub struct Root {
 }
 
 impl Root {
-    pub fn measure(&mut self, size: Size<Number>) -> Result<(), SimpleError> {
+    pub fn measure(&mut self, size: Size<Number>) -> Result<()> {
         set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size)?)
     }
 }
 
-fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) -> Result<(), SimpleError> {
+fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) -> Result<()> {
     view_node.shard_view.set_frame(Rect {
         start: layout.location.x,
         end: layout.location.x + layout.size.width,
@@ -58,17 +58,17 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) -> Result
     Ok(())
 }
 
-pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Result<Root, SimpleError> {
+pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Result<Root> {
     match json::parse(json) {
         Ok(json) => render(platform, context, &json["root"]),
-        Err(err) => Err(SimpleError::from(err)),
+        Err(err) => Err(Box::new(err)),
     }
 }
 
-fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Result<Root, SimpleError> {
+fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Result<Root> {
     let mut shard_view = match json["kind"].as_str() {
         Some(kind) => platform.create_view(context, kind)?,
-        None => return Err(SimpleError::new("expected kind")),
+        None => return Err(Box::new("expected kind")),
     };
 
     for (key, value) in json["props"].entries() {
@@ -92,7 +92,7 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Resul
 
     let layout = match json["layout"] {
         JsonValue::Object(ref value) => value,
-        _ => return Err(SimpleError::new("expected layout")),
+        _ => return Err(Box::new("expected layout")),
     };
 
     let stretch_node = stretch::style::Node {
@@ -253,18 +253,18 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Resul
     Ok(Root { view_node: ViewNode { shard_view, children }, stretch_node })
 }
 
-fn parse_dimension(json: &JsonValue, default: Dimension) -> Result<Dimension, SimpleError> {
+fn parse_dimension(json: &JsonValue, default: Dimension) -> Result<Dimension> {
     let value = &json["value"];
 
     match json["unit"] {
         JsonValue::Short(ref unit) if unit == "auto" => Ok(Dimension::Auto),
         JsonValue::Short(ref unit) if unit == "points" => match value.as_f32() {
             Some(value) => Ok(Dimension::Points(value)),
-            None => Err(SimpleError::new("expected float")),
+            None => Err(Box::new("expected float")),
         },
         JsonValue::Short(ref unit) if unit == "percent" => match value.as_f32() {
             Some(value) => Ok(Dimension::Percent(value)),
-            None => Err(SimpleError::new("expected float")),
+            None => Err(Box::new("expected float")),
         },
         _ => Ok(default),
     }

@@ -7,17 +7,16 @@
 use core;
 
 use json::JsonValue;
-use simple_error::SimpleError;
 use std::any::Any;
 use std::f32;
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::*;
+use stretch::result::Result;
 
 use jni::objects::{GlobalRef, JObject, JString, JValue};
 use jni::sys::{jlong, jobject};
 use jni::JNIEnv;
-use jni::errors::Error;
 
 pub struct JavaObject {
     instance: GlobalRef,
@@ -34,13 +33,16 @@ impl JavaObject {
         Box::new(JavaObject { instance: env.new_global_ref(instance).unwrap(), env })
     }
 
-    fn call_method(&self, name: &str, signature: &str, params: &[jni::objects::JValue]) -> Result<JValue, Error> {
-        self.env.call_method(self.instance.as_obj(), name, signature, params)
+    fn call_method(&self, name: &str, signature: &str, params: &[jni::objects::JValue]) -> Result<JValue> {
+        match self.env.call_method(self.instance.as_obj(), name, signature, params) {
+            Ok(val) => Ok(val),
+            Err(err) => Err(Box::new(err)),
+        }
     }
 }
 
 impl core::ShardViewManager for JavaObject {
-    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<core::ShardView>, SimpleError> {
+    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<core::ShardView>> {
         let kind = self.env.new_string(kind).unwrap();
         let context = context.downcast_ref::<GlobalRef>().unwrap();
 
@@ -52,23 +54,24 @@ impl core::ShardViewManager for JavaObject {
 
         match j_view {
             Ok(val) => Ok(rust_obj(&self.env, val.l().unwrap())),
-            Err(err) => Err(SimpleError::from(err)),
+            Err(err) => Err(Box::new(err)),
         }
     }
 }
 
 impl core::ShardView for JavaObject {
-    fn add_child(&mut self, child: &core::ShardView) -> Result<(), SimpleError> {
+    fn add_child(&mut self, child: &core::ShardView) -> Result<()> {
         let child = child.as_any().downcast_ref::<JavaObject>().unwrap();
-        let result = self.call_method("addChild", "(Lapp/visly/shard/ShardView;)V", &[JValue::from(child.instance.as_obj())]);
+        let result =
+            self.call_method("addChild", "(Lapp/visly/shard/ShardView;)V", &[JValue::from(child.instance.as_obj())]);
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(SimpleError::from(err)),
+            Err(err) => Err(Box::new(err)),
         }
     }
 
-    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<(), SimpleError> {
+    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<()> {
         let key = self.env.new_string(key).unwrap();
         let value = self.env.new_string(value.dump()).unwrap();
 
@@ -80,11 +83,11 @@ impl core::ShardView for JavaObject {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(SimpleError::from(err)),
+            Err(err) => Err(Box::new(err)),
         }
     }
 
-    fn set_frame(&mut self, frame: Rect<f32>) -> Result<(), SimpleError> {
+    fn set_frame(&mut self, frame: Rect<f32>) -> Result<()> {
         let result = self.call_method(
             "setFrame",
             "(FFFF)V",
@@ -93,21 +96,16 @@ impl core::ShardView for JavaObject {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(SimpleError::from(err)),
+            Err(err) => Err(Box::new(err)),
         }
     }
 
-    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>, SimpleError> {
-        let result = self
-            .call_method(
-                "measure",
-                "(FF)Lapp/visly/shard/Size;",
-                &[
-                    JValue::from(constraints.width.or_else(f32::NAN)),
-                    JValue::from(constraints.height.or_else(f32::NAN)),
-                ],
-            );
-
+    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>> {
+        let result = self.call_method(
+            "measure",
+            "(FF)Lapp/visly/shard/Size;",
+            &[JValue::from(constraints.width.or_else(f32::NAN)), JValue::from(constraints.height.or_else(f32::NAN))],
+        );
 
         match result {
             Ok(result) => {
@@ -116,8 +114,8 @@ impl core::ShardView for JavaObject {
                 let height = self.env.get_field(size, "height", "F").unwrap().f().unwrap();
 
                 Ok(Size { width, height })
-            },
-            Err(err) => Err(SimpleError::from(err)),
+            }
+            Err(err) => Err(Box::new(err)),
         }
     }
 
@@ -155,9 +153,9 @@ pub extern "C" fn Java_app_visly_shard_ShardViewManager_render(
     match root {
         Ok(root) => Box::into_raw(Box::new(root)) as jlong,
         Err(err) => {
-            env.throw(err.to_string()).unwrap();
+            env.throw(format!("{:?}", err)).unwrap();
             0
-        },
+        }
     }
 }
 
@@ -191,8 +189,12 @@ pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_measure(
     });
 
     match result {
-        Ok(_) => { Box::leak(root); },
-        Err(err) => { env.throw(err.to_string()).unwrap(); },
+        Ok(_) => {
+            Box::leak(root);
+        }
+        Err(err) => {
+            env.throw(format!("{:?}", err)).unwrap();
+        }
     };
 }
 
