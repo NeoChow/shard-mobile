@@ -95,8 +95,12 @@ class ShardViewManager internal constructor() {
 
     fun loadJson(ctx: Context, json: String): Result<ShardRoot> {
         assert(isInitialized()) { "Must call ShardViewManager.init() from your Application class" }
-        val ctx = ShardContext(ctx)
-        return Result.success(ShardRoot(ctx, render(ctx, json)))
+        return try {
+            val ctx = ShardContext(ctx)
+            Result.success(ShardRoot(ctx, render(ctx, json)))
+        } catch (e: Exception) {
+            Result.error(e)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -3,7 +3,7 @@ name = "core"
 version = "0.1.0"
 dependencies = [
  "json 0.11.13 (registry+https://github.com/rust-lang/crates.io-index)",
- "stretch 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "stretch 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -17,21 +17,14 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "simple-error"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
 name = "stretch"
-version = "0.1.9"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libm 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "simple-error 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [metadata]
 "checksum json 0.11.13 (registry+https://github.com/rust-lang/crates.io-index)" = "9ad0485404155f45cce53a40d4b2d6ac356418300daed05273d9e26f91c390be"
 "checksum libm 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "03c0bb6d5ce1b5cc6fd0578ec1cbc18c9d88b5b591a5c7c1d6c6175e266a0819"
-"checksum simple-error 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "c00e871264295428089fb278c4b225be3ca92c227c918857f2e562bac973257b"
-"checksum stretch 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)" = "adcbf227f9928108b2c99998f3cbe5fbb7847cd73d9519a623a1ac1ce99581ee"
+"checksum stretch 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "9981d22a2614f4dc16b96f14428506d86ba4983e516529c3c0bbb045a4c27446"

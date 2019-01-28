@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::*;
+use stretch::result::Result;
 
 pub struct View {
     pub kind: String,
@@ -19,20 +20,23 @@ pub struct View {
 }
 
 impl core::ShardView for View {
-    fn add_child(&mut self, _: &core::ShardView) {
+    fn add_child(&mut self, _: &core::ShardView) -> Result<()> {
         self.child_count += 1;
+        Ok(())
     }
 
-    fn set_prop(&mut self, key: &str, value: &JsonValue) {
+    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<()> {
         self.props.insert(key.to_string(), value.dump());
+        Ok(())
     }
 
-    fn set_frame(&mut self, frame: Rect<f32>) {
+    fn set_frame(&mut self, frame: Rect<f32>) -> Result<()> {
         self.frame = frame;
+        Ok(())
     }
 
-    fn measure(&self, constraints: Size<Number>) -> Size<f32> {
-        Size { width: constraints.width.or_else(100.0), height: constraints.height.or_else(100.0) }
+    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>> {
+        Ok(Size { width: constraints.width.or_else(100.0), height: constraints.height.or_else(100.0) })
     }
 
     fn as_any(&self) -> &Any {
@@ -43,12 +47,12 @@ impl core::ShardView for View {
 pub struct ViewManager {}
 
 impl core::ShardViewManager for ViewManager {
-    fn create_view(&self, _: &Any, kind: &str) -> Box<core::ShardView> {
-        Box::new(View {
+    fn create_view(&self, _: &Any, kind: &str) -> Result<Box<core::ShardView>> {
+        Ok(Box::new(View {
             kind: kind.to_string(),
             props: HashMap::new(),
             frame: Rect { start: 0.0, end: 0.0, top: 0.0, bottom: 0.0 },
             child_count: 0,
-        })
+        }))
     }
 }

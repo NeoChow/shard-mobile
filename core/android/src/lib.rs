@@ -12,8 +12,9 @@ use std::f32;
 use stretch::geometry::Rect;
 use stretch::geometry::Size;
 use stretch::number::*;
+use stretch::result::Result;
 
-use jni::objects::{GlobalRef, JObject, JString, JValue};
+use jni::objects::{GlobalRef, JObject, JString, JThrowable, JValue};
 use jni::sys::{jlong, jobject};
 use jni::JNIEnv;
 
@@ -27,18 +28,40 @@ fn rust_obj(env: &JNIEnv, j_obj: JObject) -> Box<JavaObject> {
     unsafe { Box::from_raw(ptr.j().unwrap() as *mut JavaObject) }
 }
 
+fn throw(env: &JNIEnv, err: Box<Any>) {
+    if let Some(exception) = err.downcast_ref::<GlobalRef>() {
+        env.throw(JThrowable::from(exception.as_obj())).unwrap();
+    } else if let Some(error) = err.downcast_ref::<&str>() {
+        env.throw(*error).unwrap();
+    } else if let Some(error) = err.downcast_ref::<String>() {
+        env.throw(error.as_str()).unwrap();
+    } else {
+        env.throw("Unknown native error").unwrap();
+    }
+}
+
 impl JavaObject {
     fn new(env: JNIEnv<'static>, instance: JObject) -> Box<JavaObject> {
         Box::new(JavaObject { instance: env.new_global_ref(instance).unwrap(), env })
     }
 
-    fn call_method(&self, name: &str, signature: &str, params: &[jni::objects::JValue]) -> JValue {
-        self.env.call_method(self.instance.as_obj(), name, signature, params).unwrap()
+    fn call_method(&self, name: &str, signature: &str, params: &[jni::objects::JValue]) -> Result<JValue> {
+        let result = self.env.call_method(self.instance.as_obj(), name, signature, params);
+
+        match result {
+            Ok(val) => Ok(val),
+            Err(_) => {
+                let exception = self.env.exception_occurred().unwrap();
+                self.env.exception_clear().unwrap();
+                let global_exception = self.env.new_global_ref(*exception).unwrap();
+                Err(Box::new(global_exception))
+            }
+        }
     }
 }
 
 impl core::ShardViewManager for JavaObject {
-    fn create_view(&self, context: &Any, kind: &str) -> Box<core::ShardView> {
+    fn create_view(&self, context: &Any, kind: &str) -> Result<Box<core::ShardView>> {
         let kind = self.env.new_string(kind).unwrap();
         let context = context.downcast_ref::<GlobalRef>().unwrap();
 
@@ -47,52 +70,72 @@ impl core::ShardViewManager for JavaObject {
             "(Lapp/visly/shard/ShardContext;Ljava/lang/String;)Lapp/visly/shard/ShardView;",
             &[JValue::from(context.as_obj()), JValue::from(JObject::from(kind))],
         );
-        rust_obj(&self.env, j_view.l().unwrap())
+
+        match j_view {
+            Ok(val) => Ok(rust_obj(&self.env, val.l().unwrap())),
+            Err(err) => Err(err),
+        }
     }
 }
 
 impl core::ShardView for JavaObject {
-    fn add_child(&mut self, child: &core::ShardView) {
+    fn add_child(&mut self, child: &core::ShardView) -> Result<()> {
         let child = child.as_any().downcast_ref::<JavaObject>().unwrap();
-        self.call_method("addChild", "(Lapp/visly/shard/ShardView;)V", &[JValue::from(child.instance.as_obj())]);
+        let result =
+            self.call_method("addChild", "(Lapp/visly/shard/ShardView;)V", &[JValue::from(child.instance.as_obj())]);
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        }
     }
 
-    fn set_prop(&mut self, key: &str, value: &JsonValue) {
+    fn set_prop(&mut self, key: &str, value: &JsonValue) -> Result<()> {
         let key = self.env.new_string(key).unwrap();
         let value = self.env.new_string(value.dump()).unwrap();
 
-        self.call_method(
+        let result = self.call_method(
             "setProp",
             "(Ljava/lang/String;Ljava/lang/String;)V",
             &[JValue::from(JObject::from(key)), JValue::from(JObject::from(value))],
         );
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        }
     }
 
-    fn set_frame(&mut self, frame: Rect<f32>) {
-        self.call_method(
+    fn set_frame(&mut self, frame: Rect<f32>) -> Result<()> {
+        let result = self.call_method(
             "setFrame",
             "(FFFF)V",
             &[JValue::from(frame.start), JValue::from(frame.end), JValue::from(frame.top), JValue::from(frame.bottom)],
         );
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        }
     }
 
-    fn measure(&self, constraints: Size<Number>) -> Size<f32> {
-        let size = self
-            .call_method(
-                "measure",
-                "(FF)Lapp/visly/shard/Size;",
-                &[
-                    JValue::from(constraints.width.or_else(f32::NAN)),
-                    JValue::from(constraints.height.or_else(f32::NAN)),
-                ],
-            )
-            .l()
-            .unwrap();
+    fn measure(&self, constraints: Size<Number>) -> Result<Size<f32>> {
+        let result = self.call_method(
+            "measure",
+            "(FF)Lapp/visly/shard/Size;",
+            &[JValue::from(constraints.width.or_else(f32::NAN)), JValue::from(constraints.height.or_else(f32::NAN))],
+        );
 
-        let width = self.env.get_field(size, "width", "F").unwrap().f().unwrap();
-        let height = self.env.get_field(size, "height", "F").unwrap().f().unwrap();
+        match result {
+            Ok(result) => {
+                let size = result.l().unwrap();
+                let width = self.env.get_field(size, "width", "F").unwrap().f().unwrap();
+                let height = self.env.get_field(size, "height", "F").unwrap().f().unwrap();
 
-        Size { width, height }
+                Ok(Size { width, height })
+            }
+            Err(err) => Err(err),
+        }
     }
 
     fn as_any(&self) -> &Any {
@@ -126,7 +169,13 @@ pub extern "C" fn Java_app_visly_shard_ShardViewManager_render(
 
     let root = core::render_root(Box::leak(view_manager), &context, json.to_str().unwrap());
 
-    Box::into_raw(Box::new(root)) as jlong
+    match root {
+        Ok(root) => Box::into_raw(Box::new(root)) as jlong,
+        Err(err) => {
+            throw(&env, err);
+            0
+        }
+    }
 }
 
 #[no_mangle]
@@ -153,12 +202,19 @@ pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_measure(
     let width = env.get_field(size, "width", "F").unwrap().f().unwrap();
     let height = env.get_field(size, "height", "F").unwrap().f().unwrap();
 
-    root.measure(Size {
+    let result = root.measure(Size {
         width: if width.is_nan() { Number::Undefined } else { Number::Defined(width) },
         height: if height.is_nan() { Number::Undefined } else { Number::Defined(height) },
     });
 
-    Box::leak(root);
+    match result {
+        Ok(_) => {
+            Box::leak(root);
+        }
+        Err(err) => {
+            throw(&env, err);
+        }
+    };
 }
 
 #[no_mangle]
