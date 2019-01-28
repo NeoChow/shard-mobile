@@ -22,8 +22,9 @@ fn render_view_of_kind() {
             "layout": {}
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.kind, "test");
@@ -44,8 +45,9 @@ fn render_view_with_flex_direction() {
             }
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     assert_eq!(root.stretch_node.flex_direction, stretch::style::FlexDirection::Column);
 }
@@ -66,8 +68,9 @@ fn render_view_with_size() {
             }
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
@@ -90,8 +93,9 @@ fn render_view_with_children() {
             ]
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     assert_eq!(root.view_node.children.len(), 2);
     assert_eq!(root.stretch_node.children.len(), 2);
@@ -117,8 +121,9 @@ fn render_view_with_props() {
             }
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.props["one"], "\"hello\"");
@@ -138,8 +143,9 @@ fn render_view_intrinsic_size() {
             "layout": {}
         }
     }"#,
-    );
-    root.measure(Size::undefined());
+    )
+    .unwrap();
+    root.measure(Size::undefined()).unwrap();
 
     let view = root.view_node.shard_view.as_any().downcast_ref::<test::View>().unwrap();
     assert_eq!(view.frame, Rect { start: 0.0, end: 100.0, top: 0.0, bottom: 100.0 });
