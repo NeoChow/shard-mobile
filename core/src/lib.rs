@@ -61,7 +61,7 @@ fn set_frame(view_node: &mut ViewNode, layout: &stretch::layout::Node) -> Result
 pub fn render_root(platform: &ShardViewManager, context: &Any, json: &str) -> Result<Root> {
     match json::parse(json) {
         Ok(json) => render(platform, context, &json["root"]),
-        Err(err) => Err(Box::new(err)),
+        Err(err) => Err(Box::new(err.to_string())),
     }
 }
 

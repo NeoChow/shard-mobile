@@ -14,7 +14,7 @@ use stretch::geometry::Size;
 use stretch::number::*;
 use stretch::result::Result;
 
-use jni::objects::{GlobalRef, JObject, JString, JValue};
+use jni::objects::{GlobalRef, JObject, JString, JThrowable, JValue};
 use jni::sys::{jlong, jobject};
 use jni::JNIEnv;
 
@@ -28,15 +28,34 @@ fn rust_obj(env: &JNIEnv, j_obj: JObject) -> Box<JavaObject> {
     unsafe { Box::from_raw(ptr.j().unwrap() as *mut JavaObject) }
 }
 
+fn throw(env: &JNIEnv, err: Box<Any>) {
+    if let Some(exception) = err.downcast_ref::<GlobalRef>() {
+        env.throw(JThrowable::from(exception.as_obj())).unwrap();
+    } else if let Some(error) = err.downcast_ref::<&str>() {
+        env.throw(*error).unwrap();
+    } else if let Some(error) = err.downcast_ref::<String>() {
+        env.throw(error.as_str()).unwrap();
+    } else {
+        env.throw("Unknown native error").unwrap();
+    }
+}
+
 impl JavaObject {
     fn new(env: JNIEnv<'static>, instance: JObject) -> Box<JavaObject> {
         Box::new(JavaObject { instance: env.new_global_ref(instance).unwrap(), env })
     }
 
     fn call_method(&self, name: &str, signature: &str, params: &[jni::objects::JValue]) -> Result<JValue> {
-        match self.env.call_method(self.instance.as_obj(), name, signature, params) {
+        let result = self.env.call_method(self.instance.as_obj(), name, signature, params);
+
+        match result {
             Ok(val) => Ok(val),
-            Err(err) => Err(Box::new(err)),
+            Err(_) => {
+                let exception = self.env.exception_occurred().unwrap();
+                self.env.exception_clear().unwrap();
+                let global_exception = self.env.new_global_ref(*exception).unwrap();
+                Err(Box::new(global_exception))
+            }
         }
     }
 }
@@ -54,7 +73,7 @@ impl core::ShardViewManager for JavaObject {
 
         match j_view {
             Ok(val) => Ok(rust_obj(&self.env, val.l().unwrap())),
-            Err(err) => Err(Box::new(err)),
+            Err(err) => Err(err),
         }
     }
 }
@@ -67,7 +86,7 @@ impl core::ShardView for JavaObject {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(Box::new(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -83,7 +102,7 @@ impl core::ShardView for JavaObject {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(Box::new(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -96,7 +115,7 @@ impl core::ShardView for JavaObject {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(Box::new(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -115,7 +134,7 @@ impl core::ShardView for JavaObject {
 
                 Ok(Size { width, height })
             }
-            Err(err) => Err(Box::new(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -153,7 +172,7 @@ pub extern "C" fn Java_app_visly_shard_ShardViewManager_render(
     match root {
         Ok(root) => Box::into_raw(Box::new(root)) as jlong,
         Err(err) => {
-            env.throw(format!("{:?}", err)).unwrap();
+            throw(&env, err);
             0
         }
     }
@@ -193,7 +212,7 @@ pub unsafe extern "C" fn Java_app_visly_shard_ShardRoot_measure(
             Box::leak(root);
         }
         Err(err) => {
-            env.throw(format!("{:?}", err)).unwrap();
+            throw(&env, err);
         }
     };
 }
