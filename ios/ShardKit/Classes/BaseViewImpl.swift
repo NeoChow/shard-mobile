@@ -46,9 +46,7 @@ class BaseViewImpl: ShardViewImpl {
         case "border-radius":
             switch value {
             case let .String(value) where value == "max": self.borderRadius = Float.infinity
-            case let .Object(value):
-                throw "hello swift error"
-                self.borderRadius = try value.asDimension()
+            case let .Object(value): self.borderRadius = try value.asDimension()
             default: self.borderRadius = 0
             }
         case "on-click":
