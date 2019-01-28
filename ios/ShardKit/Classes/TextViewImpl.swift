@@ -132,7 +132,7 @@ internal class TextViewImpl: BaseViewImpl {
             
             let descriptor = UIFontDescriptor(fontAttributes: [.family: family]).withSymbolicTraits(traits)!
             attributes[.font] = UIFont(descriptor: descriptor, size: size)
-        } else {
+        } else if attributes[.font] == nil {
             attributes[.font] = UIFont(name: family, size: size)
         }
         
