@@ -17,12 +17,12 @@ internal class ImageViewImpl: BaseViewImpl {
         return CGSize(width: width ?? imgSize.width, height: height ?? imgSize.height)
     }
     
-    override func setProp(key: String, value: JsonValue) {
-        super.setProp(key: key, value: value)
+    override func setProp(key: String, value: JsonValue) throws {
+        try super.setProp(key: key, value: value)
         
         switch key {
         case "src":
-            self.src = URL(string: try! value.asString())
+            self.src = URL(string: try value.asString())
         case "content-mode":
             switch value {
             case .String(let value) where value == "cover": self.contentMode = .scaleAspectFill

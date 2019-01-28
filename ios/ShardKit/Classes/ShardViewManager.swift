@@ -7,6 +7,21 @@
 
 import UIKit
 
+public struct ShardError: Error {
+    public enum ShardErrorType {
+        case HttpStatusCodeError
+        case UnknownResponseError
+    }
+    
+    public let type: ShardErrorType
+    public let message: String
+}
+
+public enum Result<T> {
+    case Success(T)
+    case Failure(Error)
+}
+
 private func shard_view_manager_create_view(_ self_ptr: UnsafeRawPointer?, _ context_ptr: UnsafeRawPointer?, _ kind: UnsafePointer<Int8>?) -> UnsafeMutablePointer<IOSView>? {
     let viewManager: ShardViewManager = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let context: ShardContext = Unmanaged.fromOpaque(UnsafeRawPointer(context_ptr!)).takeUnretainedValue()
@@ -18,9 +33,9 @@ public typealias ViewImplFactory = (ShardContext) -> ShardViewImpl
 
 public class ShardViewManager {
     public static let shared = ShardViewManager()
+    public var session: NetworkSession = URLSession(configuration: .default)
     
     internal var rust_ptr: OpaquePointer! = nil
-    private let defaultSession = URLSession(configuration: .default)
     internal var implFactories: Dictionary<String, ViewImplFactory> = [:]
     
     private init() {
@@ -46,21 +61,55 @@ public class ShardViewManager {
         return ShardView(implFactories[kind]!(context))
     }
     
-    public func loadUrl(url: URL, onComplete: @escaping (ShardRoot) -> ()) {
-        let task = self.defaultSession.dataTask(with: url) { data, response, httpError in
-            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
-            DispatchQueue.main.async { onComplete(self.loadJson(json)) }
+    func getResult(_ data: Data?, _ response: URLResponse?, _ httpError: Error?) -> Result<ShardRoot> {
+        guard httpError == nil else {
+            return Result.Failure(httpError!)
         }
-        task.resume()
+        
+        if let httpResponse = response as? HTTPURLResponse {
+            if (httpResponse.statusCode != 200) {
+                return Result.Failure(
+                    ShardError(
+                        type: .HttpStatusCodeError,
+                        message: "Server responded with status code \(httpResponse.statusCode)."
+                    )
+                )
+            }
+        } else {
+            return Result.Failure(
+                ShardError(
+                    type: .UnknownResponseError,
+                    message: "Unknown response type."
+                )
+            )
+        }
+        
+        let json = String(data: data!, encoding: .utf8)
+        
+        return loadJson(json!)
     }
     
-    public func loadJson(_ json: JsonValue) -> ShardRoot {
+    public func loadUrl(url: URL, onComplete: @escaping (Result<ShardRoot>) -> Void) {
+        session.loadData(from: url) { data, response, httpError in
+            let result = self.getResult(data, response, httpError)
+            
+            DispatchQueue.main.async {
+                onComplete(result)
+            }
+        }
+    }
+    
+    public func loadJson(_ json: JsonValue) -> Result<ShardRoot> {
         return loadJson(json.toString())
     }
     
-    public func loadJson(_ json: String) -> ShardRoot {
+    public func loadJson(_ json: String) -> Result<ShardRoot> {
         let context = ShardContext()
         let context_ptr = Unmanaged.passUnretained(context).toOpaque()
-        return ShardRoot(context, shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String))
+        let shardRoot = ShardRoot(context, shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String))
+        
+        // TODO: Catch render errors here
+        
+        return Result.Success(shardRoot)
     }
 }

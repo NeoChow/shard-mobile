@@ -1,19 +1,5 @@
 #!/bin/sh
 
-read -r -d '' CARGO_CONFIG << EOM
-[target.aarch64-linux-android]
-ar = ".NDK/arm64/bin/aarch64-linux-android-ar"
-linker = ".NDK/arm64/bin/aarch64-linux-android-clang"
-
-[target.armv7-linux-androideabi]
-ar = ".NDK/arm/bin/arm-linux-androideabi-ar"
-linker = ".NDK/arm/bin/arm-linux-androideabi-clang"
-
-[target.i686-linux-android]
-ar = ".NDK/x86/bin/i686-linux-android-ar"
-linker = ".NDK/x86/bin/i686-linux-android-clang"
-EOM
-
 JNI_LIBS=../../android/core/src/main/jniLibs
 
 cd $(dirname $0)/../android

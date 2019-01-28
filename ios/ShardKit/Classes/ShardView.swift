@@ -16,7 +16,7 @@ private func shard_view_set_prop(_ self_ptr: UnsafeRawPointer?, _ key: UnsafePoi
     let view: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let key = String(cString: key!)
     let value = String(cString: value!)
-    view.setProp(key, value)
+    try! view.setProp(key, value)
 }
 
 private func shard_view_add_child(_ self_ptr: UnsafeRawPointer?, _ child_ptr: UnsafeRawPointer?) {
@@ -43,7 +43,7 @@ public protocol ShardViewImpl {
     var delegate: ShardViewImplDelegate? {get set}
     
     func measure(width: CGFloat?, height: CGFloat?) -> CGSize
-    func setProp(key: String, value: JsonValue)
+    func setProp(key: String, value: JsonValue) throws
     func setViewState(_ state: ShardControlState, _ view: UIView)
     func createView() -> UIView
     func bindView(_ view: UIView)
@@ -74,8 +74,8 @@ public class ShardView: ShardViewImplDelegate {
         return impl.createView()
     }()
     
-    internal func setProp(_ key: String, _ value: String) {
-        impl.setProp(key: key, value: JsonValue(try! JSONSerialization.jsonObject(with: value.data(using: .utf8)!, options: [.allowFragments])))
+    internal func setProp(_ key: String, _ value: String) throws {
+        try impl.setProp(key: key, value: JsonValue(try JSONSerialization.jsonObject(with: value.data(using: .utf8)!, options: [.allowFragments])))
     }
     
     internal func measure(_ size: CSize) -> CSize {

@@ -12,8 +12,8 @@ internal class FlexboxViewImpl: BaseViewImpl {
         return CGSize(width: width ?? 0, height: height ?? 0)
     }
     
-    override func setProp(key: String, value: JsonValue) {
-        super.setProp(key: key, value: value)
+    override func setProp(key: String, value: JsonValue) throws {
+        try super.setProp(key: key, value: value)
     }
     
     override func createView() -> UIView {

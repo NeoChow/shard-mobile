@@ -14,17 +14,17 @@ class ScrollViewImplSpec: QuickSpec {
         let viewimpl = ScrollViewImpl(ShardContext())
         
         it("should set direction vertical") {
-            viewimpl.setProp(key: "direction", value: JsonValue.String("vertical"))
+            try! viewimpl.setProp(key: "direction", value: JsonValue.String("vertical"))
             expect(viewimpl.direction).to(equal(Direction.vertical))
         }
         
         it("should set direction horizontal") {
-            viewimpl.setProp(key: "direction", value: JsonValue.String("horizontal"))
+            try! viewimpl.setProp(key: "direction", value: JsonValue.String("horizontal"))
             expect(viewimpl.direction).to(equal(Direction.horizontal))
         }
         
         it("should set content inset") {
-            viewimpl.setProp(key: "content-inset", value: JsonValue.Object([
+            try! viewimpl.setProp(key: "content-inset", value: JsonValue.Object([
                 "unit": JsonValue.String("points"),
                 "value": JsonValue.Number(10)
             ]))
