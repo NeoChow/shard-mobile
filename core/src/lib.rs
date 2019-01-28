@@ -36,7 +36,7 @@ pub struct Root {
 
 impl Root {
     pub fn measure(&mut self, size: Size<Number>) {
-        set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size));
+        set_frame(&mut self.view_node, &stretch::compute(&self.stretch_node, size).unwrap());
     }
 }
 
@@ -220,7 +220,7 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Root 
 
         measure: Some(Box::new(move |constraint| {
             let shard_view = unsafe { &*raw_shard_view };
-            shard_view.measure(constraint)
+            Ok(shard_view.measure(constraint))
         })),
 
         children: node_children,

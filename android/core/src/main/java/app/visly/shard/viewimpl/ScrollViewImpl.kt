@@ -47,7 +47,13 @@ class ScrollViewImpl(ctx: ShardContext): BaseViewImpl<View>(ctx) {
 
             "content" -> {
                 content = when (value) {
-                    is JsonValue.Object -> ShardViewManager.instance.loadJson(ctx, value)
+                    is JsonValue.Object -> {
+                        val content = ShardViewManager.instance.loadJson(ctx, value)
+                        if (content.isError()) {
+                            throw content.error()
+                        }
+                        content.success()
+                    }
                     else -> null
                 }
             }

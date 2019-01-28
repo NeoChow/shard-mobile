@@ -30,21 +30,34 @@ private func shard_view_measure(_ self_ptr: UnsafeRawPointer?, _ size: UnsafePoi
     return view.measure(size!.pointee)
 }
 
+public enum ShardControlState: String {
+    case Default = "default"
+    case Pressed = "pressed"
+}
+
+public protocol ShardViewImplDelegate {
+    func setState(_ state: ShardControlState)
+}
+
 public protocol ShardViewImpl {
+    var delegate: ShardViewImplDelegate? {get set}
+    
     func measure(width: CGFloat?, height: CGFloat?) -> CGSize
     func setProp(key: String, value: JsonValue) throws
+    func setViewState(_ state: ShardControlState, _ view: UIView)
     func createView() -> UIView
     func bindView(_ view: UIView)
 }
 
-public class ShardView {
+public class ShardView: ShardViewImplDelegate {
     internal var rust_ptr: UnsafeMutablePointer<IOSView>! = nil
-    internal let impl: ShardViewImpl
+    internal var impl: ShardViewImpl
     internal var frame: CGRect = .zero
     internal var children: Array<ShardView> = []
     
     init(_ impl: ShardViewImpl) {
         self.impl = impl
+        self.impl.delegate = self
         let context = Unmanaged.passRetained(self).toOpaque()
         self.rust_ptr = shard_view_new(context, shard_view_set_frame, shard_view_set_prop, shard_view_add_child, shard_view_measure)
     }
@@ -54,7 +67,7 @@ public class ShardView {
     }
     
     public var size: CGSize {
-         return frame.size
+        return frame.size
     }
     
     internal lazy var view: UIView = {
@@ -70,5 +83,13 @@ public class ShardView {
             width: size.width.isNaN ? nil : CGFloat(size.width),
             height: size.height.isNaN ? nil : CGFloat(size.height))
         return CSize(width: Float(size.width), height: Float(size.height))
+    }
+    
+    public func setState(_ state: ShardControlState) {
+        self.impl.setViewState(state, view)
+        
+        for child in self.children {
+            child.setState(state)
+        }
     }
 }

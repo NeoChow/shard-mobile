@@ -19,7 +19,9 @@ class BaseViewImpl: ShardViewImpl {
     internal var borderColor = UIColor.clear
     internal var borderWidth = Float(0)
     internal var borderRadius = Float(0)
-    internal var clickHandler: () -> () = {}
+    internal var clickHandler: (() -> ())? = nil
+    
+    var delegate: ShardViewImplDelegate?
     
     init(_ context: ShardContext) {
         self.context = context
@@ -56,23 +58,37 @@ class BaseViewImpl: ShardViewImpl {
         }
     }
     
+    func setViewState(_ state: ShardControlState, _ view: UIView) {
+        switch state {
+        case .Pressed:
+            view.backgroundColor = self.backgroundColor.pressed ?? self.backgroundColor.default
+            break
+        default:
+            view.backgroundColor = self.backgroundColor.default
+            break
+        }
+    }
+    
     func bindView(_ view: UIView) {
         view.clipsToBounds = true
         view.backgroundColor = backgroundColor.default
         view.layer.borderColor = borderColor.cgColor
         view.layer.borderWidth = CGFloat(borderWidth)
         view.layer.cornerRadius = borderRadius.isInfinite ? min(view.frame.width, view.frame.height) / 2 : CGFloat(borderRadius)
-        view.removeGestureRecognizer(self.tapGestureRecognizer)
-        view.addGestureRecognizer(self.tapGestureRecognizer)
+        
+        if (self.clickHandler != nil) {
+            view.removeGestureRecognizer(self.tapGestureRecognizer)
+            view.addGestureRecognizer(self.tapGestureRecognizer)
+        }
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         switch sender.state {
-        case .ended:
-            self.clickHandler()
-            sender.view?.backgroundColor = self.backgroundColor.default
         case .began:
-            sender.view?.backgroundColor = self.backgroundColor.pressed ?? self.backgroundColor.default
+            self.delegate?.setState(.Pressed)
+        case .ended:
+            self.delegate?.setState(.Default)
+            self.clickHandler?()
         default: ()
         }
     }
