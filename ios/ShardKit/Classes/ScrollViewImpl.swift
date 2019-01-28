@@ -25,8 +25,8 @@ internal class ScrollViewImpl: BaseViewImpl {
         }
     }
     
-    override func setProp(key: String, value: JsonValue) {
-        super.setProp(key: key, value: value)
+    override func setProp(key: String, value: JsonValue) throws {
+        try super.setProp(key: key, value: value)
         
         switch key {
         case "direction":
@@ -35,8 +35,15 @@ internal class ScrollViewImpl: BaseViewImpl {
             case .String(let value) where value == "horizontal": self.direction = .horizontal
             default: return self.direction = .vertical
             }
-        case "content-inset": self.contentInset = try! value.asObject().asDimension()
-        case "content": self.content = ShardViewManager.shared.loadJson(value)
+        case "content-inset": self.contentInset = try value.asObject().asDimension()
+        case "content":
+            let result = ShardViewManager.shared.loadJson(value)
+            switch(result) {
+            case .Success(let content):
+                self.content = content
+            case .Failure(let error):
+                throw error
+            }
         default: ()
         }
     }
