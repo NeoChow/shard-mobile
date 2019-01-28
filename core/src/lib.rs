@@ -242,7 +242,7 @@ fn render(platform: &ShardViewManager, context: &Any, json: &JsonValue) -> Resul
 
         measure: Some(Box::new(move |constraint| {
             let shard_view = unsafe { &*raw_shard_view };
-            Ok(shard_view.measure(constraint))
+            shard_view.measure(constraint)
         })),
 
         children: node_children,

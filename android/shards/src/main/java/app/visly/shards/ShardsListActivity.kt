@@ -151,7 +151,7 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
 
         ShardViewManager.instance.loadUrl(this, shard.url) {
             if (it.isError()) {
-                Log.d("visly", it.error().toString())
+                it.error().printStackTrace()
             } else {
                 shardRoot.setRoot(it.success())
             }

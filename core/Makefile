@@ -1,5 +1,5 @@
 
-read -r -d '' CARGO_CONFIG << EOM
+define CARGO_CONFIG
 [target.aarch64-linux-android]
 ar = ".NDK/arm64/bin/aarch64-linux-android-ar"
 linker = ".NDK/arm64/bin/aarch64-linux-android-clang"
@@ -11,7 +11,9 @@ linker = ".NDK/arm/bin/arm-linux-androideabi-clang"
 [target.i686-linux-android]
 ar = ".NDK/x86/bin/i686-linux-android-ar"
 linker = ".NDK/x86/bin/i686-linux-android-clang"
-EOM
+endef
+
+export CARGO_CONFIG
 
 install: install-ios install-android
 
