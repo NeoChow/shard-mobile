@@ -22,7 +22,12 @@ public enum Result<T> {
     case Failure(Error)
 }
 
-private func shard_view_manager_create_view(_ self_ptr: UnsafeRawPointer?, _ context_ptr: UnsafeRawPointer?, _ kind: UnsafePointer<Int8>?) -> UnsafeMutablePointer<IOSView>? {
+private func shard_view_manager_create_view(
+    _ self_ptr: UnsafeRawPointer?,
+    _ context_ptr: UnsafeRawPointer?,
+    _ kind: UnsafePointer<Int8>?,
+    _ error: UnsafeMutablePointer<UnsafePointer<Int8>?>?) -> UnsafeMutablePointer<IOSView>? {
+    
     let viewManager: ShardViewManager = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let context: ShardContext = Unmanaged.fromOpaque(UnsafeRawPointer(context_ptr!)).takeUnretainedValue()
     let view = viewManager.createView(context: context, kind: String(cString: kind!))
@@ -106,10 +111,15 @@ public class ShardViewManager {
     public func loadJson(_ json: String) -> Result<ShardRoot> {
         let context = ShardContext()
         let context_ptr = Unmanaged.passUnretained(context).toOpaque()
-        let shardRoot = ShardRoot(context, shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String))
         
-        // TODO: Catch render errors here
+        var error: UnsafePointer<Int8>? = nil
+        let error_ptr = UnsafeMutablePointer(&error)
+        let ios_root = shard_render(self.rust_ptr, context_ptr, (json as NSString).utf8String, error_ptr)
         
-        return Result.Success(shardRoot)
+        if let error = error {
+            return Result.Failure(String(cString: error))
+        } else {
+            return Result.Success(ShardRoot(context, ios_root))
+        }
     }
 }

@@ -7,25 +7,51 @@
 
 import UIKit
 
-private func shard_view_set_frame(_ self_ptr: UnsafeRawPointer?, _ start: Float, _ end: Float, _ top: Float, _ bottom: Float) {
+private func shard_view_set_frame(
+    _ self_ptr: UnsafeRawPointer?,
+    _ start: Float,
+    _ end: Float,
+    _ top: Float,
+    _ bottom: Float,
+    _ error: UnsafeMutablePointer<UnsafePointer<Int8>?>?) {
+    
     let view: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     view.frame = CGRect(x: CGFloat(start), y: CGFloat(top), width: CGFloat(end - start), height: CGFloat(bottom - top))
 }
 
-private func shard_view_set_prop(_ self_ptr: UnsafeRawPointer?, _ key: UnsafePointer<Int8>?, _ value: UnsafePointer<Int8>?) {
+private func shard_view_set_prop(
+    _ self_ptr: UnsafeRawPointer?,
+    _ key: UnsafePointer<Int8>?,
+    _ value: UnsafePointer<Int8>?,
+    _ err: UnsafeMutablePointer<UnsafePointer<Int8>?>?) {
+    
     let view: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let key = String(cString: key!)
     let value = String(cString: value!)
-    try! view.setProp(key, value)
+    
+    do {
+        try view.setProp(key, value)
+    } catch {
+        let error_string = (error.localizedDescription as NSString).utf8String
+        err?.initialize(to: error_string)
+    }
 }
 
-private func shard_view_add_child(_ self_ptr: UnsafeRawPointer?, _ child_ptr: UnsafeRawPointer?) {
+private func shard_view_add_child(
+    _ self_ptr: UnsafeRawPointer?,
+    _ child_ptr: UnsafeRawPointer?,
+    _ error: UnsafeMutablePointer<UnsafePointer<Int8>?>?) {
+    
     let view: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     let child: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(child_ptr!)).takeUnretainedValue()
     view.children.append(child)
 }
 
-private func shard_view_measure(_ self_ptr: UnsafeRawPointer?, _ size: UnsafePointer<CSize>?) -> CSize {
+private func shard_view_measure(
+    _ self_ptr: UnsafeRawPointer?,
+    _ size: UnsafePointer<CSize>?,
+    _ error: UnsafeMutablePointer<UnsafePointer<Int8>?>?) -> CSize {
+    
     let view: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(self_ptr!)).takeUnretainedValue()
     return view.measure(size!.pointee)
 }
@@ -59,7 +85,12 @@ public class ShardView: ShardViewImplDelegate {
         self.impl = impl
         self.impl.delegate = self
         let context = Unmanaged.passRetained(self).toOpaque()
-        self.rust_ptr = shard_view_new(context, shard_view_set_frame, shard_view_set_prop, shard_view_add_child, shard_view_measure)
+        self.rust_ptr = shard_view_new(
+            context,
+            shard_view_set_frame,
+            shard_view_set_prop,
+            shard_view_add_child,
+            shard_view_measure)
     }
     
     deinit {

@@ -7,7 +7,9 @@
  
 import UIKit
 
-extension String: Error {}
+extension String: LocalizedError {
+    public var errorDescription: String? { return self }
+}
 
 public extension UIColor {
     convenience init(hex: String) throws {

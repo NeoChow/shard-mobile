@@ -21,13 +21,13 @@ public class ShardRoot {
     }
     
     public func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
-        shard_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)))
+        shard_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)), nil)
         let rootView: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(shard_root_get_view(root)!)).takeUnretainedValue()
         return rootView.size
     }
     
     func layout(width: CGFloat?, height: CGFloat?) -> CGSize {
-        shard_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)))
+        shard_root_measure(root, CSize(width: Float(width ?? CGFloat.nan), height: Float(height ?? CGFloat.nan)), nil)
         let rootView: ShardView = Unmanaged.fromOpaque(UnsafeRawPointer(shard_root_get_view(root)!)).takeUnretainedValue()
         
         func updateFrame(_ root: ShardView) {
