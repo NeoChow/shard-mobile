@@ -162,6 +162,10 @@ class ShardsListActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissi
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
 
+        shardRoot.on("dismiss-alert") {
+            popWindow.dismiss()
+        }
+
         popupView.setOnClickListener {
             popWindow.dismiss()
         }
