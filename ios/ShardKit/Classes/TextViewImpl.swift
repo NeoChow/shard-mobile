@@ -14,13 +14,6 @@ internal class TextViewImpl: BaseViewImpl {
     internal var numberOfLines: Int = -1
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
-    internal var substringClickHandler: ((_ sender: UITapGestureRecognizer) -> ())? = nil
-    
-    internal lazy var substringTapGestureRecognizer: UILongPressGestureRecognizer = {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(handleSubstringTap(sender:)))
-        gesture.minimumPressDuration = 0
-        return gesture
-    }()
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -62,11 +55,6 @@ internal class TextViewImpl: BaseViewImpl {
         
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
-        
-        if (self.substringClickHandler != nil) {
-            view.removeGestureRecognizer(self.substringTapGestureRecognizer)
-            view.addGestureRecognizer(self.substringTapGestureRecognizer)
-        }
     }
     
     func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any], location: Int? = nil) throws -> NSAttributedString {
@@ -173,10 +161,20 @@ internal class TextViewImpl: BaseViewImpl {
                 let action = try value["action"]!.asString()
                 let range = NSRange(location: location ?? 0, length: string.length)
                 
-                self.substringClickHandler = { sender -> () in
+                self.tapHandler = { sender -> () in
                     let label = sender.view as! UILabel
-                    if sender.didTapAttributedTextInLabel(label: label, inRange: range) {
-                        print("Trigger event: \(action):\(try! value["value"]!.asString())")
+                    let charIndex = sender.tappedCharInAttributedText(inLabel: label)
+                    
+                    if charIndex != nil && NSLocationInRange(charIndex!, range) {
+                        switch sender.state {
+                        case .began:
+                            self.delegate?.setState(.Pressed)
+                        case .ended:
+                            self.delegate?.setState(.Default)
+                            //self.context.dispatch(action: action, value: value["value"])
+                            print("Trigger event: \(action):\(try! value["value"]!.asString())")
+                        default: ()
+                        }
                     }
                 }
             }
@@ -199,21 +197,12 @@ internal class TextViewImpl: BaseViewImpl {
         
         return string
     }
-    
-    @objc func handleSubstringTap(sender: UITapGestureRecognizer) {
-        switch sender.state {
-        case .began: ()
-        case .ended:
-            self.substringClickHandler?(sender)
-        default: ()
-        }
-    }
 }
 
 internal extension UITapGestureRecognizer {
-    func didTapAttributedTextInLabel(label: UILabel, inRange characterRange: NSRange) -> Bool {
+    func tappedCharInAttributedText(inLabel label: UILabel) -> Int? {
         guard let attributedString = label.attributedText else {
-            return false
+            return nil
         }
         
         let layoutManager = NSLayoutManager()
@@ -230,20 +219,20 @@ internal extension UITapGestureRecognizer {
         
         let locationOfTouchInLabel = self.location(in: label)
         
-        let characterIndex = layoutManager.glyphIndex(
+        let charIndex = layoutManager.glyphIndex(
             for: locationOfTouchInLabel,
             in: textContainer
         )
         
-        let characterRect = layoutManager.boundingRect(
-            forGlyphRange: NSRange(location: characterIndex, length: 1),
+        let charRect = layoutManager.boundingRect(
+            forGlyphRange: NSRange(location: charIndex, length: 1),
             in: textContainer
         )
         
-        if !characterRect.contains(locationOfTouchInLabel) {
-            return false
+        if !charRect.contains(locationOfTouchInLabel) {
+            return nil
         }
         
-        return NSLocationInRange(characterIndex, characterRange)
+        return charIndex
     }
 }

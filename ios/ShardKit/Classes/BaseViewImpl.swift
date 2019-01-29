@@ -19,7 +19,7 @@ class BaseViewImpl: ShardViewImpl {
     internal var borderColor = UIColor.clear
     internal var borderWidth = Float(0)
     internal var borderRadius = Float(0)
-    internal var clickHandler: (() -> ())? = nil
+    internal var tapHandler:  ((_ sender: UITapGestureRecognizer) -> ())? = nil
     
     var delegate: ShardViewImplDelegate?
     
@@ -52,7 +52,17 @@ class BaseViewImpl: ShardViewImpl {
         case "on-click":
             let value = try value.asObject()
             let action = try value["action"]!.asString()
-            self.clickHandler = { self.context.dispatch(action: action, value: value["value"]) }
+            
+            self.tapHandler = { sender -> () in
+                switch sender.state {
+                case .began:
+                    self.delegate?.setState(.Pressed)
+                case .ended:
+                    self.delegate?.setState(.Default)
+                    self.context.dispatch(action: action, value: value["value"])
+                default: ()
+                }
+            }
             
         default: ()
         }
@@ -76,7 +86,7 @@ class BaseViewImpl: ShardViewImpl {
         view.layer.borderWidth = CGFloat(borderWidth)
         view.layer.cornerRadius = borderRadius.isInfinite ? min(view.frame.width, view.frame.height) / 2 : CGFloat(borderRadius)
         
-        if (self.clickHandler != nil) {
+        if (self.tapHandler != nil) {
             view.removeGestureRecognizer(self.tapGestureRecognizer)
             view.addGestureRecognizer(self.tapGestureRecognizer)
         }
@@ -84,11 +94,8 @@ class BaseViewImpl: ShardViewImpl {
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         switch sender.state {
-        case .began:
-            self.delegate?.setState(.Pressed)
-        case .ended:
-            self.delegate?.setState(.Default)
-            self.clickHandler?()
+        case .began, .ended:
+            self.tapHandler?(sender)
         default: ()
         }
     }
