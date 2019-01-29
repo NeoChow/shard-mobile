@@ -79,7 +79,6 @@ internal class TextViewImpl: BaseViewImpl {
         
         let view = view as! UILabel
         view.attributedText = textWithLineHeight()
-        
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
     }
@@ -204,7 +203,6 @@ internal class TextViewImpl: BaseViewImpl {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = .byWordWrapping
         paragraphStyle.lineHeightMultiple = CGFloat(lineHeightMultiple)
-        paragraphStyle.alignment = textAlignment
         
         string.addAttribute(
             .paragraphStyle,
