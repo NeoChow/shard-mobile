@@ -9,11 +9,17 @@ import UIKit
 
 private let systemFont = UIFont.systemFont(ofSize: 12)
 
+internal struct SubstringTapEvent {
+    var range: NSRange
+    var handler: () -> ()
+}
+
 internal class TextViewImpl: BaseViewImpl {
     internal var text: NSAttributedString = NSAttributedString()
     internal var numberOfLines: Int = -1
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
+    private var tapEvents: [SubstringTapEvent] = []
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -36,6 +42,27 @@ internal class TextViewImpl: BaseViewImpl {
             default: self.textAlignment = .left
             }
         default: ()
+        }
+        
+        self.tapHandler = { sender -> () in
+            let label = sender.view as! UILabel
+            let charIndex = sender.tappedCharInAttributedText(inLabel: label)
+            
+            if charIndex == nil {
+                return
+            }
+            
+            for tapEvent in self.tapEvents {
+                if charIndex != nil && NSLocationInRange(charIndex!, tapEvent.range) {
+                    switch sender.state {
+                    case .began: () // TODO: Handle substring pressed state
+                    case .ended:
+                        tapEvent.handler()
+                        return
+                    default: ()
+                    }
+                }
+            }
         }
     }
     
@@ -153,7 +180,7 @@ internal class TextViewImpl: BaseViewImpl {
             }
         }
         
-        try props.get("link") {
+        try props.get("on-click") {
             switch $0 {
             case .Null: ()
             case let value:
@@ -161,22 +188,11 @@ internal class TextViewImpl: BaseViewImpl {
                 let action = try value["action"]!.asString()
                 let range = NSRange(location: location ?? 0, length: string.length)
                 
-                self.tapHandler = { sender -> () in
-                    let label = sender.view as! UILabel
-                    let charIndex = sender.tappedCharInAttributedText(inLabel: label)
-                    
-                    if charIndex != nil && NSLocationInRange(charIndex!, range) {
-                        switch sender.state {
-                        case .began:
-                            self.delegate?.setState(.Pressed)
-                        case .ended:
-                            self.delegate?.setState(.Default)
-                            //self.context.dispatch(action: action, value: value["value"])
-                            print("Trigger event: \(action):\(try! value["value"]!.asString())")
-                        default: ()
-                        }
-                    }
-                }
+                let tapEvent = SubstringTapEvent(range: range, handler: {
+                    self.context.dispatch(action: action, value: value["value"])
+                })
+                
+                tapEvents = tapEvents + [tapEvent]
             }
         }
         
