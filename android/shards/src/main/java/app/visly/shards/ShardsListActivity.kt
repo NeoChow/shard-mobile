@@ -299,7 +299,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 if (position == 1) {
                     vh.label.text = activity.getString(R.string.examples)
                 } else {
-                    vh.label.text = activity.getString(R.string.previous_shards)
+                    vh.label.text = activity.getString(R.string.my_shards)
                 }
             }
 
