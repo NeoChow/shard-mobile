@@ -19,7 +19,7 @@ internal class TextViewImpl: BaseViewImpl {
     internal var numberOfLines: Int = -1
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
-    private var tapEvents: [SubstringTapEvent] = []
+    internal var tapEvents: [SubstringTapEvent] = []
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -29,6 +29,8 @@ internal class TextViewImpl: BaseViewImpl {
     
     override func setProp(key: String, value: JsonValue) throws {
         try super.setProp(key: key, value: value)
+        
+        tapEvents = []
         
         switch key {
         case "span": self.text = try attributedString(from: try value.asObject(), attributes: [:])
