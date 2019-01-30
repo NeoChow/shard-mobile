@@ -83,6 +83,23 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    @objc func onAddButtonPressed() {
+        let addAlert = UIAlertController(title: "Enter a shard id:", message: nil, preferredStyle: .alert)
+        
+        func configurationTextField(textField: UITextField!) {}
+        
+        addAlert.addTextField(configurationHandler: configurationTextField)
+        addAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
+            if let textField = addAlert.textFields?[0] {
+                print("Shard id: \(textField.text)")
+            }
+        }))
+        
+        addAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(addAlert, animated: true, completion: nil)
+    }
+    
     @objc func onClearButtonPressed() {
         let clearAlert = UIAlertController(title: "Are you sure you want to clear previous shards?", message: nil, preferredStyle: .alert)
         
@@ -129,6 +146,8 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             
             addButton.centerYAnchor.constraint(equalTo: header.layoutMarginsGuide.centerYAnchor).isActive = true
             addButton.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor).isActive = true
+            
+            addButton.addTarget(self, action: #selector(onAddButtonPressed), for: .touchUpInside)
         }
     }
     
@@ -226,7 +245,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     // MARK: - AlertLauncherDelegate
-
+    
     func didDismiss() {
         self.scanVC.paused = false
     }
