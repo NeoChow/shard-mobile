@@ -81,6 +81,18 @@ internal class TextViewImpl: BaseViewImpl {
         view.attributedText = textWithLineHeight()
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
+        view.backgroundColor = UIColor.yellow
+        
+        let size = view.attributedText!.size()
+        let baselineOffset = size.height * CGFloat(lineHeightMultiple - 1) / 2
+        print("baselineOffset: \(baselineOffset)")
+        print("string.size(): \(size)")
+        
+        /*string.addAttribute(
+         .baselineOffset,
+         value: baselineOffset,
+         range: NSRange(location: 0, length: string.length)
+         )*/
     }
     
     func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any], location: Int? = nil) throws -> NSAttributedString {
@@ -207,7 +219,8 @@ internal class TextViewImpl: BaseViewImpl {
         string.addAttribute(
             .paragraphStyle,
             value: paragraphStyle,
-            range: NSRange(location: 0, length: string.length))
+            range: NSRange(location: 0, length: string.length)
+        )
         
         return string
     }
