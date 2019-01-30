@@ -83,6 +83,22 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    func loadShard(url: URL) {
+        fetchData(url: url) { json in
+            do {
+                let new = try self.shardHandler.create(json: json, type: .Default)
+                
+                let updated = try self.shardHandler.get(type: .Default)
+                self.previous = updated
+                self.tableView.reloadData()
+                
+                self.alertLauncher.load(withShard: new)
+            } catch {
+                print("Unexpected error: \(error).")
+            }
+        }
+    }
+    
     @objc func onAddButtonPressed() {
         let addAlert = UIAlertController(title: "Enter a shard id:", message: nil, preferredStyle: .alert)
         
@@ -91,7 +107,11 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         addAlert.addTextField(configurationHandler: configurationTextField)
         addAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
             if let textField = addAlert.textFields?[0] {
-                print("Shard id: \(textField.text)")
+                guard let shardId = textField.text, let url = URL(string: "https://playground.shardlib.com/api/shards/\(shardId)/latest") else {
+                    return
+                }
+                
+                self.loadShard(url: url)
             }
         }))
         
@@ -228,20 +248,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     func didScan(url: URL) {
         self.scanVC.paused = true
-        
-        fetchData(url: url) { json in
-            do {
-                let new = try self.shardHandler.create(json: json, type: .Default)
-                
-                let updated = try self.shardHandler.get(type: .Default)
-                self.previous = updated
-                self.tableView.reloadData()
-                
-                self.alertLauncher.load(withShard: new)
-            } catch {
-                print("Unexpected error: \(error).")
-            }
-        }
+        self.loadShard(url: url)
     }
     
     // MARK: - AlertLauncherDelegate
