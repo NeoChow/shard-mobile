@@ -12,10 +12,14 @@ import SafariServices
 class ShardsTableViewController: UITableViewController, ScanViewControllerDelegate, AlertLauncherDelegate {
     let SECTION_EXAMPLES = 0
     let SECTION_PREVIOUS = 1
+    let HEADER_FOOTER_HEIGHT: CGFloat = 44
     
     let scanVC = ScanViewController()
     let alertLauncher = AlertLauncher()
     let shardHandler = ShardHandler()
+    
+    let addButton = UIButton(type: .system)
+    let clearButton = UIButton(type: .system)
     
     var examples: [Shard] = []
     var previous: [Shard] = []
@@ -63,6 +67,22 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         task.resume()
     }
     
+    func loadShard(url: URL) {
+        fetchData(url: url) { json in
+            do {
+                let new = try self.shardHandler.create(json: json, type: .Default)
+                
+                let updated = try self.shardHandler.get(type: .Default)
+                self.previous = updated
+                self.tableView.reloadData()
+                
+                self.alertLauncher.load(withShard: new)
+            } catch {
+                print("Unexpected error: \(error).")
+            }
+        }
+    }
+    
     func loadExamples() {
         fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { json in
             let storedExamples = self.examples
@@ -80,22 +100,6 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             }
             
             self.tableView.reloadData()
-        }
-    }
-    
-    func loadShard(url: URL) {
-        fetchData(url: url) { json in
-            do {
-                let new = try self.shardHandler.create(json: json, type: .Default)
-                
-                let updated = try self.shardHandler.get(type: .Default)
-                self.previous = updated
-                self.tableView.reloadData()
-                
-                self.alertLauncher.load(withShard: new)
-            } catch {
-                print("Unexpected error: \(error).")
-            }
         }
     }
     
@@ -155,12 +159,15 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return HEADER_FOOTER_HEIGHT
+    }
+    
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         if (section == SECTION_PREVIOUS) {
             let header = view as! UITableViewHeaderFooterView
             
-            let addButton = UIButton(type: .system)
-            addButton.setTitle("Add +", for: .normal)
+            addButton.setTitle("Add", for: .normal)
             header.addSubview(addButton)
             addButton.translatesAutoresizingMaskIntoConstraints = false
             
@@ -172,27 +179,26 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == SECTION_PREVIOUS && previous.count > 0 ? 60 : 20
+        return HEADER_FOOTER_HEIGHT
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UITableViewHeaderFooterView(frame: tableView.frame)
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         if section == SECTION_PREVIOUS && previous.count > 0 {
-            let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 60))
+            let footer = view as! UITableViewHeaderFooterView
             
-            let clearButton = UIButton(type: .system)
             clearButton.setTitle("Clear", for: .normal)
-            clearButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
-            clearButton.addTarget(self, action: #selector(onClearButtonPressed), for: .touchUpInside)
-            
-            clearButton.translatesAutoresizingMaskIntoConstraints = false
             footer.addSubview(clearButton)
+            clearButton.translatesAutoresizingMaskIntoConstraints = false
+            
             clearButton.centerYAnchor.constraint(equalTo: footer.layoutMarginsGuide.centerYAnchor).isActive = true
             clearButton.trailingAnchor.constraint(equalTo: footer.layoutMarginsGuide.trailingAnchor).isActive = true
             
-            return footer
+            clearButton.addTarget(self, action: #selector(onClearButtonPressed), for: .touchUpInside)
         }
-        
-        return nil
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
