@@ -118,6 +118,20 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         }
     }
     
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        if (section == SECTION_PREVIOUS) {
+            let header = view as! UITableViewHeaderFooterView
+            
+            let addButton = UIButton(type: .system)
+            addButton.setTitle("Add +", for: .normal)
+            header.addSubview(addButton)
+            addButton.translatesAutoresizingMaskIntoConstraints = false
+            
+            addButton.centerYAnchor.constraint(equalTo: header.layoutMarginsGuide.centerYAnchor).isActive = true
+            addButton.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor).isActive = true
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return section == SECTION_PREVIOUS && previous.count > 0 ? 60 : 20
     }
