@@ -153,7 +153,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         case SECTION_EXAMPLES:
             return "Examples"
         case SECTION_PREVIOUS:
-            return "Previous shards"
+            return "My shards"
         default:
             return nil
         }
