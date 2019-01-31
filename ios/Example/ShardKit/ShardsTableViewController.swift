@@ -45,7 +45,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
             
             self.tableView.reloadData()
         } catch {
-            print("Unexpected error: \(error).")
+            didRecieveError("Unexpected error.", error.localizedDescription)
         }
         
         loadExamples()
@@ -55,28 +55,44 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
         self.scanVC.paused = false
     }
     
-    func fetchData(url: URL, onComplete: @escaping (JsonValue) -> ()) {
+    func fetchData(url: URL, onComplete: @escaping (Result<JsonValue>) -> ()) {
         let task = URLSession.shared.dataTask(with: url) { data, response, httpError in
-            let json = JsonValue(try! JSONSerialization.jsonObject(with: data!, options: []))
-            DispatchQueue.main.async { onComplete(json) }
+            guard httpError == nil else {
+                DispatchQueue.main.async { onComplete(Result.Failure(httpError!)) }
+                
+                return
+            }
+            
+            do {
+                let json = JsonValue(try JSONSerialization.jsonObject(with: data!, options: []))
+                DispatchQueue.main.async { onComplete(Result.Success(json)) }
+            } catch let error {
+                DispatchQueue.main.async { onComplete(Result.Failure(error)) }
+            }
         }
+        
         task.resume()
     }
     
     func loadExamples() {
-        fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { json in
+        fetchData(url: URL(string: "https://playground.shardlib.com/api/shards/examples")!) { result in
             let storedExamples = self.examples
-            self.examples = []
             
-            do {
-                let result = try json.asArray()
-                for json in result {
-                    let shard = try self.shardHandler.create(json: json, type: .Example)
-                    self.examples = self.examples + [shard]
+            switch(result) {
+            case .Success(let json):
+                do {
+                    self.examples = []
+                    let result = try json.asArray()
+                    for json in result {
+                        let shard = try self.shardHandler.create(json: json, type: .Example)
+                        self.examples = self.examples + [shard]
+                    }
+                } catch {
+                    print("Unexpected error. \(error.localizedDescription)")
+                    self.examples = storedExamples
                 }
-            } catch {
-                print("Unexpected error: \(error).")
-                self.examples = storedExamples
+            case .Failure(let error):
+                print("Unexpected error. \(error.localizedDescription)")
             }
             
             self.tableView.reloadData()
@@ -92,7 +108,7 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
                 self.previous = []
                 self.tableView.reloadData()
             } catch {
-                print("Unexpected error: \(error).")
+                self.didRecieveError("Unexpected error.", error.localizedDescription)
             }
         }))
         
@@ -196,23 +212,28 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     func didScan(url: URL) {
         self.scanVC.paused = true
         
-        fetchData(url: url) { json in
-            do {
-                let new = try self.shardHandler.create(json: json, type: .Default)
-                
-                let updated = try self.shardHandler.get(type: .Default)
-                self.previous = updated
-                self.tableView.reloadData()
-                
-                self.alertLauncher.load(withShard: new)
-            } catch {
-                print("Unexpected error: \(error).")
+        fetchData(url: url) { result in
+            switch(result) {
+            case .Success(let json):
+                do {
+                    let new = try self.shardHandler.create(json: json, type: .Default)
+                    
+                    let updated = try self.shardHandler.get(type: .Default)
+                    self.previous = updated
+                    self.tableView.reloadData()
+                    
+                    self.alertLauncher.load(withShard: new)
+                } catch {
+                    self.didRecieveError("Could not load Shard.", error.localizedDescription)
+                }
+            case .Failure(let error):
+                self.didRecieveError("Could not load Shard.", error.localizedDescription)
             }
         }
     }
     
     // MARK: - AlertLauncherDelegate
-
+    
     func didDismiss() {
         self.scanVC.paused = false
     }
@@ -223,7 +244,9 @@ class ShardsTableViewController: UITableViewController, ScanViewControllerDelega
     
     func didRecieveError(_ title: String, _ message: String) {
         let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        errorAlert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        errorAlert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: { _ in
+            self.scanVC.paused = false
+        }))
         self.present(errorAlert, animated: true, completion: nil)
     }
 }
