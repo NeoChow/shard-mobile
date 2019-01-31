@@ -14,6 +14,22 @@ internal struct SubstringTapEvent {
     var handler: () -> ()
 }
 
+internal class CustomUILabel: UILabel {
+    internal var lineHeightMultiple = Float(1)
+    
+    override func drawText(in rect: CGRect) {
+        if lineHeightMultiple != 1, let string = self.attributedText {
+            let height = string.size().height
+            
+            let offset = ((height / CGFloat(lineHeightMultiple)) - height) / 2
+            
+            super.drawText(in: rect.offsetBy(dx: 0, dy: offset))
+        } else {
+            super.drawText(in: rect)
+        }
+    }
+}
+
 internal class TextViewImpl: BaseViewImpl {
     internal var text: NSAttributedString = NSAttributedString()
     internal var numberOfLines: Int = -1
@@ -67,7 +83,7 @@ internal class TextViewImpl: BaseViewImpl {
     }
     
     override func createView() -> UIView {
-        let label = UILabel()
+        let label = CustomUILabel()
         label.textColor = .black
         label.font = systemFont
         label.isUserInteractionEnabled = true
@@ -77,22 +93,11 @@ internal class TextViewImpl: BaseViewImpl {
     override func bindView(_ view: UIView) {
         super.bindView(view)
         
-        let view = view as! UILabel
+        let view = view as! CustomUILabel
         view.attributedText = textWithLineHeight()
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
-        view.backgroundColor = UIColor.yellow
-        
-        let size = view.attributedText!.size()
-        let baselineOffset = size.height * CGFloat(lineHeightMultiple - 1) / 2
-        print("baselineOffset: \(baselineOffset)")
-        print("string.size(): \(size)")
-        
-        /*string.addAttribute(
-         .baselineOffset,
-         value: baselineOffset,
-         range: NSRange(location: 0, length: string.length)
-         )*/
+        view.lineHeightMultiple = self.lineHeightMultiple
     }
     
     func attributedString(from props: [String: JsonValue], attributes: [NSAttributedString.Key : Any], location: Int? = nil) throws -> NSAttributedString {
