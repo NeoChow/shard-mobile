@@ -17,8 +17,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.TextView
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -35,8 +33,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IllegalArgumentException
 import android.view.*
-import android.widget.FrameLayout
-import android.widget.PopupWindow
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import app.visly.shard.JsonValue
 import app.visly.shard.ShardRootView
@@ -207,20 +204,19 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
 
     private val addShardDialog: AlertDialog = activity.let {
         val builder = AlertDialog.Builder(it)
+        val contentView = inflater.inflate(R.layout.add_shard_input, null, false)
+        val inputField = contentView.findViewById<EditText>(R.id.input)
 
         builder.apply {
             setTitle(R.string.enter_shard_id)
 
-            setView(inflater.inflate(R.layout.add_shard_input, null, false))
+            setView(contentView)
 
-            setPositiveButton(R.string.ok,
-                    DialogInterface.OnClickListener { dialog, id ->
-                        Log.d("Shards", "User tapped ok")
-                    })
-            setNegativeButton(R.string.cancel,
-                    DialogInterface.OnClickListener { dialog, id ->
-                        Log.d("Shards", "User tapped cancel")
-                    })
+            setPositiveButton(R.string.ok) { dialog, id ->
+                loadShard(inputField.text.toString(), "latest")
+            }
+
+            setNegativeButton(R.string.cancel, null)
         }
 
         builder.create()
@@ -257,6 +253,34 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
         }
     }
 
+    fun loadShard(instance: String, revision: String) {
+        ShardService.instance.getShard(instance, revision).enqueue(object : Callback<Shard> {
+            override fun onResponse(call: Call<Shard>, response: Response<Shard>) {
+                val shard = response.body()!!
+
+                val handler = Handler(Looper.getMainLooper())
+                GlobalScope.launch {
+                    ShardsDatabase.instance(activity)?.apply {
+                        with(shardDao()) {
+                            try {
+                                insertShard(shard)
+                                handler.post {
+                                    shards.add(0, shard)
+                                    notifyItemInserted(0)
+                                }
+                            } catch (ignored: Exception) {
+                            }
+                        }
+                    }
+                }
+
+                activity.showShard(shard)
+            }
+
+            override fun onFailure(call: Call<Shard>, t: Throwable) {}
+        })
+    }
+
     override fun getItemId(position: Int): Long {
         return when (position) {
             0 -> ID_SCANNER
@@ -289,34 +313,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                 vh.scanner.setHasPermission(cameraPermissionGranted)
                 vh.scanner.delegate.didRequestPermission = activity::didRequestPermission
                 vh.scanner.delegate.didScanShard = { instance, revision ->
-                    if (!activity.showingShard) {
-                        activity.showingShard = true
-
-                        ShardService.instance.getShard(instance, revision).enqueue(object: Callback<Shard> {
-                            override fun onResponse(call: Call<Shard>, response: Response<Shard>) {
-                                val shard = response.body()!!
-
-                                val handler = Handler(Looper.getMainLooper())
-                                GlobalScope.launch {
-                                    ShardsDatabase.instance(activity)?.apply {
-                                        with(shardDao()) {
-                                            try {
-                                                insertShard(shard)
-                                                handler.post {
-                                                    shards.add(0, shard)
-                                                    notifyItemInserted(0)
-                                                }
-                                            } catch (ignored: Exception) { }
-                                        }
-                                    }
-                                }
-
-                                activity.showShard(shard)
-                            }
-
-                            override fun onFailure(call: Call<Shard>, t: Throwable) {}
-                        })
-                    }
+                    loadShard(instance, revision)
                 }
             }
 
