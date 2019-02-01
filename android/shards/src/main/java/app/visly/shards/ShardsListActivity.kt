@@ -8,6 +8,7 @@
 package app.visly.shards
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -36,6 +37,7 @@ import java.lang.IllegalArgumentException
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.PopupWindow
+import androidx.appcompat.app.AlertDialog
 import app.visly.shard.JsonValue
 import app.visly.shard.ShardRootView
 import app.visly.shard.ShardViewManager
@@ -203,6 +205,27 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
     private val inflater = LayoutInflater.from(activity)
     private var cameraPermissionGranted: Boolean = false
 
+    private val addShardDialog: AlertDialog = activity.let {
+        val builder = AlertDialog.Builder(it)
+
+        builder.apply {
+            setTitle(R.string.enter_shard_id)
+
+            setView(inflater.inflate(R.layout.add_shard_input, null, false))
+
+            setPositiveButton(R.string.ok,
+                    DialogInterface.OnClickListener { dialog, id ->
+                        Log.d("Shards", "User tapped ok")
+                    })
+            setNegativeButton(R.string.cancel,
+                    DialogInterface.OnClickListener { dialog, id ->
+                        Log.d("Shards", "User tapped cancel")
+                    })
+        }
+
+        builder.create()
+    }
+
     init {
         setHasStableIds(true)
     }
@@ -305,7 +328,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
                     vh.label.text = activity.getString(R.string.my_shards)
                     vh.button.text = activity.getString(R.string.add_shard)
                     vh.button.setOnClickListener {
-                        addShard()
+                        this.addShardDialog.show()
                     }
                 }
             }
@@ -324,9 +347,5 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
     fun setPermissionGranted(granted: Boolean) {
         this.cameraPermissionGranted = granted
         notifyItemChanged(0)
-    }
-
-    fun addShard() {
-        Log.d("Shard", "Add shard pressed")
     }
 }

@@ -6,4 +6,7 @@
     <string name="add_shard">Add shard</string>
     <string name="refresh">Refresh</string>
     <string name="localhost">Localhost</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_shard_id">Enter a shard id:</string>
 </resources>
