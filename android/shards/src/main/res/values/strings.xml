@@ -3,6 +3,7 @@
     <string name="my_shards">My shards</string>
     <string name="examples">Examples</string>
     <string name="camera_access">Allow camera access</string>
+    <string name="add_shard">Add shard</string>
     <string name="refresh">Refresh</string>
     <string name="localhost">Localhost</string>
 </resources>

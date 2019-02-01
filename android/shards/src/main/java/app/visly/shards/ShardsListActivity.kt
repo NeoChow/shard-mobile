@@ -17,6 +17,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.TextView
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -179,6 +180,7 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
 
     class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val label: TextView = view.findViewById(R.id.label)
+        val button: Button = view.findViewById(R.id.button)
     }
 
     class ShardViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -298,8 +300,13 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
             is HeaderViewHolder -> {
                 if (position == 1) {
                     vh.label.text = activity.getString(R.string.examples)
+                    vh.button.visibility = View.GONE
                 } else {
                     vh.label.text = activity.getString(R.string.my_shards)
+                    vh.button.text = activity.getString(R.string.add_shard)
+                    vh.button.setOnClickListener {
+                        addShard()
+                    }
                 }
             }
 
@@ -317,5 +324,9 @@ class ShardsListAdapter(val activity: ShardsListActivity): RecyclerView.Adapter<
     fun setPermissionGranted(granted: Boolean) {
         this.cameraPermissionGranted = granted
         notifyItemChanged(0)
+    }
+
+    fun addShard() {
+        Log.d("Shard", "Add shard pressed")
     }
 }
