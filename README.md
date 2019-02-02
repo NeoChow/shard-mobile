@@ -8,9 +8,17 @@ This repo contains both the Android and iOS libraries for Shard written in Kotli
 
 ## Getting started
 ### Android
-To get started using Shard in your Android app just add the Shard core dependency.
+To get started using Shard in your Android app just add the Shard core dependency. Also make sure to configure abi splits to ensure that only the required native libraries are bundled in your apk.
 
 ```groovy
+android {
+    splits {
+        abi {
+            enable true
+        }
+    }
+}
+
 dependencies {
     implementation 'app.visly.shard:core:0.1.5'
 }
