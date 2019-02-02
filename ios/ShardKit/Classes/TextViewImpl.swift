@@ -7,7 +7,7 @@
 
 import UIKit
 
-private let systemFont = UIFont.systemFont(ofSize: 12)
+private let systemFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
 
 internal struct SubstringTapEvent {
     var range: NSRange
@@ -20,6 +20,13 @@ internal class TextViewImpl: BaseViewImpl {
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
     internal var tapEvents: [SubstringTapEvent] = []
+    internal var fontCollection: FontCollection = [:]
+    
+    init(_ context: ShardContext, _ fontCollection: FontCollection) {
+        super.init(context)
+        
+        self.fontCollection = fontCollection
+    }
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -30,10 +37,10 @@ internal class TextViewImpl: BaseViewImpl {
     override func setProp(key: String, value: JsonValue) throws {
         try super.setProp(key: key, value: value)
         
-        tapEvents = []
-        
         switch key {
-        case "span": self.text = try attributedString(from: try value.asObject(), attributes: [:])
+        case "span":
+            tapEvents = []
+            self.text = try attributedString(from: try value.asObject(), attributes: [:])
         case "max-lines": self.numberOfLines = Int(try value.asNumber())
         case "line-height": self.lineHeightMultiple = try value.asObject()["value"]!.asNumber()
         case "text-align":
@@ -89,23 +96,32 @@ internal class TextViewImpl: BaseViewImpl {
         var attributes = attributes
         let currentFont = attributes[.font] as! UIFont?
         
-        let family: String = try props.get("font-family") {
-            switch $0 {
-            case .String(let value):
-                if !UIFont.familyNames.contains(value) {
-                    throw "Unexpected value for font-family: \(value)"
-                }
-                return value
-            case .Null: return currentFont?.familyName ?? systemFont.familyName
-            case let value: throw "Unexpected value for font-family: \(value)"
-            }
-        }
-        
         let size: CGFloat = try props.get("font-size") {
             switch $0 {
             case .Object(let value): return CGFloat(try value.asDimension())
             case .Null: return currentFont?.pointSize ?? systemFont.pointSize
             case let value: throw "Unexpected value for font-size: \(value)"
+            }
+        }
+        
+        let font: UIFont = try props.get("font-family") {
+            switch $0 {
+            case .String(let value):
+                if let registeredFont = fontCollection[value] {
+                    return registeredFont(size)
+                } else {
+                    if let nativeFont = UIFont(name: value, size: size) {
+                        return nativeFont
+                    } else {
+                        throw "Unexpected value for font-family: \(value)"
+                    }
+                }
+                
+            case .Null:
+                let fontName = currentFont?.fontName ?? systemFont.fontName
+                return UIFont(name: fontName, size: size) ?? systemFont
+                
+            case let value: throw "Unexpected value for font-family: \(value)"
             }
         }
         
@@ -146,10 +162,11 @@ internal class TextViewImpl: BaseViewImpl {
                 }
             }
             
-            let descriptor = UIFontDescriptor(fontAttributes: [.family: family]).withSymbolicTraits(traits)!
+            let descriptor = font.fontDescriptor.withSymbolicTraits(traits) ?? font.fontDescriptor
+            
             attributes[.font] = UIFont(descriptor: descriptor, size: size)
-        } else if attributes[.font] == nil {
-            attributes[.font] = UIFont(name: family, size: size)
+        } else {
+            attributes[.font] = font
         }
         
         try props.get("font-color") {

@@ -35,6 +35,7 @@ private func shard_view_manager_create_view(
 }
 
 public typealias ViewImplFactory = (ShardContext) -> ShardViewImpl
+public typealias FontCollection = Dictionary<String, (_ size: CGFloat) -> UIFont>
 
 public class ShardViewManager {
     public static let shared = ShardViewManager()
@@ -43,13 +44,15 @@ public class ShardViewManager {
     internal var rust_ptr: OpaquePointer! = nil
     internal var implFactories: Dictionary<String, ViewImplFactory> = [:]
     
+    internal var fonts: FontCollection = [:]
+    
     private init() {
         let self_ptr = Unmanaged.passUnretained(self).toOpaque()
         self.rust_ptr = shard_view_manager_new(self_ptr, shard_view_manager_create_view)
         
         setViewImpl("flexbox", { FlexboxViewImpl($0) })
         setViewImpl("image", { ImageViewImpl($0) })
-        setViewImpl("text", { TextViewImpl($0) })
+        setViewImpl("text", { TextViewImpl($0, self.fonts) })
         setViewImpl("scroll", { ScrollViewImpl($0) })
         setViewImpl("solid-color", { SolidColorViewImpl($0) })
     }
@@ -60,6 +63,10 @@ public class ShardViewManager {
     
     public func setViewImpl(_ kind: String, _ factory: @escaping ViewImplFactory) {
         self.implFactories[kind] = factory
+    }
+    
+    public func registerFont(_ key: String, _ font: @escaping (_ size: CGFloat) -> UIFont) {
+        self.fonts[key] = font
     }
     
     func createView(context: ShardContext, kind: String) -> ShardView {
