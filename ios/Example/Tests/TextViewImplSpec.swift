@@ -11,7 +11,7 @@ import Nimble
 
 class TextViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = TextViewImpl(ShardContext())
+        let viewimpl = TextViewImpl(ShardContext(), [:])
         
         it("should set text align to start") {
             try! viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))
@@ -115,6 +115,38 @@ class TextViewImplSpec: QuickSpec {
             
             expect(result[0].range.location).to(equal("Hello ".count))
             expect(result[0].range.length).to(equal("world!".count))
+        }
+        
+        it("should use registered font") {
+            func registeredFont(_ size: CGFloat) -> UIFont {
+                return UIFont(name: "Helvetica", size: size)!
+            }
+            let viewimpl = TextViewImpl(ShardContext(), ["Registered-Font":registeredFont])
+            
+            try! viewimpl.setProp(key: "span", value: JsonValue.Object([
+                "text": JsonValue.String("Hello world!"),
+                "font-family": JsonValue.String("Registered-Font")
+                ]))
+            
+            let font = viewimpl.text.attribute(.font, at: 0, effectiveRange: nil) as! UIFont
+            expect(font.fontName).to(equal("Helvetica"))
+        }
+        
+        it("should throw error if used font is unregistered") {
+            let viewimpl = TextViewImpl(ShardContext(), [:])
+            
+            var errorResult: Error?
+            
+            do {
+                try viewimpl.setProp(key: "span", value: JsonValue.Object([
+                    "text": JsonValue.String("Hello world!"),
+                    "font-family": JsonValue.String("Registered-Font")
+                    ]))
+            } catch {
+                errorResult = error
+            }
+            
+            expect(errorResult).notTo(beNil())
         }
     }
 }
