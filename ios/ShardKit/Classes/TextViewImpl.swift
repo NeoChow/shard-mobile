@@ -14,7 +14,12 @@ internal struct SubstringTapEvent {
     var handler: () -> ()
 }
 
-internal class CustomUILabel: UILabel {
+// It seems like setting lineHeightMultiple (as a paragraph attribute on an
+// attributed string) isn't shifting the top of the lines, but the center. This
+// means that the text won't be vertical aligned in the UILabel. This UILabel
+// subclass will fix this problem by setting an offset on the rect in the
+// drawRect method.
+internal class LineHeightFixUILabel: UILabel {
     internal var lineHeightMultiple = Float(1)
     
     override func drawText(in rect: CGRect) {
@@ -83,7 +88,7 @@ internal class TextViewImpl: BaseViewImpl {
     }
     
     override func createView() -> UIView {
-        let label = CustomUILabel()
+        let label = LineHeightFixUILabel()
         label.textColor = .black
         label.font = systemFont
         label.isUserInteractionEnabled = true
@@ -93,7 +98,7 @@ internal class TextViewImpl: BaseViewImpl {
     override func bindView(_ view: UIView) {
         super.bindView(view)
         
-        let view = view as! CustomUILabel
+        let view = view as! LineHeightFixUILabel
         view.attributedText = textWithLineHeight()
         view.textAlignment = self.textAlignment
         view.numberOfLines = self.numberOfLines
