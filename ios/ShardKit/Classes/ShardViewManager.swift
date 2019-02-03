@@ -52,7 +52,7 @@ public class ShardViewManager {
         
         setViewImpl("flexbox", { FlexboxViewImpl($0) })
         setViewImpl("image", { ImageViewImpl($0) })
-        setViewImpl("text", { TextViewImpl($0, self.fonts) })
+        setViewImpl("text", { TextViewImpl($0) })
         setViewImpl("scroll", { ScrollViewImpl($0) })
         setViewImpl("solid-color", { SolidColorViewImpl($0) })
     }
@@ -116,7 +116,7 @@ public class ShardViewManager {
     }
     
     public func loadJson(_ json: String) -> Result<ShardRoot> {
-        let context = ShardContext()
+        let context = ShardContext(fontCollection: fonts)
         let context_ptr = Unmanaged.passUnretained(context).toOpaque()
         
         var error: UnsafePointer<Int8>? = nil

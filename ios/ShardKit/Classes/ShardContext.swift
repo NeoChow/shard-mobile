@@ -14,7 +14,13 @@ internal protocol ShardContextDelegate {
 public class ShardContext {
     internal var delegate: ShardContextDelegate? = nil
     
+    private(set) public var fontCollection: FontCollection
+    
     public func dispatch(action: String, value: JsonValue?) {
         delegate?.onActionDispatched(action: action, value: value)
+    }
+    
+    init(fontCollection: FontCollection = [:]) {
+        self.fontCollection = fontCollection
     }
 }

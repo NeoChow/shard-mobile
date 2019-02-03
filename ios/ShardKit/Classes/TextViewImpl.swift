@@ -20,13 +20,6 @@ internal class TextViewImpl: BaseViewImpl {
     internal var textAlignment: NSTextAlignment = .left
     internal var lineHeightMultiple = Float(1)
     internal var tapEvents: [SubstringTapEvent] = []
-    internal var fontCollection: FontCollection = [:]
-    
-    init(_ context: ShardContext, _ fontCollection: FontCollection) {
-        super.init(context)
-        
-        self.fontCollection = fontCollection
-    }
     
     override func measure(width: CGFloat?, height: CGFloat?) -> CGSize {
         let constraint = CGSize(width: width ?? CGFloat.greatestFiniteMagnitude, height: height ?? CGFloat.greatestFiniteMagnitude)
@@ -107,7 +100,7 @@ internal class TextViewImpl: BaseViewImpl {
         let font: UIFont = try props.get("font-family") {
             switch $0 {
             case .String(let value):
-                if let registeredFont = fontCollection[value] {
+                if let registeredFont = context.fontCollection[value] {
                     return registeredFont(size)
                 } else {
                     if let nativeFont = UIFont(name: value, size: size) {

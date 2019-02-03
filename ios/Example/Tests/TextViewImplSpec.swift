@@ -11,7 +11,7 @@ import Nimble
 
 class TextViewImplSpec: QuickSpec {
     override func spec() {
-        let viewimpl = TextViewImpl(ShardContext(), [:])
+        let viewimpl = TextViewImpl(ShardContext())
         
         it("should set text align to start") {
             try! viewimpl.setProp(key: "text-align", value: JsonValue.String("start"))
@@ -121,7 +121,7 @@ class TextViewImplSpec: QuickSpec {
             func registeredFont(_ size: CGFloat) -> UIFont {
                 return UIFont(name: "Helvetica", size: size)!
             }
-            let viewimpl = TextViewImpl(ShardContext(), ["Registered-Font":registeredFont])
+            let viewimpl = TextViewImpl(ShardContext(fontCollection: ["Registered-Font":registeredFont]))
             
             try! viewimpl.setProp(key: "span", value: JsonValue.Object([
                 "text": JsonValue.String("Hello world!"),
@@ -133,7 +133,7 @@ class TextViewImplSpec: QuickSpec {
         }
         
         it("should throw error if used font is unregistered") {
-            let viewimpl = TextViewImpl(ShardContext(), [:])
+            let viewimpl = TextViewImpl(ShardContext())
             
             var errorResult: Error?
             
